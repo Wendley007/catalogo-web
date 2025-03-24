@@ -7,12 +7,12 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../services/firebaseConnection";
 
 const Home = () => {
-  const [loading, setLoading] = useState(true); // Estado de carregamento
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function handleLogout() {
       await signOut(auth);
-      setLoading(false); // Define o carregamento como falso após a saída
+      setLoading(false);
     }
 
     handleLogout();
@@ -28,11 +28,11 @@ const Home = () => {
 
   return (
     <div
-      className="bg-cover bg-no-repeat bg-center bg-fixed h-screen"
+      className="relative bg-cover bg-no-repeat bg-center h-full"
       style={{ backgroundImage: `url(${fundo})` }}
     >
       <div
-        className="absolute bottom-0 left-0 right-0 top-0 h-full w-full overflow-hidden"
+        className="w-full min-h-screen flex justify-center items-center flex-col gap-4"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.75)" }}
       >
         <div className="flex h-full items-center justify-center">

@@ -166,7 +166,7 @@ const TodasCategorias = () => {
             </Link>
           )}
         </div>
-        <section className="bg-gray-400 bg-opacity-35 p-2 -mt-8 mb-12 rounded-lg w-full max-w-xl mx-auto flex justify-center items-center gap-2">
+        <section className="bg-gray-400 bg-opacity-35 p-2  mb-12 rounded-lg w-full max-w-xl mx-auto flex justify-center items-center gap-2">
           <input
             className="w-full border-2 text-xs text-gray-500 rounded-lg h-8 px-3 outline-none"
             type="text"
