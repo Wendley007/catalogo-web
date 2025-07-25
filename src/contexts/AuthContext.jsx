@@ -88,6 +88,7 @@ const AuthProvider = ({ children }) => {
         handleInfoUser,
         user,
         updateUserProfile,
+        signOut: handleLogout,
         handleLogout,
       }}
     >

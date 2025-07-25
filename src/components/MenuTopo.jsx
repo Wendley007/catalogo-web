@@ -1,206 +1,168 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useContext, useRef } from "react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Home, Info, Menu as MenuIcon, X as CloseIcon } from "react-feather";
-import { FiChevronDown } from "react-icons/fi";
-import { AiOutlineEnvironment } from "react-icons/ai";
-import { FaSignInAlt, FaSignOutAlt, FaUserPlus } from "react-icons/fa";
-import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
-import { FaTimes, FaCheckCircle, FaTimesCircle, FaCog } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { Link, useLocation } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Home,
+  Info,
+  MapPin,
+  Settings,
+  ChevronDown,
+  LogIn,
+  LogOut,
+  UserPlus,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Edit3,
+  ChevronRight,
+} from "lucide-react";
 
-/* Item do Menu */
+import logo1 from "../assets/logo1.png";
 
-const MenuItem = ({ to, icon, children }) => (
-  <Link
-    to={to}
-    className="flex items-center text-gray-300 ml-28 hover:text-gray-100 transition duration-300"
-  >
-    {icon}
-    <span className="text-xs ml-1 uppercase font-semibold">{children}</span>
-  </Link>
-);
-
-/* Botão com Ícone */
-
-const ButtonWithIcon = ({ onClick, icon, text }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="flex items-center justify-center rounded-full border-2 border-white px-2 py-2 text-xs leading-normal transition duration-300 ease-in-out hover:border-neutral-100 hover:bg-white hover:bg-opacity-20 hover:text-white focus:border-white focus:text-white focus:outline-none focus:ring-0 active:border-white active:text-white dark:hover:bg-white dark:hover:bg-opacity-20"
-    data-te-ripple-init
-    data-te-ripple-color="light"
-  >
-    {icon}
-    <span className="ml-1 text-xs">{text}</span>
-  </button>
-);
-
-/* ---------------------------------  Menu Mobile -----------------------------------*/
-
-const MobileMenu = ({ menuItems, isOpen, onClose, handleLogout }) => {
-  const [isShrunk, setIsShrunk] = useState(false);
-  const menuRef = useRef(null);
-
-  const handleScroll = () => {
-    if (window.scrollY > 10) {
-      setIsShrunk(true);
-    } else {
-      setIsShrunk(false);
-    }
-  };
-
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
-      onClose();
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      window.addEventListener("scroll", handleScroll);
-      window.addEventListener("mousedown", handleClickOutside);
-    } else {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
+// --------------------------------------------------------------- Componente para item do menu
+const MenuItem = ({ to, icon: Icon, children, onClick }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
 
   return (
-    <div
-      className={`fixed inset-0 z-50 transition-opacity duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+    <Link
+      to={to}
+      onClick={onClick}
+      className={`flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+        isActive
+          ? "bg-white/10 text-white"
+          : "text-white/75 hover:text-white hover:bg-white/10"
       }`}
     >
-      <div
-        className={`fixed inset-0 bg-gray-900 bg-opacity-90 transition-transform duration-300 ease-in-out ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        } transform`}
-      />
-      <div
-        ref={menuRef}
-        className={`absolute top-0 right-0 w-full max-w-md bg-gray-800 rounded-l-lg transition-all duration-300 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        } p-6`}
-      >
-        <button
-          onClick={onClose}
-          className="self-end text-gray-500 hover:text-gray-200 focus:outline-none mb-4"
-          aria-label="Fechar menu"
-        >
-          <FaTimes
-            className={`w-6 h-6 transition-transform transform ${
-              isShrunk ? "rotate-45" : ""
-            }`}
-          />
-        </button>
-        <h2
-          className={`text-2xl text-green-400 uppercase font-bold text-center mb-4 transition-all duration-300 ${
-            isShrunk ? "text-lg" : ""
-          }`}
-        >
-          Menu
-        </h2>
-        <div className="flex flex-col items-center w-full space-y-3">
-          {menuItems.map((item, index) => (
-            <Link
-              key={index}
-              to={item.to}
-              className="flex items-center justify-center text-gray-300 hover:text-white transition duration-200 ease-in-out w-full text-center py-3 rounded-md hover:bg-gray-700 shadow-lg"
-              onClick={onClose}
-              aria-label={item.label}
-            >
-              {item.icon}
-              <span className="text-md ml-2 uppercase font-semibold">
-                {item.label}
-              </span>
-            </Link>
-          ))}
-          <div className="border-t border-gray-600 my-4 w-full"></div>
-          <MobileUserMenu isOpen={isOpen} handleLogout={handleLogout} />
-        </div>
-      </div>
-    </div>
+      <Icon size={18} />
+      <span>{children}</span>
+    </Link>
   );
 };
 
+// ---------------------------------------------------------------  Modal para feedback
 const Modal = ({ isOpen, message, success, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70"
-      aria-modal="true"
-      role="dialog"
-    >
-      <div
-        className={`bg-white p-6 rounded-lg shadow-lg text-center ${
-          success ? "text-green-600" : "text-red-600"
-        }`}
-      >
+    <section className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+      <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm mx-4">
         <div className="flex items-center justify-center mb-4">
           {success ? (
-            <FaCheckCircle className="text-green-700 w-8 h-8" />
+            <CheckCircle className="text-green-500" size={32} />
           ) : (
-            <FaTimesCircle className="text-red-700 w-8 h-8" />
+            <XCircle className="text-red-500" size={32} />
           )}
         </div>
-        <h2
-          className={`font-bold text-lg ${
+        <h3
+          className={`text-lg font-semibold text-center mb-2 ${
             success ? "text-green-700" : "text-red-700"
           }`}
         >
           {success ? "Sucesso!" : "Erro!"}
-        </h2>
-        <p
-          className={`mt-2 ${
-            success ? "text-gray-700 text-xs" : "text-gray-600 text-xs"
-          }`}
-        >
-          {message}
-        </p>
+        </h3>
+        <p className="text-gray-600 text-center text-sm mb-4">{message}</p>
         <button
           onClick={onClose}
-          className={`mt-4 ${
-            success ? "bg-green-500" : "bg-red-500"
-          } text-white px-4 py-2 rounded hover:${
-            success ? "bg-green-600" : "bg-red-600"
-          } transition duration-300`}
-          aria-label="Fechar modal"
+          className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+            success
+              ? "bg-green-500 hover:bg-green-600 text-white"
+              : "bg-red-500 hover:bg-red-600 text-white"
+          }`}
         >
           Fechar
         </button>
       </div>
-    </div>
+    </section>
   );
 };
 
-const MobileUserMenu = ({ isOpen, handleLogout }) => {
-  const { user, updateUserProfile } = useContext(AuthContext);
+// --------------------------------------------------------------- Componente de contagem regressiva
+const CountdownItem = ({ value, label }) => (
+  <section className="text-center flex items-baseline gap-[2px]">
+    <div className="text-sm font-bold">{value.toString().padStart(2, "0")}</div>
+    <div className="text-xs opacity-80">{label}</div>
+  </section>
+);
+
+// Função para calcular tempo restante
+const calculateTimeRemaining = () => {
+  const now = new Date();
+  const dayOfWeek = now.getDay();
+  const currentHour = now.getHours();
+  let feiraAberta = false;
+
+  if (dayOfWeek === 0 && currentHour >= 6 && currentHour < 12) {
+    feiraAberta = true;
+  }
+
+  let nextOpening;
+  if (dayOfWeek === 0 && currentHour < 6) {
+    nextOpening = new Date(now);
+    nextOpening.setHours(6, 0, 0, 0);
+  } else {
+    nextOpening = new Date(now);
+    nextOpening.setDate(now.getDate() + ((7 - dayOfWeek) % 7));
+    nextOpening.setHours(6, 0, 0, 0);
+  }
+
+  if (nextOpening < now) {
+    nextOpening.setDate(nextOpening.getDate() + 7);
+  }
+
+  const difference = nextOpening.getTime() - now.getTime();
+  const days = Math.floor(difference / (24 * 3600000));
+  const remainingHours = Math.floor((difference % (24 * 3600000)) / 3600000);
+  const minutes = Math.floor((difference % 3600000) / 60000);
+  const seconds = Math.floor((difference % 60000) / 1000);
+
+  return {
+    feiraAberta,
+    days,
+    hours: remainingHours,
+    minutes,
+    seconds,
+  };
+};
+
+// --------------------------------------------------------------- Menu do usuário para desktop
+
+const UserMenu = ({ isOpen, onToggle }) => {
+  const menuRef = useRef(null);
+  const { user, updateUserProfile, signOut } = useContext(AuthContext);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(user?.name || "");
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [modalSuccess, setModalSuccess] = useState(true);
+  const navigate = useNavigate();
 
-  const validateName = (name) => /^[a-zA-Z0-9\s]{1,14}$/.test(name);
+  // Fecha o menu se clicar fora
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        onToggle();
+      }
+    };
+    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, onToggle]);
+
+  const validateName = (name) => /^[\p{L}\s.'-]{1,30}$/u.test(name);
 
   const handleSave = async () => {
     if (!validateName(newName)) {
       setModalMessage(
-        "Nome inválido. Certifique-se de que o nome contenha apenas letras, números e espaços, e tenha no máximo 14 caracteres."
+        "Nome inválido. Use apenas letras, acentos e espaços (máx. 30 caracteres)."
       );
       setModalSuccess(false);
-      setModalOpen(true);
-      return;
+      return setModalOpen(true);
     }
-
     try {
       await updateUserProfile({ displayName: newName });
       setEditingName(false);
@@ -208,538 +170,488 @@ const MobileUserMenu = ({ isOpen, handleLogout }) => {
       setModalSuccess(true);
       setModalOpen(true);
     } catch (error) {
-      console.error("Erro ao atualizar o nome:", error);
       setModalMessage("Falha ao atualizar o nome.");
       setModalSuccess(false);
       setModalOpen(true);
     }
   };
 
-  useEffect(() => {
-    if (user) {
-      console.log("Dados do usuário:", user);
-      console.log("Foto do usuário:", user.photoURL); // Verifique se este valor é correto.
-    }
-  }, [user]);
+  const handleLogout = () => {
+    signOut();
+    onToggle();
+    navigate("/");
+  };
 
   return (
-    <div
-      className={`relative z-10 ${
-        isOpen ? "block" : "hidden"
-      } bg-green-300 bg-opacity-10 p-4 rounded-md mt-4 shadow-xl transition-opacity duration-300`}
-    >
-      {user ? (
-        <div className="flex items-center space-x-3">
-          {user.photoURL ? (
-            <img
-              src={user.photoURL}
-              alt="Foto do usuário"
-              className="w-12 h-12 sm:w-16 rounded-full border-2 border-gray-600 shadow-lg transition-transform transform hover:scale-110"
-              onError={(e) =>
-                (e.target.src = "caminho/para/imagem/default.jpg")
-              }
-            />
+    <section ref={menuRef} className="relative">
+      {isOpen && (
+        <div
+          className="absolute right-0 -mr-24 mt-10 w-72 bg-white rounded-xl shadow-2xl border border-gray-300 z-50 py-3"
+          role="menu"
+          aria-label="Menu do usuário"
+        >
+          {user ? (
+            <>
+              {/* Perfil do usuário */}
+              <div className="flex items-start space-x-3 px-4 pb-3">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt="Foto do usuário"
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    {user.name?.[0]?.toUpperCase() || "U"}
+                  </div>
+                )}
+
+                <div className="flex-1">
+                  {editingName ? (
+                    <>
+                      <input
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        placeholder="Novo nome"
+                      />
+                      <div className="flex mt-2 space-x-2">
+                        <button
+                          onClick={handleSave}
+                          className="flex-1 px-2 py-1 text-xs text-white bg-green-500 rounded hover:bg-green-600"
+                        >
+                          Salvar
+                        </button>
+                        <button
+                          onClick={() => setEditingName(false)}
+                          className="flex-1 px-2 py-1 text-xs text-white bg-gray-500 rounded hover:bg-gray-600"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center space-x-2">
+                        <span className="font-semibold text-gray-900">
+                          {user.name}
+                        </span>
+                        <span className="w-2 h-2 bg-green-500 rounded-full" />
+                      </div>
+                      <p className="text-sm text-gray-600">{user.email}</p>
+                      <button
+                        onClick={() => setEditingName(true)}
+                        className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-700 mt-1"
+                      >
+                        <Edit3 size={12} />
+                        <span>Editar nome</span>
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Botão de logout */}
+              <button
+                onClick={handleLogout}
+                className="w-full px-4 py-2 justify-center text-red-600 hover:bg-red-50 flex items-center space-x-2 transition-colors"
+              >
+                <LogOut size={16} />
+                <span>Sair</span>
+              </button>
+            </>
           ) : (
-            <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold shadow-lg">
-              {user.name[0].toUpperCase()}
+            // Caso não esteja logado
+            <div className="space-y-1">
+              <Link
+                to="/login"
+                onClick={onToggle}
+                className="w-full px-4 py-2 justify-center text-blue-600 hover:bg-blue-50 flex items-center space-x-2 transition-colors"
+              >
+                <LogIn size={16} />
+                <span>Entrar</span>
+              </Link>
+              <Link
+                to="/registro"
+                onClick={onToggle}
+                className="w-full px-4 py-2 justify-center text-green-600 hover:bg-green-50 flex items-center space-x-2 transition-colors"
+              >
+                <UserPlus size={16} />
+                <span>Cadastrar</span>
+              </Link>
             </div>
           )}
-
-          <div>
-            {editingName ? (
-              <div className="flex flex-col items-center space-y-3">
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  className="bg-gray-700 text-center text-white p-1 mb-1 rounded-md text-xs w-full max-w-xs"
-                  placeholder="Digite seu novo nome"
-                />
-                <div className="flex space-x-2">
-                  <button
-                    onClick={handleSave}
-                    className="bg-green-500 text-xs font-medium text-white p-1 rounded-md hover:bg-green-600 transition duration-300"
-                  >
-                    Salvar
-                  </button>
-                  <button
-                    onClick={() => setEditingName(false)}
-                    className="bg-red-500 text-xs font-medium text-white p-1 rounded-md hover:bg-red-600 transition duration-300"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="flex items-center">
-                  <div className="uppercase text-sm text-gray-200 font-semibold">
-                    {user.name}
-                  </div>
-                  <div className="w-2 h-2 bg-green-500 rounded-full ml-2"></div>
-                </div>
-                <div className="text-xs mt-2 text-gray-400">{user.email}</div>
-                <button
-                  onClick={() => setEditingName(true)}
-                  className="text-blue-400 text-xs text-center mt-2"
-                >
-                  Editar Nome
-                </button>
-              </div>
-            )}
-          </div>
-          <Link
-            to="/"
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm flex items-center justify-center text-red-500 hover:bg-gray-700 hover:text-white transition duration-300"
-          >
-            <FaSignOutAlt className="w-4 h-4 mr-2" /> Sair
-          </Link>
-        </div>
-      ) : (
-        <div className="flex justify-center space-x-4">
-          <Link
-            to="/Login"
-            className="text-blue-400 text-sm hover:text-blue-500 transition duration-300"
-            aria-label="Entrar"
-          >
-            Entrar
-          </Link>
-          <Link
-            to="/Registro"
-            className="text-green-400 text-sm hover:text-green-500 transition duration-300"
-            aria-label="Cadastrar"
-          >
-            Cadastrar
-          </Link>
         </div>
       )}
+
       <Modal
         isOpen={modalOpen}
         message={modalMessage}
         success={modalSuccess}
         onClose={() => setModalOpen(false)}
       />
-    </div>
+    </section>
   );
 };
 
-/*-----------------------    Menu do Usuário versão WEB     ------------------------*/
+// ---------------------------------------------------------------  Menu lateral mobile
 
-const MenuUsuario = ({ isOpen, onToggle }) => {
-  const menuRef = useRef(null);
-  const { user, updateUserProfile, handleLogout } = useContext(AuthContext);
-  const [editingName, setEditingName] = useState(false);
-  const [newName, setNewName] = useState(user?.name || "");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
-  const [modalSuccess, setModalSuccess] = useState(true);
+const MobileMenu = ({ isOpen, onClose, menuItems }) => {
+  const { user, handleLogout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        onToggle();
-      }
-    }
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, onToggle]);
-
-  const validateName = (name) => /^[a-zA-Z0-9\s]{1,14}$/.test(name);
-
-  const handleSave = async () => {
-    if (!validateName(newName)) {
-      setModalMessage(
-        "Nome inválido. Certifique-se de que o nome contenha apenas letras, números e espaços, e tenha no máximo 14 caracteres."
-      );
-      setModalSuccess(false);
-      setModalOpen(true);
-      return;
-    }
-
-    try {
-      await updateUserProfile({ displayName: newName });
-      setEditingName(false);
-      setModalMessage("Nome atualizado com sucesso!");
-      setModalSuccess(true);
-      setModalOpen(true);
-    } catch (error) {
-      console.error("Erro ao atualizar o nome:", error);
-      setModalMessage("Falha ao atualizar o nome.");
-      setModalSuccess(false);
-      setModalOpen(true);
-    }
+  const handleSignOut = async () => {
+    await handleLogout();
+    onClose();
+    navigate("/");
   };
 
+  if (!isOpen) return null;
   return (
-    <div ref={menuRef} className="relative ml-4">
-      {isOpen && (
-        <div className="absolute mt-6 right-0 -mr-12 z-10 bg-opacity-85 w-60 rounded-md bg-gray-900 py-2 shadow-lg ring-1 ring-white ring-opacity-25 focus:outline-none">
-          {user ? (
-            <>
-              <div className="flex items-center space-x-2 px-2 py-2">
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt="User Photo"
-                    className="w-10 h-10 rounded-full"
+    <>
+      {/* Backdrop com blur */}
+      <main
+        className="fixed inset-0 z-50 lg:hidden"
+        style={{ backdropFilter: "blur(8px)" }}
+        role="dialog"
+        aria-modal="true"
+      >
+        {/* Backdrop */}
+        <div
+          className="fixed inset-0 bg-gradient-to-br from-black/60 via-green-900/30 to-black/60"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+
+        {/* Sidebar Menu */}
+        <section className="absolute top-0 right-0 h-[95vh] w-[350px] rounded-l-2xl bg-gradient-to-r from-green-50 to-blue-50 shadow-2xl overflow-hidden z-50 transition-all duration-500 ease-out">
+          {/* Header */}
+          <header className="relative bg-gradient-to-r from-green-600 to-green-700 p-6 shadow-lg">
+            <div className="absolute inset-0 bg-black/10" />
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <Link to="/">
+                  <motion.img
+                    src={logo1}
+                    alt="Logo"
+                    className="w-16 h-16 drop-shadow-lg"
+                    whileHover={{ scale: 1.1 }}
                   />
-                ) : (
-                  <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {user.name[0].toUpperCase()}
-                  </div>
-                )}
+                </Link>
                 <div>
-                  {editingName ? (
-                    <div className="flex flex-col items-center space-y-3">
-                      <input
-                        type="text"
-                        value={newName}
-                        onChange={(e) => setNewName(e.target.value)}
-                        className="bg-gray-700 text-center text-white p-1 mb-1 rounded-md text-xs w-full max-w-xs"
-                        placeholder="Digite seu novo nome"
-                      />
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={handleSave}
-                          className="bg-green-500 text-xs font-medium text-white p-1 rounded-md hover:bg-green-600 transition duration-300"
-                        >
-                          Salvar
-                        </button>
-                        <button
-                          onClick={() => setEditingName(false)}
-                          className="bg-red-500 text-xs font-medium text-white p-1 rounded-md hover:bg-red-600 transition duration-300"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="flex items-center">
-                        <div className="uppercase text-sm text-gray-200 font-semibold">
-                          {user.name}
-                        </div>
-                        <div className="w-2 h-2 bg-green-500 rounded-full ml-2"></div>
-                      </div>
-                      <div className="text-xs mt-2 text-gray-400">
-                        {user.email}
-                      </div>
-                      <button
-                        onClick={() => setEditingName(true)}
-                        className="text-blue-400 text-xs text-center mt-2"
-                      >
-                        Editar Nome
-                      </button>
-                    </div>
-                  )}
+                  <h2 className="text-xl font-bold text-white -ml-2">Menu</h2>
+                  <p className="text-green-100 text-sm -ml-2">Navegação</p>
                 </div>
               </div>
-              <Link
-                to="/"
-                onClick={() => {
-                  handleLogout();
-                  onToggle();
-                }}
-                className="px-4 py-2 text-sm flex items-center justify-center text-red-500 hover:bg-gray-700 hover:text-white transition duration-300"
-              >
-                <FaSignOutAlt className="w-4 h-4 mr-2" /> Sair
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/Login"
-                className="px-4 py-2 text-sm flex items-center justify-center text-blue-500 hover:bg-gray-700 hover:text-white transition duration-300"
-              >
-                <FaSignInAlt className="w-4 h-4 mr-2" /> Entrar
-              </Link>
-              <Link
-                to="/Registro"
-                className="px-4 py-2 text-sm flex items-center justify-center text-green-500 hover:bg-gray-700 hover:text-white transition duration-300"
-              >
-                <FaUserPlus className="w-4 h-4 mr-2" /> Cadastrar
-              </Link>
-            </>
-          )}
-        </div>
-      )}
-      {modalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-sm mx-auto relative">
-            <div
-              className={`p-4 ${modalSuccess ? "bg-green-100" : "bg-red-100"}`}
-            >
-              <h2
-                className={`text-lg font-semibold ${
-                  modalSuccess ? "text-green-800" : "text-red-800"
-                }`}
-              >
-                {modalSuccess ? "Sucesso!" : "Erro!"}
-              </h2>
-              <p className="mt-2 text-sm text-gray-700">{modalMessage}</p>
               <button
-                onClick={() => setModalOpen(false)}
-                className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+                onClick={onClose}
+                className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition duration-300 transform hover:scale-110"
+                aria-label="Fechar menu"
               >
-                <FaTimesCircle />
+                <X size={20} />
               </button>
             </div>
-          </div>
-        </div>
-      )}
-    </div>
+          </header>
+
+          {/* Itens de navegação */}
+          <motion.nav
+            className="px-6 py-8 space-y-3"
+            initial={{ opacity: 0, x: 30 }}
+            animate={isOpen ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            {menuItems.map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={index}
+                  to={item.to}
+                  onClick={onClose}
+                  className="group flex items-center space-x-4 p-4 rounded-xl bg-white border border-gray-100 shadow-sm hover:shadow-md hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 transition-all duration-300 transform hover:scale-[1.02]"
+                  style={{ transitionDelay: `${index * 80}ms` }}
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transform transition-transform group-hover:scale-110">
+                    <Icon size={20} />
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-gray-900 font-semibold group-hover:text-green-700 transition-colors">
+                      {item.label}
+                    </span>
+                    <div className="w-0 h-0.5 bg-gradient-to-r from-green-500 to-green-600 group-hover:w-full transition-all duration-300" />
+                  </div>
+                  <ChevronRight
+                    size={16}
+                    className="text-gray-400 group-hover:text-green-600 transform transition-transform group-hover:translate-x-1"
+                  />
+                </Link>
+              );
+            })}
+          </motion.nav>
+
+          {/* Área do usuário */}
+          <footer className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-gray-100 to-transparent">
+            {user ? (
+              <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-200">
+                <div className="flex items-center space-x-4 mb-4">
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt="Foto do usuário"
+                      className="w-14 h-14 rounded-full object-cover border-3 border-green-200 shadow-lg"
+                    />
+                  ) : (
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                      {user.name?.[0]?.toUpperCase() || "U"}
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-900 text-lg">
+                      {user.name}
+                    </p>
+                    <p className="text-gray-600 text-sm">{user.email}</p>
+                    <div className="flex items-center space-x-1 mt-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                      <span className="text-green-600 text-xs font-medium">
+                        Online
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-transform duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                >
+                  <LogOut size={18} />
+                  <span className="font-semibold">Sair da Conta</span>
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Link
+                  to="/login"
+                  onClick={onClose}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-transform duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                >
+                  <LogIn size={18} />
+                  <span className="font-semibold">Fazer Login</span>
+                </Link>
+                <Link
+                  to="/registro"
+                  onClick={onClose}
+                  className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-transform duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                >
+                  <UserPlus size={18} />
+                  <span className="font-semibold">Cadastrar</span>
+                </Link>
+              </div>
+            )}
+          </footer>
+        </section>
+      </main>
+    </>
   );
 };
 
-/* Item de Contagem Regressiva */
+// --------------------------------------------------------------- Componente principal do MenuTopo
 
-const CountdownItem = ({ value, label, isMobile }) => (
-  <div className={`countdown-item ${isMobile ? "text-xs" : ""}`}>
-    <p className={`text-sm ${isMobile ? "text-xs" : ""}`}>
-      {value.toString().padStart(2, "0")}
-    </p>
-    <p className="text-xs">{label}</p>
-  </div>
-);
-
-/* Função para Calcular o Tempo Restante */
-
-const calculateTimeRemaining = () => {
-  const agora = new Date();
-  const diaDaSemana = agora.getDay();
-  const horas = agora.getHours();
-  let feiraAberta = false;
-
-  if (diaDaSemana === 0 && horas >= 6 && horas < 12) {
-    feiraAberta = true;
-  }
-
-  let proximaAbertura;
-  if (diaDaSemana === 0 && horas < 6) {
-    proximaAbertura = new Date(agora);
-    proximaAbertura.setHours(6, 0, 0, 0);
-  } else {
-    proximaAbertura = new Date(agora);
-    proximaAbertura.setDate(agora.getDate() + ((7 - diaDaSemana) % 7));
-    proximaAbertura.setHours(6, 0, 0, 0);
-  }
-
-  if (proximaAbertura < agora) {
-    proximaAbertura.setDate(proximaAbertura.getDate() + 7);
-  }
-
-  const diferenca = proximaAbertura - agora;
-  const diasRestantes = Math.floor(diferenca / (24 * 3600000));
-  const horasRestantes = Math.floor((diferenca % (24 * 3600000)) / 3600000);
-  const minutosRestantes = Math.floor((diferenca % 3600000) / 60000);
-  const segundosRestantes = Math.floor((diferenca % 60000) / 1000);
-
-  return {
-    feiraAberta,
-    diasRestantes,
-    horasRestantes,
-    minutosRestantes,
-    segundosRestantes,
-  };
-};
-
-const DynamicMenuTopo = ({ logoSrc, menuItems, isMobile, handleLogout }) => {
-  const [tempoRestante, setTempoRestante] = useState({
-    dias: 0,
-    horas: 0,
-    minutos: 0,
-    segundos: 0,
+const MenuTopo = () => {
+  const [timeRemaining, setTimeRemaining] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
   });
-
   const [feiraAberta, setFeiraAberta] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    const updateTempoRestante = () => {
-      const {
-        feiraAberta,
-        diasRestantes,
-        horasRestantes,
-        minutosRestantes,
-        segundosRestantes,
-      } = calculateTimeRemaining();
-
+    const updateTime = () => {
+      const { feiraAberta, days, hours, minutes, seconds } =
+        calculateTimeRemaining();
       setFeiraAberta(feiraAberta);
-
-      if (!feiraAberta) {
-        setTempoRestante({
-          dias: diasRestantes,
-          horas: horasRestantes,
-          minutos: minutosRestantes,
-          segundos: segundosRestantes,
-        });
-      }
+      setTimeRemaining({ days, hours, minutes, seconds });
     };
 
-    updateTempoRestante();
-
-    const intervalId = setInterval(updateTempoRestante, 1000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  return (
-    <nav className="flex flex-col lg:flex-row justify-between items-center bg-green-600 bg-opacity-55 py-1 text-white shadow-lg hover:text-neutral-700 dark:text-neutral-200">
-      <div className="flex items-center justify-between w-full md:px-14">
-        <Link to="/">
-          <motion.img
-            src={logoSrc}
-            alt="Logo"
-            className="w-20 h-20"
-            whileHover={{ scale: 1.1 }}
-          />
-        </Link>
-        <div
-          className={`info-box ${
-            feiraAberta ? "bg-green-500" : "bg-black"
-          } text-white bg-opacity-20 p-2 rounded-md shadow-sm text-center flex flex-col justify-center items-center`}
-        >
-          {feiraAberta ? (
-            <h2 className="text-xs uppercase font-semibold">
-              A feira está aberta. Aproveite!
-            </h2>
-          ) : (
-            <>
-              <h2 className="text-xs font-semibold uppercase">
-                A feira abrirá em:
-              </h2>
-              <div className="countdown text-xs grid font-medium grid-cols-4 gap-5 text-center">
-                {tempoRestante.dias > 0 && (
-                  <CountdownItem
-                    value={tempoRestante.dias}
-                    label={tempoRestante.dias === 1 ? "Dia" : "Dias"}
-                  />
-                )}
-                <CountdownItem
-                  value={tempoRestante.horas}
-                  label={tempoRestante.horas === 1 ? "Hora" : "Horas"}
-                />
-                <CountdownItem
-                  value={tempoRestante.minutos}
-                  label={tempoRestante.minutos === 1 ? "Minuto" : "Minutos"}
-                />
-                <CountdownItem
-                  value={tempoRestante.segundos}
-                  label={tempoRestante.segundos === 1 ? "Segundo" : "Segundos"}
-                />
-              </div>
-            </>
-          )}
-        </div>
-        {isMobile && (
-          <button
-            className="md:hidden text-white focus:outline-none"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
-          </button>
-        )}
-      </div>
-      {isMobile && (
-        <MobileMenu
-          menuItems={menuItems}
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-      {!isMobile && (
-        <div className="flex mr-4 space-x-4 ml-auto items-center">
-          {menuItems.map((item, index) => (
-            <MenuItem key={index} to={item.to} icon={item.icon}>
-              {item.label}
-            </MenuItem>
-          ))}
-          <MenuUsuario
-            isOpen={isUserMenuOpen}
-            onToggle={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            handleLogout={handleLogout}
-          />
-          <ButtonWithIcon
-            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            icon={<FiChevronDown />}
-          />
-        </div>
-      )}
-    </nav>
-  );
-};
-
-/* -----------------------------  Menu Principal ------------------------------ */
-
-const Menu = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { signed, user, signOut } = useContext(AuthContext);
-
-  const handleLogout = () => {
-    if (signed && user) {
-      signOut();
-      console.log("Logout realizado");
-      setIsMobileMenuOpen(false);
-    } else {
-      console.log("Nenhum usuário autenticado para fazer logout.");
-    }
-  };
-
-  // Itens do menu para a versão web
   const menuItems = [
-    {
-      to: "/paginaprincipal",
-      icon: <Home className="inline-block h-4 w-4" />,
-      label: "Início",
-    },
-    {
-      to: "/historia",
-      icon: <Info className="inline-block h-4 w-4" />,
-      label: "Sobre",
-    },
-    {
-      to: "/contato",
-      icon: <AiOutlineEnvironment className="inline-block h-4 w-4" />,
-      label: "Localização",
-    },
-    ...(user && user.role === "admin"
-      ? [
-          {
-            to: "/Admin",
-            icon: <FaCog className="inline-block h-4 w-4" />,
-            label: "Admin",
-          },
-        ]
+    { to: "/paginaprincipal", icon: Home, label: "Início" },
+    { to: "/historia", icon: Info, label: "História" },
+    { to: "/localizacao", icon: MapPin, label: "Localização" },
+    ...(user?.role === "admin"
+      ? [{ to: "/admin", icon: Settings, label: "Admin" }]
       : []),
   ];
 
   return (
     <>
-      <DynamicMenuTopo
-        logoSrc={logo}
+      <header className="bg-gradient-to-r from-emerald-700 via-green-600 to-green-700 shadow-lg sticky top-0 z-40">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-3">
+              <motion.img
+                src={logo1}
+                alt="Logo"
+                className="w-16 h-16 drop-shadow-lg"
+                whileHover={{ scale: 1.1 }}
+              />
+              <div className="hidden sm:block">
+                <h1 className="text-xl font-bold -ml-2 text-white">Viva Bem</h1>
+                <p className="text-sm -ml-2 text-white/80">Buritizeiro</p>
+              </div>
+            </Link>
+
+            {/* Countdown/Status */}
+            <div
+              className={`hidden md:flex items-center space-x-4 px-4 py-0 rounded-lg ${
+                feiraAberta ? "bg-green-500/30" : "bg-black/0"
+              } backdrop-blur-sm`}
+            >
+              <Clock className="text-white mt-1" size={20} />
+              <div className="text-white">
+                {feiraAberta ? (
+                  <div className="text-center">
+                    <p className="text-sm font-semibold">Feira Aberta!</p>
+                    <p className="text-xs opacity-80">Aproveite até 12h</p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-xs font-medium mb-1">
+                      Próxima abertura em:
+                    </p>
+                    <div className="flex space-x-3">
+                      {timeRemaining.days > 0 && (
+                        <CountdownItem
+                          value={timeRemaining.days}
+                          label="dias"
+                        />
+                      )}
+                      <CountdownItem value={timeRemaining.hours} label="h" />
+                      <CountdownItem
+                        value={timeRemaining.minutes}
+                        label="min"
+                      />
+                      <CountdownItem value={timeRemaining.seconds} label="s" />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center space-x-4">
+              {menuItems.map((item, index) => (
+                <MenuItem key={index} to={item.to} icon={item.icon}>
+                  {item.label}
+                </MenuItem>
+              ))}
+
+              <div className="flex items-center space-x-2">
+                <UserMenu
+                  isOpen={isUserMenuOpen}
+                  onToggle={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                />
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-lg text-white/75 hover:text-white hover:bg-white/10 transition-all duration-200"
+                >
+                  {user ? (
+                    <>
+                      {user.photoURL ? (
+                        <img
+                          src={user.photoURL}
+                          alt="Foto do usuário"
+                          className="w-9 h-9 rounded-full object-cover border-2 border-white/20"
+                        />
+                      ) : (
+                        <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                          {user.name?.[0]?.toUpperCase() || "U"}
+                        </div>
+                      )}
+                      {/* <span className="text-sm font-medium">{user.name}</span> */}
+                    </>
+                  ) : (
+                    <span className="text-sm font-medium">Conta</span>
+                  )}
+                  <ChevronDown size={16} />
+                </button>
+              </div>
+            </nav>
+
+            {/* Mobile contagem regressiva */}
+
+            <section
+              className={`md:hidden flex px-4 py-2 rounded-lg ${
+                feiraAberta ? "bg-green-500/5" : "bg-black/5"
+              } backdrop-blur-sm`}
+            >
+              <div className="flex items-center justify-center space-x-3 text-white">
+                <Clock size={16} />
+                {feiraAberta ? (
+                  <div className="text-center">
+                    <p className="text-sm font-semibold">Feira Aberta!</p>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <p className="text-xs mb-1 font-semibold">Abre em:</p>
+                    <div className="flex space-x-2 text-xs text-white">
+                      {timeRemaining.days > 0 && (
+                        <span>
+                          <span className="font-semibold">
+                            {timeRemaining.days}
+                          </span>
+                          <span className="ml-[2px]  opacity-80">dias</span>
+                        </span>
+                      )}
+                      <span>
+                        <span className="font-semibold">
+                          {timeRemaining.hours}
+                        </span>
+                        <span className="ml-[2px] opacity-80">h</span>
+                      </span>
+                      <span>
+                        <span className="font-semibold">
+                          {timeRemaining.minutes}
+                        </span>
+                        <span className="ml-[2px] opacity-80">m</span>
+                      </span>
+                      <span>
+                        <span className="font-semibold">
+                          {timeRemaining.seconds}
+                        </span>
+                        <span className="ml-[2px] opacity-80">s</span>
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* Mobile menu button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+            >
+              <Menu size={24} />
+            </button>
+          </div>
+        </section>
+      </header>
+
+      {/* Mobile Menu */}
+      <MobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
         menuItems={menuItems}
-        isMobile={window.innerWidth < 1000}
-        handleLogout={handleLogout}
       />
-      {isMobileMenuOpen && (
-        <MobileMenu
-          isOpen={isMobileMenuOpen}
-          onClose={() => setIsMobileMenuOpen(false)}
-          handleLogout={handleLogout}
-        />
-      )}
     </>
   );
 };
 
-export default Menu;
+export default MenuTopo;

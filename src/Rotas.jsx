@@ -1,8 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home/Home";
 import Historia from "./Pages/Historia/Historia";
-import Contato from "./Pages/Contato/Contato";
-import Galeria from "./Pages/Galeria/Galeria";
+import Localizacao from "./Pages/Localizacao/localizacao";
 import PaginaPrincipal from "./Pages/PaginaPrincipal/PaginaPrincipal";
 import Novo from "./Pages/Categorias/Novo/Novo";
 import Login from "./Pages/Login/Login";
@@ -17,27 +16,21 @@ import Vendedor from "./Pages/Perfis/Vendedor/Vendedor";
 import Admin from "./Pages/Admin/Admin";
 import Resultados from "./Pages/Avaliacao/Resultados";
 import Avaliacao from "./Pages/Avaliacao/Avaliacao";
+import ScrollTopo from "./components/ScrollTopo";
 
 const Rotas = () => {
   return (
     <AuthProvider>
+      <ScrollTopo />
+
       <Routes>
         <Route path="/" element={<Home />} />
-
         <Route path="/admin" element={<Admin />} />
-
         <Route path="login" element={<Login />} />
-
         <Route path="registro" element={<Registro />} />
-
         <Route path="/historia" element={<Historia />} />
-
-        <Route path="/contato" element={<Contato />} />
-
-        <Route path="/galeria" element={<Galeria />} />
-
+        <Route path="/localizacao" element={<Localizacao />} />
         <Route path="/paginaprincipal" element={<PaginaPrincipal />} />
-
         <Route
           path="/novo"
           element={
@@ -46,22 +39,15 @@ const Rotas = () => {
             </Private>
           }
         />
-
         <Route path="/todascategorias" element={<TodasCategorias />} />
-
         <Route
           path="/categorias/:idCategoria"
           element={<ProdutosPorCategoria />}
         />
-
         <Route path="/novoperfil" element={<NovoPerfil />} />
-
         <Route path="/bancas" element={<Bancas />} />
-
         <Route path="/bancas/:bancaId" element={<Vendedor />} />
-
         <Route path="/avaliacao" element={<Avaliacao />} />
-
         <Route path="/resultados" element={<Resultados />} />
       </Routes>
     </AuthProvider>

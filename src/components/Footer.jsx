@@ -1,160 +1,236 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  FaFacebook,
-  FaInstagram,
-  FaEnvelope,
-  FaPhone,
-  FaMapMarkerAlt,
-} from "react-icons/fa";
-import ifnmg from "../assets/ifnmg.jpg";
-import buritizeiro from "../assets/buritizeiro.jpg";
-
-const logos = [
-  { src: ifnmg, link: "https://www.ifnmg.edu.br/pirapora" },
-  { src: buritizeiro, link: "https://www.buritizeiro.mg.gov.br/" },
-];
-
-const endereco =
-  "Rua Professor Antonio Candido, S/N - Centro, Buritizeiro - MG";
-const linkGoogleMaps =
-  "https://www.google.com/maps/dir/Buritizeiro,+MG,+39280-000/-17.3589395,-44.9577023/@-17.3605393,-44.967312,16z/data=!3m1!4b1!4m8!4m7!1m5!1m1!1s0xaa0bcd1cc31d93:0x3509703457e77a38!2m2!1d-44.9662399!2d-17.3623205!1m0?entry=ttu";
+  MapPin,
+  Clock,
+  Phone,
+  Mail,
+  Facebook,
+  Instagram,
+  ExternalLink,
+  Heart,
+} from "lucide-react";
+import logo1 from "../assets/logo1.png";
+import ifnmgLogo from "../assets/ifnmg.jpg";
+import prefeituraLogo from "../assets/logo_Buritizeiro.jpg";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const quickLinks = [
+    { to: "/paginaprincipal", label: "Início" },
+    { to: "/historia", label: "Nossa História" },
+    { to: "/localizacao", label: "Localização" },
+    { to: "/bancas", label: "Bancas" },
+    { to: "/avaliacao", label: "Avaliação" },
+  ];
+
+  const socialLinks = [
+    {
+      href: "https://www.facebook.com/buritizeiroprefeitura/?locale=pt_BR",
+      icon: Facebook,
+      label: "Facebook",
+      color: "hover:text-blue-400",
+    },
+    {
+      href: "https://www.instagram.com/buritizeiroprefeitura/",
+      icon: Instagram,
+      label: "Instagram",
+      color: "hover:text-pink-400",
+    },
+  ];
+
+  const partners = [
+    {
+      name: "IFNMG Pirapora",
+      href: "https://www.ifnmg.edu.br/pirapora",
+      logo: ifnmgLogo,
+    },
+    {
+      name: "Prefeitura de Buritizeiro",
+      href: "https://www.buritizeiro.mg.gov.br/",
+      logo: prefeituraLogo,
+    },
+  ];
+
   return (
-    <footer className="bg-gradient-to-r from-green-800 to-green-500 p-2 text-white">
-      <div className="max-w-screen-xl px-4 pt-4 pb-4 mx-auto sm:px-4 lg:px-4 lg:pt-4">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-          <div className="text-center">
-            <div className="flex uppercase text-xs items-center justify-center lg:justify-start space-x-6 text-gray-300">
-              <Link
-                to="/paginaprincipal"
-                className="hover:text-yellow-300 hover:underline transition-all duration-300"
-              >
-                Início
-              </Link>
-              <Link
-                to="/historia"
-                className="hover:text-yellow-300 hover:underline transition-all duration-300"
-              >
-                Sobre nós
-              </Link>
-              <Link
-                to="/contato"
-                className="hover:text-yellow-300 hover:underline transition-all duration-300"
-              >
-                Nossa localização
-              </Link>
+    <footer className="bg-gray-900 text-white relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-10 left-10 w-20 h-20 bg-green-500 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 right-20 w-32 h-32 bg-green-400 rounded-full blur-xl"></div>
+        <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-green-600 rounded-full blur-xl"></div>
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          {/* Logo and Description */}
+          <div className="lg:col-span-1">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="flex w-20 h-18 items-center justify-center">
+                <motion.img
+                  src={logo1}
+                  alt="Logo"
+                  whileHover={{ scale: 1.1 }}
+                />
+              </div>
+              <div>
+                <h3 className="text-xl -ml-4 font-bold">Viva Bem</h3>
+                <p className="text-gray-400 -ml-4 text-sm">Buritizeiro</p>
+              </div>
             </div>
-            <p className="max-w-md mx-auto mt-6 leading-relaxed text-center text-gray-400 text-sm sm:max-w-xs sm:mx-0 sm:text-left">
-              Explore a diversidade da Feira Livre de Buritizeiro. Descubra
-              eventos, produtos locais e tudo o que nossa comunidade tem a
-              oferecer. Bem-vindo e aproveite sua visita!
+
+            <p className="text-gray-300 mb-6 leading-relaxed">
+              Descubra a diversidade da Feira Livre de Buritizeiro. Produtos
+              frescos, tradição e comunidade em um só lugar.
             </p>
-            <ul className="flex justify-center lg:justify-start gap-6 mt-8 md:gap-8 mb-2 sm:justify-start">
-              <li>
-                <a
-                  href="https://www.facebook.com/buritizeiroprefeitura/?locale=pt_BR"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FaFacebook className="text-2xl hover:text-blue-500 transition-all duration-300 ease-in-out transform hover:rotate-12" />
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://www.instagram.com/buritizeiroprefeitura/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <FaInstagram className="text-2xl hover:text-pink-500 transition-all duration-300 ease-in-out transform hover:rotate-12" />
-                </a>
-              </li>
-            </ul>
+
+            {/* Social Links */}
+            <div className="flex space-x-4">
+              {socialLinks.map((social, index) => {
+                const Icon = social.icon;
+                return (
+                  <a
+                    key={index}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-700 transform hover:scale-110 ${social.color}`}
+                    aria-label={social.label}
+                  >
+                    <Icon size={20} />
+                  </a>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="text-center">
-            <nav className="mt-8">
-              <ul className="flex justify-center lg:justify-start ml-0 lg:ml-10 space-x-2 text-sm">
-                {logos.map((logo, index) => (
-                  <li key={index} className="mr-4">
-                    <Link to={logo.link} className="hover:opacity-80">
-                      <motion.img
-                        src={logo.src}
-                        alt="Logo"
-                        className="w-24 h-24"
-                        whileHover={{
-                          scale: 1.1,
-                          rotate: [0, 10, -10, 0],
-                          transition: { duration: 0.3 },
-                        }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 * index }}
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6 text-green-400">
+              Links Rápidos
+            </h4>
+            <div className="space-y-3">
+              {quickLinks.map((link, index) => (
+                <Link
+                  key={index}
+                  to={link.to}
+                  className="block text-gray-300 hover:text-green-400 transition-colors duration-300 text-sm hover:translate-x-1 transform"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className="text-center sm:text-left">
-            <p className="uppercase text-xs items-center justify-center text-white">
+          {/* Contact Info */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6 text-green-400">
               Contato
-            </p>
-            <ul className="mt-8 space-y-4 text-sm">
-              <li>
+            </h4>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <MapPin
+                  className="text-green-400 mt-1 flex-shrink-0"
+                  size={18}
+                />
+                <div>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    Rua Professor Antonio Candido, S/N
+                    <br />
+                    Centro, Buritizeiro - MG
+                  </p>
+                  <a
+                    href="https://www.google.com/maps/dir/Buritizeiro,+MG,+39280-000/-17.3589395,-44.9577023/@-17.3605393,-44.967312,16z"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1 text-green-400 hover:text-green-300 text-xs mt-1 transition-colors"
+                  >
+                    <span>Ver no mapa</span>
+                    <ExternalLink size={12} />
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <Clock className="text-green-400 flex-shrink-0" size={18} />
+                <div>
+                  <p className="text-gray-300 text-sm">Domingos: 6h às 12h</p>
+                </div>
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <Phone className="text-green-400 flex-shrink-0" size={18} />
                 <a
-                  className="flex items-center justify-center sm:justify-start gap-1.5 group"
-                  href="mailto:ouvidoria@buritizeiro.mg.gov.br"
-                >
-                  <FaEnvelope className="w-4 h-4 text-white shrink-0" />
-                  <span className="text-white transition hover:text-yellow-300">
-                    ouvidoria@buritizeiro.mg.gov.br
-                  </span>
-                </a>
-              </li>
-              <li>
-                <a
-                  className="flex items-center justify-center sm:justify-start gap-1.5 group"
                   href="tel:+553837421011"
+                  className="text-gray-300 hover:text-green-400 transition-colors text-sm"
                 >
-                  <FaPhone className="w-4 h-4 text-white shrink-0" />
-                  <span className="text-white transition hover:text-yellow-300">
-                    (38) 3742-1011
-                  </span>
+                  (38) 3742-1011
                 </a>
-              </li>
-              <li className="flex items-start justify-center gap-1.5 sm:justify-start">
-                <FaMapMarkerAlt className="w-4 h-4 text-white shrink-0 hover:text-yellow-300" />
+              </div>
+
+              <div className="flex items-center space-x-3">
+                <Mail className="text-green-400 flex-shrink-0" size={18} />
                 <a
-                  href={linkGoogleMaps}
+                  href="mailto:ouvidoria@buritizeiro.mg.gov.br"
+                  className="text-gray-300 hover:text-green-400 transition-colors text-sm break-all"
+                >
+                  ouvidoria@buritizeiro.mg.gov.br
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Partners */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6 text-green-400">
+              Parceiros
+            </h4>
+            <div className="space-y-4">
+              {partners.map((partner, index) => (
+                <a
+                  key={index}
+                  href={partner.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-yellow-300"
+                  className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 group"
                 >
-                  {endereco}
+                  <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
+                    <img
+                      src={partner.logo}
+                      alt={partner.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">
+                      {partner.name}
+                    </p>
+                    <div className="flex items-center space-x-1 text-xs text-gray-400 group-hover:text-green-400 transition-colors">
+                      <span>Visitar site</span>
+                      <ExternalLink size={10} />
+                    </div>
+                  </div>
                 </a>
-              </li>
-            </ul>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="pt-4 mt -4 border-t border-green-200">
-          <div className="text-center sm:flex sm:justify-between sm:text-left">
-            <p className="text-sm text-gray-400">
-              <span>&middot;</span>
-              <a
-                className="inline-block text-gray-200 underline transition hover:text-yellow-300"
-                href="/"
-              >
-                Todos os direitos reservados
-              </a>
-            </p>
-            <p className="text-sm text-gray-200 sm:order-first sm:mt-0">
-              &copy; 2024 Feira Livre de Buritizeiro
-            </p>
+        {/* Bottom Section */}
+        <div className="border-t border-gray-800 mt-12 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <span>© {currentYear} Feira Livre de Buritizeiro</span>
+              <span>•</span>
+              <span>Todos os direitos reservados</span>
+            </div>
+
+            <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <span>Feito com</span>
+              <Heart className="text-red-500" size={16} fill="currentColor" />
+              <span>para nossa comunidade</span>
+            </div>
           </div>
         </div>
       </div>

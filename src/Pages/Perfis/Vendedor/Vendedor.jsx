@@ -1,8 +1,16 @@
+/* eslint-disable react/prop-types */
 import { useState, useEffect, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import banner from "../../../assets/banner.jpg";
+import { FaWhatsapp } from "react-icons/fa";
+import { db } from "../../../services/firebaseConnection";
+import { AuthContext } from "../../../contexts/AuthContext";
+
+import MenuTopo from "../../../components/MenuTopo";
+import Footer from "../../../components/Footer";
+import ScrollTopoButton from "../../../components/ScrollTopoButton";
 import {
   doc,
   getDoc,
@@ -12,16 +20,168 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { db } from "../../../services/firebaseConnection";
-import MenuTopo from "../../../components/MenuTopo";
-import Footer from "../../../components/Footer";
-import fundo from "../../../assets/fundo.jpg";
-import { FaWhatsapp } from "react-icons/fa";
-import { RiCheckLine } from "react-icons/ri";
-import { HiX, HiExclamationCircle } from "react-icons/hi";
-import { AuthContext } from "../../../contexts/AuthContext";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  Plus,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  ChevronRight,
+  Store,
+  Users,
+  Package,
+  Loader,
+  ShoppingBag,
+  MapPin,
+  Award,
+  Heart,
+} from "lucide-react";
+
+// --------------------------------------------------------------- Modal Component
+
+const Modal = ({ isOpen, onClose, type, title, message, icon: Icon }) => {
+  if (!isOpen) return null;
+
+  const getColors = () => {
+    switch (type) {
+      case "success":
+        return {
+          bg: "bg-green-50",
+          border: "border-green-200",
+          icon: "text-green-500",
+          button: "bg-green-500 hover:bg-green-600",
+          title: "text-green-800",
+        };
+      case "error":
+        return {
+          bg: "bg-red-50",
+          border: "border-red-200",
+          icon: "text-red-500",
+          button: "bg-red-500 hover:bg-red-600",
+          title: "text-red-800",
+        };
+      case "warning":
+        return {
+          bg: "bg-yellow-50",
+          border: "border-yellow-200",
+          icon: "text-yellow-500",
+          button: "bg-yellow-500 hover:bg-yellow-600",
+          title: "text-yellow-800",
+        };
+      default:
+        return {
+          bg: "bg-blue-50",
+          border: "border-blue-200",
+          icon: "text-blue-500",
+          button: "bg-blue-500 hover:bg-blue-600",
+          title: "text-blue-800",
+        };
+    }
+  };
+
+  const colors = getColors();
+
+  return (
+    <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className={`${colors.bg} ${colors.border} border-2 rounded-xl shadow-2xl p-8 max-w-md w-full text-center`}
+      >
+        <div className="flex justify-center mb-6">
+          <div
+            className={`w-16 h-16 ${colors.bg} rounded-full flex items-center justify-center shadow-lg`}
+          >
+            <Icon className={colors.icon} size={32} />
+          </div>
+        </div>
+        <h3 className={`text-xl font-bold ${colors.title} mb-3`}>{title}</h3>
+        <p className="text-gray-600 mb-6 leading-relaxed">{message}</p>
+        <button
+          onClick={onClose}
+          className={`${colors.button} text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-lg`}
+        >
+          Fechar
+        </button>
+      </motion.div>
+    </section>
+  );
+};
+
+// --------------------------------------------------------------- Estatísticas dos vendedores
+
+const StatsSection = ({ vendedores, produtosAdicionados }) => {
+  const stats = [
+    {
+      icon: Users,
+      value: vendedores.length,
+      label: "Vendedores",
+      color: "text-blue-500",
+    },
+    {
+      icon: Package,
+      value: produtosAdicionados.length,
+      label: "Produtos",
+      color: "text-green-500",
+    },
+    {
+      icon: Award,
+      value: "100%",
+      label: "Qualidade",
+      color: "text-purple-500",
+    },
+    { icon: Heart, value: "Local", label: "Produção", color: "text-red-500" },
+  ];
+
+  return (
+    <section className="py-16 bg-gradient-to-r from-green-50 to-blue-50 relative overflow-hidden">
+      <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 relative z-10"
+        >
+          <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
+            Estatísticas da Banca
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Números que mostram nossa qualidade e variedade
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-white/80 backdrop-blur-lg rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 text-center group hover:scale-105 border border-white/20"
+              >
+                <div
+                  className={`w-16 h-16 bg-gradient-to-br from-white to-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-125 transition-all duration-500 shadow-lg`}
+                >
+                  <Icon className={stat.color} size={32} />
+                </div>
+                <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+                  {stat.value}
+                </h3>
+                <p className="text-gray-700 font-semibold">{stat.label}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </article>
+    </section>
+  );
+};
+
+// ======================================================= Página do vendedor
 
 const Vendedor = () => {
   const { bancaId } = useParams();
@@ -31,15 +191,24 @@ const Vendedor = () => {
   const [produtosExistentes, setProdutosExistentes] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
   const [produtosAdicionados, setProdutosAdicionados] = useState([]);
-  const [adicionadoModalVisible, setAdicionadoModalVisible] = useState(false);
-  const [removidoModalVisible, setRemovidoModalVisible] = useState(false);
-  const [limiteExcedidoModalVisible, setLimiteExcedidoModalVisible] =
-    useState(false);
-  const [produtoDuplicadoModalVisible, setProdutoDuplicadoModalVisible] =
-    useState(false);
-  const [produtoSelecionadoModalVisible, setProdutoSelecionadoModalVisible] =
-    useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Modal estados
+  const [modal, setModal] = useState({
+    isOpen: false,
+    type: "",
+    title: "",
+    message: "",
+    icon: null,
+  });
+
+  const showModal = (type, title, message, icon) => {
+    setModal({ isOpen: true, type, title, message, icon });
+  };
+
+  const closeModal = () => {
+    setModal({ isOpen: false, type: "", title: "", message: "", icon: null });
+  };
 
   useEffect(() => {
     const fetchBanca = async () => {
@@ -124,12 +293,22 @@ const Vendedor = () => {
   const handleAddProduto = async () => {
     try {
       if (!vendedores[0] || !produtoSelecionado) {
-        setProdutoSelecionadoModalVisible(true);
+        showModal(
+          "warning",
+          "Atenção!",
+          "Selecione um produto antes de adicionar.",
+          AlertTriangle
+        );
         return;
       }
 
       if (produtosAdicionados.length >= 24) {
-        setLimiteExcedidoModalVisible(true);
+        showModal(
+          "warning",
+          "Limite Atingido!",
+          "Limite de 24 produtos atingido!",
+          AlertTriangle
+        );
         return;
       }
 
@@ -140,7 +319,12 @@ const Vendedor = () => {
         (prod) => prod.id === produtoId
       );
       if (produtoExistente) {
-        setProdutoDuplicadoModalVisible(true);
+        showModal(
+          "error",
+          "Produto Duplicado!",
+          "Este produto já foi adicionado!",
+          XCircle
+        );
         return;
       }
 
@@ -178,10 +362,22 @@ const Vendedor = () => {
         }))
       );
 
-      setAdicionadoModalVisible(true);
+      showModal(
+        "success",
+        "Sucesso!",
+        "Produto adicionado com sucesso!",
+        CheckCircle
+      );
+      setProdutoSelecionado("");
       console.log("Produto adicionado com sucesso!");
     } catch (error) {
       console.error("Erro ao adicionar produto:", error);
+      showModal(
+        "error",
+        "Erro!",
+        "Erro ao adicionar produto. Tente novamente.",
+        XCircle
+      );
     }
   };
 
@@ -197,262 +393,325 @@ const Vendedor = () => {
       });
 
       setProdutosAdicionados(novosProdutosAdicionados);
-      setRemovidoModalVisible(true);
+      showModal(
+        "success",
+        "Sucesso!",
+        "Produto removido com sucesso!",
+        CheckCircle
+      );
       console.log("Produto removido com sucesso!");
     } catch (error) {
       console.error("Erro ao remover produto:", error);
+      showModal(
+        "error",
+        "Erro!",
+        "Erro ao remover produto. Tente novamente.",
+        XCircle
+      );
     }
   };
 
-  return (
-    <div
-      className="bg-cover bg-center min-h-screen text-gray-800 relative"
-      style={{ backgroundImage: `url(${fundo})` }}
-    >
-      <div className="bg-gray-800 bg-opacity-70 min-h-screen h-full relative z-10 flex flex-col">
+  if (isLoading) {
+    return (
+      <section className="min-h-screen bg-gray-50">
         <MenuTopo />
-        <div className="container mx-auto py-8 flex-grow">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-screen">
-              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
-            </div>
-          ) : (
-            <div className="bg-gray-200 bg-opacity-85 rounded-lg shadow-md p-8">
-              <h1 className="text-2xl uppercase text-center font-bold text-gray-800 mb-6">
-                {banca.nome}
-              </h1>
-              <div className="mb-8">
-                <h2 className="text-sm uppercase text-center font-semibold text-gray-800 mb-4">
-                  Vendedores
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                  {vendedores.map((vendedor) => (
-                    <div
-                      key={vendedor.id}
-                      className="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center transition duration-300 transform hover:scale-105"
-                    >
-                      <div className="w-48 h-48 mb-2 overflow-hidden rounded-full">
-                        <img
-                          src={
-                            vendedor.images && vendedor.images.length > 0
-                              ? vendedor.images[0].url
-                              : "placeholder.jpg"
-                          }
-                          alt={`Imagem de perfil de ${vendedor.nome}`}
-                          className="object-cover w-full h-full rounded-full"
-                        />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {vendedor.nome}
-                      </h3>
-                      <p className="text-gray-600 mb-1">{vendedor.cidade}</p>
-                      <a
-                        href={`https://api.whatsapp.com/send?phone=${vendedor?.whatsapp}&text= Olá ${vendedor?.nome}! vi sua ${banca?.nome} no site da Feira de Buritizeiro e fiquei interessado.`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-2 inline-block bg-green-500 text-white py-2 px-4 rounded-lg font-medium text-xs hover:bg-green-600"
-                      >
-                        Conversar com vendedor{" "}
-                        <FaWhatsapp className="inline-block ml-1" />
-                      </a>
-                    </div>
-                  ))}
-                </div>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Loader
+              className="animate-spin mx-auto mb-4 text-green-600"
+              size={48}
+            />
+            <p className="text-gray-600 text-lg">
+              Carregando informações da banca...
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </section>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-gray-50">
+      <MenuTopo />
+
+      <section
+        className="bg-cover bg-no-repeat bg-center py-20"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.738), rgba(0, 0, 0, 0.728)), url(${banner})`,
+        }}
+      >
+        {/* Background */}
+        <div className="absolute top-20 left-10 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-white/20 rounded-full blur-xl"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center relative z-10"
+          >
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <Store size={40} className="text-white" />
               </div>
-              {user?.role === "admin" && (
-                <div className="mb-2">
-                  <label
-                    htmlFor="produto"
-                    className="block text-sm font-medium"
-                  >
-                    Selecione um produto:
-                  </label>
-                  <select
-                    id="produto"
-                    onChange={handleProdutoChange}
-                    value={produtoSelecionado}
-                    className="border border-green-600 text-sm py-1 rounded text-green-700"
-                  >
-                    <option value="">Selecione um produto...</option>
-                    {produtosExistentes
-                      .flatMap((categoria) => categoria.produtos)
-                      .filter(
-                        (produto) =>
-                          !produtosAdicionados.some(
-                            (adicionado) => adicionado.id === produto.id
-                          )
-                      )
-                      .sort((a, b) => a.nome.localeCompare(b.nome))
-                      .map((produto) => (
-                        <option key={produto.id} value={produto.id}>
-                          {produto.nome}
-                        </option>
-                      ))}
-                  </select>
+            </div>
+            <h1 className="text-4xl text-white lg:text-5xl font-bold mb-4">
+              {banca?.nome}
+            </h1>
+            <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed">
+              Conheça nossos vendedores e produtos de qualidade
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Estatísticas Section */}
+      <StatsSection
+        vendedores={vendedores}
+        produtosAdicionados={produtosAdicionados}
+      />
+
+      {/* Main Content */}
+      <section className="py-20 bg-gradient-to-br bg-white from-slate-50 relative overflow-hidden">
+        {/* Background */}
+
+        <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Vendedores Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-16"
+          >
+            <h2 className="text-3xl text-center lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-12">
+              Nossos Vendedores
+            </h2>
+
+            <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {vendedores.map((vendedor, index) => (
+                <motion.div
+                  key={vendedor.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50"
+                >
+                  {/* Card do vendedor*/}
+                  <div className="bg-gradient-to-r bg-white via-teal-50 to-green-100 p-6 text-center">
+                    <div className="w-36 h-36 mx-auto relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-green-300 to-blue-300 rounded-full blur-lg"></div>
+                      <img
+                        src={
+                          vendedor.images && vendedor.images.length > 0
+                            ? vendedor.images[0].url
+                            : "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400"
+                        }
+                        alt={`Imagem de perfil de ${vendedor.nome}`}
+                        className="relative w-full h-full rounded-full object-cover shadow-2xl border-1 border-white"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-8 text-center">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      {vendedor.nome}
+                    </h3>
+                    <p className="text-gray-600 text-lg mb-4 flex items-center justify-center space-x-2">
+                      <MapPin size={16} />
+                      <span>{vendedor.cidade}</span>
+                    </p>
+
+                    <a
+                      href={`https://api.whatsapp.com/send?phone=${vendedor?.whatsapp}&text=Olá ${vendedor?.nome}! Vi sua ${banca?.nome} no site da Feira de Buritizeiro e fiquei interessado.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center text-sm space-x-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-lg transform hover:scale-105"
+                    >
+                      <FaWhatsapp size={22} />
+                      <span>Conversar no WhatsApp</span>
+                    </a>
+                  </div>
+                </motion.div>
+              ))}
+            </section>
+          </motion.div>
+
+          {/* Admin gerencimento dos produtos */}
+          {user?.role === "admin" && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mb-16"
+            >
+              <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-lg p-8 border border-white/50">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+                  Gerenciar Produtos
+                </h3>
+
+                <div className="flex flex-col md:flex-row gap-4 items-end">
+                  <div className="flex-1">
+                    <label
+                      htmlFor="produto"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Selecione um produto:
+                    </label>
+                    <select
+                      id="produto"
+                      onChange={handleProdutoChange}
+                      value={produtoSelecionado}
+                      className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                    >
+                      <option value="">Selecione um produto...</option>
+                      {produtosExistentes
+                        .flatMap((categoria) => categoria.produtos)
+                        .filter(
+                          (produto) =>
+                            !produtosAdicionados.some(
+                              (adicionado) => adicionado.id === produto.id
+                            )
+                        )
+                        .sort((a, b) => a.nome.localeCompare(b.nome))
+                        .map((produto) => (
+                          <option key={produto.id} value={produto.id}>
+                            {produto.nome}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
                   <button
-                    className="bg-red-500 text-sm ml-4 text-white px-2 py-1 rounded-lg inline-flex items-center transition duration-300 hover:bg-red-600 focus:outline-none mt-4"
                     onClick={handleAddProduto}
+                    className="inline-flex items-center text-sm space-x-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-lg transform hover:scale-105"
                   >
-                    Adicionar Produto
+                    <Plus size={20} />
+                    <span>Adicionar Produto</span>
                   </button>
                 </div>
-              )}
-              <div className="mt-2">
-                <h2 className="text-sm uppercase text-center mb-4 mt-6 font-semibold text-gray-800">
-                  Produtos Disponíveis
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {produtosAdicionados.map((produto) => (
-                    <div
-                      key={produto.id}
-                      className="bg-white rounded-lg shadow-md p-4 transition duration-300 transform hover:scale-105"
-                    >
-                      <h3 className="text-sm text-center font-semibold text-gray-800 mb-2">
+              </div>
+            </motion.div>
+          )}
+
+          {/* Produtos Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-3xl mt-32 text-center lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-12">
+              Produtos Disponíveis
+            </h2>
+
+            {produtosAdicionados.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                {produtosAdicionados.map((produto, index) => (
+                  <motion.div
+                    key={produto.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    className="bg-white/80 backdrop-blur-lg rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50"
+                  >
+                    <div className="relative">
+                      {produto.images && produto.images.length > 0 && (
+                        <img
+                          src={produto.images[0].url}
+                          alt={`Imagem de ${produto.nome}`}
+                          className="w-full h-48 object-cover"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+
+                    <div className="p-4">
+                      <h3 className="text-lg font-bold text-gray-900 text-center">
                         {produto.nome}
                       </h3>
-                      {produto.images && produto.images.length > 0 && (
-                        <div className="w-full h-48 mb-2 overflow-hidden rounded-md">
-                          <img
-                            src={produto.images[0].url}
-                            alt={`Imagem de ${produto.nome}`}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                      )}
+
                       {user?.role === "admin" && (
                         <button
-                          className="bg-red-500 text-white py-1 px-3 rounded-lg font-medium text-sm hover:bg-red-600"
                           onClick={() => handleRemoverProduto(produto.id)}
+                          className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 text-white py-2 px-4 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-lg transform hover:scale-105"
                         >
-                          Remover
+                          <Trash2 size={16} />
+                          <span>Remover</span>
                         </button>
                       )}
                     </div>
-                  ))}
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="bg-white/80 backdrop-blur-lg rounded-xl p-12 shadow-lg border border-white/50 max-w-md mx-auto">
+                  <ShoppingBag
+                    className="mx-auto mb-4 text-gray-400"
+                    size={64}
+                  />
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    Nenhum produto disponível
+                  </h3>
+                  <p className="text-gray-600">
+                    Esta banca ainda não possui produtos cadastrados.
+                  </p>
                 </div>
               </div>
-              <div className=" mb-8 mt-8 flex justify-center space-x-4">
-                <Link to="/todascategorias">
-                  <motion.button
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 1.8 }}
-                    className="bg-green-700 text-white text-xs py-2 px-6 rounded-md hover:bg-green-800 focus:outline-none focus:shadow-outline transition-colors flex items-center"
-                  >
-                    <FontAwesomeIcon icon={faChevronRight} className="mr-2" />
-                    Conheça todas as categorias
-                  </motion.button>
-                </Link>
-                <Link to="/bancas">
-                  <motion.button
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 1.8 }}
-                    className="bg-green-700 text-white text-xs py-2 px-6 rounded-md hover:bg-green-800 focus:outline-none focus:shadow-outline transition-colors flex items-center"
-                  >
-                    <FontAwesomeIcon icon={faChevronRight} className="mr-2" />
-                    Conheça todas as bancas
-                  </motion.button>
-                </Link>
-              </div>
-            </div>
-          )}
-          {/* Modal de produto adicionado */}
-          {adicionadoModalVisible && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col items-center">
-                <RiCheckLine className="text-green-500 text-3xl mb-4" />
-                <p className="text-sm font-semibold text-gray-800 mb-4">
-                  Produto adicionado com sucesso!
-                </p>
-                <button
-                  onClick={() => setAdicionadoModalVisible(false)}
-                  className="bg-green-500 text-white px-4 py-2 rounded-md mt-4"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          )}
+            )}
+          </motion.div>
 
-          {/* Modal de produto removido */}
-          {removidoModalVisible && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col items-center">
-                <RiCheckLine className="text-green-500 text-4xl mb-4" />
-                <p className="text-sm font-semibold text-gray-800 mb-4">
-                  Produto removido com sucesso!
-                </p>
-                <button
-                  onClick={() => setRemovidoModalVisible(false)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md mt-4"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          )}
+          {/* Botões de navegação */}
 
-          {/* Modal de limite de produtos atingidos */}
-          {limiteExcedidoModalVisible && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col items-center">
-                <p className="text-sm font-semibold text-gray-800 mb-4">
-                  Limite de 20 produtos atingido!
-                </p>
-                <button
-                  onClick={() => setLimiteExcedidoModalVisible(false)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md mt-4"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          )}
+          <article className="flex flex-col sm:flex-row gap-6 justify-center items-center mt-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <Link
+                to="/todascategorias"
+                className="inline-flex items-center text-sm space-x-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 font-semibold text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-lg transform hover:scale-105"
+              >
+                <ChevronRight size={24} />
+                <span>Conheça todas as categorias</span>
+              </Link>
+            </motion.div>
 
-          {/* Modal de produto já foi adicionado */}
-          {produtoDuplicadoModalVisible && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col items-center">
-                <div className="flex items-center justify-center rounded-full bg-red-500 text-white w-12 h-12 mb-6">
-                  <HiX className="text-3xl" />
-                </div>
-                <p className="text-sm text-center font-semibold text-gray-800 mb-4">
-                  Este produto já foi adicionado!
-                </p>
-                <button
-                  onClick={() => setProdutoDuplicadoModalVisible(false)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 mt-4"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          )}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <Link
+                to="/bancas"
+                className="inline-flex items-center text-sm space-x-3 bg-gradient-to-r from-gray-700 to-gray-800 text-white px-8 py-3 rounded-xl font-semibold hover:from-gray-800 hover:to-gray-900 transition-all duration-300 shadow-lg hover:shadow-2xl transform hover:scale-105"
+              >
+                <ChevronRight size={24} />
+                <span>Conheça todas as bancas</span>
+              </Link>
+            </motion.div>
+          </article>
+        </article>
+      </section>
 
-          {/* Modal de produto não selecionado */}
-          {produtoSelecionadoModalVisible && (
-            <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
-              <div className="bg-white rounded-lg p-8 shadow-lg flex flex-col items-center">
-                <div className="flex items-center justify-center rounded-full bg-yellow-500 text-white w-12 h-12 mb-4">
-                  <HiExclamationCircle className="text-3xl" />
-                </div>
-                <p className="text-sm font-semibold text-gray-800 mb-4">
-                  Selecione um produto antes de adicionar.
-                </p>
-                <button
-                  onClick={() => setProdutoSelecionadoModalVisible(false)}
-                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 mt-4"
-                >
-                  Fechar
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        <Footer />
-      </div>
-    </div>
+      <ScrollTopoButton />
+
+      <Footer />
+
+      {/* Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={closeModal}
+        type={modal.type}
+        title={modal.title}
+        message={modal.message}
+        icon={modal.icon}
+      />
+    </main>
   );
 };
 

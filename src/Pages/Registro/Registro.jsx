@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import logo1 from "../../assets/logo1.png";
+import logo from "../../assets/logo.png";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../../components/Input";
@@ -274,23 +274,19 @@ const Registro = () => {
         {/* Logo e Título */}
         <Link
           to="/"
-          className="max-w-sm w-full flex flex-col items-center mt-8"
+          className="max-w-sm w-full flex flex-col items-center mt-10"
         >
-          <img src={logo1} alt="Logo" className="w-40 mx-auto animate-bounce" />
-          <h1 className="text-2xl uppercase text-white mb-1 font-extrabold tracking-wide">
-            Viva Bem
-          </h1>
-          <h3 className="text-sm text-gray-300 font-semibold">Buritizeiro</h3>
+          <img src={logo} alt="Logo" className="w-32 mx-auto animate-bounce" />
         </Link>
 
         <form
-          className="bg-white max-w-md w-full bg-opacity-10 text-sm backdrop-blur-md rounded-lg p-8 shadow-lg"
+          className="bg-white max-w-md w-full bg-opacity-10 text-sm backdrop-blur-md rounded-2xl p-8 shadow-lg"
           onSubmit={handleSubmit(onSubmit)}
         >
           <h1 className="text-center mb-6 text-gray-200 font-bold text-xl">
             REGISTRO
           </h1>
-          <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
             <div>
               <Input
                 type="text"
@@ -314,7 +310,7 @@ const Registro = () => {
               />
             </div>
           </div>
-          <div className="mb-4">
+          <div className="mb-6">
             <Input
               type="password"
               placeholder="Digite sua senha..."
@@ -323,21 +319,32 @@ const Registro = () => {
               register={register}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-sm font-semibold text-white mb-2 text-center">
+          <div className="mb-6">
+            <label
+              htmlFor="role"
+              className="block text-sm font-semibold text-white mb-2 text-center"
+            >
               Tipo de usuário
             </label>
+
             <select
+              id="role"
               {...register("role")}
-              className="block w-full p-2 text-gray-300 bg-zinc-900 rounded-md border border-gray-300 focus:outline-none"
+              className="block w-full px-2 py-3 bg-zinc-900 text-gray-200 border border-gray-600 rounded-md focus:outline-none transition-colors"
             >
+              <option value="" disabled selected>
+                Selecione uma opção
+              </option>
               <option value="cliente">Cliente</option>
               <option value="admin" disabled={isAdminDisabled}>
                 Administrador
               </option>
             </select>
+
             {isAdminDisabled && (
-              <p className="text-red-400 mt-2 text-center"></p>
+              <p className="mt-2 text-sm text-red-400 text-center">
+                O acesso de administrador está desativado.
+              </p>
             )}
           </div>
           {isLoading ? (
@@ -347,7 +354,7 @@ const Registro = () => {
           ) : (
             <button
               type="submit"
-              className="bg-zinc-800 w-full hover:bg-zinc-900 rounded-md text-white h-10 font-medium transition duration-300 transform hover:scale-105"
+              className="bg-zinc-800 w-full text-sm hover:bg-zinc-900 rounded-md text-white py-3 font-medium transition duration-300 transform hover:scale-105"
             >
               Cadastrar
             </button>
@@ -368,16 +375,23 @@ const Registro = () => {
             </>
           )}
 
+          {/* Divider */}
+          <div className="my-6 flex items-center">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <span className="px-4 text-sm text-gray-200">ou</span>
+            <div className="flex-1 border-t border-gray-300"></div>
+          </div>
+
           <div className="flex flex-col gap-2 mt-4">
             <button
               onClick={handleGoogleLogin}
-              className="bg-red-500 text-white text-sm rounded-md px-2 py-2 flex items-center justify-center gap-2"
+              className="bg-red-500 text-white text-sm rounded-md px-2 py-3 flex items-center justify-center gap-2"
             >
               <FaGoogle size={20} /> Entrar com Google
             </button>
             <Link
               to="/Login"
-              className="text-white inline-block text-xs text-center hover:bg-zinc-500 py-2 px-2 rounded-md transition duration-300 ease-in-out"
+              className="text-white inline-block mt-4 text-sm text-center hover:bg-zinc-500 py-3 px-2 rounded-md transition duration-300 ease-in-out"
             >
               Já possui uma conta? Conecte-se.
             </Link>
@@ -386,7 +400,7 @@ const Registro = () => {
         <div className="flex flex-col gap-2">
           <Link
             to="/"
-            className="text-white text-xs hover:bg-zinc-500 rounded-md py-2 px-2 text-center transition duration-300 ease-in-out"
+            className="text-white text-sm mb-10 hover:bg-zinc-500 rounded-md py-2 px-2 text-center transition duration-300 ease-in-out"
           >
             Voltar ao Início
           </Link>

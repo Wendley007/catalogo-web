@@ -20,7 +20,7 @@ const Admin = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
-  const [adminUids, setAdminUids] = useState([]); // Armazena os UIDs dos dois primeiros administradores
+  const [adminUids, setAdminUids] = useState([]);
 
   useEffect(() => {
     const fetchUsers = async () => {

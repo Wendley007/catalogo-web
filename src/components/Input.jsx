@@ -12,7 +12,7 @@ export function Input({ name, placeholder, type, register, rules, error }) {
   return (
     <div className="relative">
       <input
-        className="w-full border-2 rounded-md h-8 px-2"
+        className="w-full border-2 rounded-md py-2 px-2"
         placeholder={placeholder}
         type={showPassword ? "text" : type}
         {...register(name, rules)}
