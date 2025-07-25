@@ -3,6 +3,7 @@ import { createContext, useState, useEffect } from "react";
 import { onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebaseConnection";
+import { logger } from "../utils/logger";
 
 const AuthContext = createContext({
   signed: false,
@@ -62,7 +63,7 @@ const AuthProvider = ({ children }) => {
           photoURL: auth.currentUser.photoURL, // Atualizando a foto
         }));
       } catch (error) {
-        console.error("Erro ao atualizar perfil do usuário:", error);
+        logger.error("Erro ao atualizar perfil do usuário", error);
         throw error;
       }
     } else {
@@ -74,9 +75,9 @@ const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       setUser(null);
-      console.log("Deslogado com sucesso");
+      logger.success("Deslogado com sucesso");
     } catch (error) {
-      console.error("Erro ao deslogar:", error);
+      logger.error("Erro ao deslogar", error);
     }
   };
 
