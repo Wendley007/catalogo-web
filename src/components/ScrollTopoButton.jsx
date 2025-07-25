@@ -27,7 +27,7 @@ export default function ScrollTopoButton() {
           animate={{ opacity: 1, scale: 1 }}
           whileHover={{ scale: 1.15 }}
           transition={{ duration: 0.3 }}
-          className="fixed bottom-4 right-4 z-50 w-12 h-12 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-[0_0_12px_rgba(244,114,182,0.7)] hover:from-pink-600 hover:to-rose-600 transition-all duration-300 flex items-center justify-center"
+          className="fixed bottom-4 right-4 z-40 w-12 h-12 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-[0_0_12px_rgba(244,114,182,0.7)] hover:from-pink-600 hover:to-rose-600 transition-all duration-300 flex items-center justify-center"
         >
           <ArrowUp size={20} />
         </motion.button>

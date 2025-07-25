@@ -665,10 +665,6 @@ const TodasCategorias = () => {
 
       <section className="py-20 bg-gradient-to-br bg-white relative">
         {/* Background */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-32 left-32 w-96 h-96 bg-gradient-to-r from-blue-50 to-purple-100 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-32 right-32 w-80 h-80 bg-gradient-to-r from-green-100 to-teal-100 rounded-full blur-3xl"></div>
-        </div>
 
         <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div

@@ -324,7 +324,8 @@ const MobileMenu = ({ isOpen, onClose, menuItems }) => {
         />
 
         {/* Sidebar Menu */}
-        <section className="absolute top-0 right-0 h-[95vh] w-[350px] rounded-l-2xl bg-gradient-to-r from-green-50 to-blue-50 shadow-2xl overflow-hidden z-50 transition-all duration-500 ease-out">
+        <section className="absolute top-0 right-0 h-screen w-[350px] rounded-l-2xl bg-gradient-to-r from-green-50 to-blue-50 shadow-2xl overflow-auto z-60">
+          {" "}
           {/* Header */}
           <header className="relative bg-gradient-to-r from-green-600 to-green-700 p-6 shadow-lg">
             <div className="absolute inset-0 bg-black/10" />
@@ -352,7 +353,6 @@ const MobileMenu = ({ isOpen, onClose, menuItems }) => {
               </button>
             </div>
           </header>
-
           {/* Itens de navegação */}
           <motion.nav
             className="px-6 py-8 space-y-3"
@@ -387,7 +387,6 @@ const MobileMenu = ({ isOpen, onClose, menuItems }) => {
               );
             })}
           </motion.nav>
-
           {/* Área do usuário */}
           <footer className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-gray-100 to-transparent">
             {user ? (
