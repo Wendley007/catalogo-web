@@ -72,6 +72,6 @@ export default defineConfig({
 
   // Configurações de esbuild
   esbuild: {
-    jsxInject: `import React from 'react'`,
+    // Removido jsxInject para evitar conflito com imports manuais
   },
 });
