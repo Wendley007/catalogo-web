@@ -33,7 +33,7 @@ const ImageUploadButton = ({ onChange }) => (
 const NovoProdutoForm = () => {
   const { user } = useContext(AuthContext);
   const [categorias, setCategorias] = useState([]);
-  const [setNovaCategoria] = useState("");
+  const [novaCategoria, setNovaCategoria] = useState("");
   const [produtoCadastrado, setProdutoCadastrado] = useState("");
   const [imagemProduto, setImagemProduto] = useState(null);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState("");

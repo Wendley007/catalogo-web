@@ -11,7 +11,7 @@ import {
   deleteDoc,
   query,
 } from "firebase/firestore";
-import fundo from "../../../assets/fundo.jpg";
+
 import MenuTopo from "../../../components/MenuTopo";
 import Footer from "../../../components/Footer";
 import ConfirmModal from "../../../components/Modal/ConfirmModal";
@@ -49,7 +49,7 @@ const ProductImage = ({ images, name }) => {
   }
 
   return (
-    <div className="relative w-full h-60 overflow-hidden group">
+    <div className="relative w-full h-64 overflow-hidden group">
       <motion.img
         key={currentImageIndex}
         initial={{ opacity: 0 }}
@@ -57,12 +57,14 @@ const ProductImage = ({ images, name }) => {
         transition={{ duration: 0.3 }}
         src={images[currentImageIndex].url}
         alt={`${name} - Imagem ${currentImageIndex + 1}`}
-        className="object-cover w-full h-full transform scale-100 group-hover:scale-105 transition-transform duration-300"
+        className="object-cover w-full h-full transform scale-100 group-hover:scale-110 transition-transform duration-500"
       />
 
       {/* Overlay com nome do produto */}
-      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <p className="text-white font-bold text-lg text-center px-4">{name}</p>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        <p className="text-white font-bold text-lg text-center px-4 pb-4">
+          {name}
+        </p>
       </div>
 
       {/* Navegação de imagens */}
@@ -127,8 +129,13 @@ const ProductCard = ({ produto, onSelect, onDelete, isAdmin }) => {
 
   return (
     <div className="cursor-pointer" onClick={handleClick}>
-      <section className="relative bg-gradient-to-br from-green-300 to-green-900 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border-2 border-transparent hover:border-green-400">
+      <section className="relative bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50">
         <ProductImage images={produto.images} name={produto.nome} />
+
+        {/* Etiqueta simples */}
+        <div className="absolute top-3 left-3">
+          <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-white/20"></div>
+        </div>
 
         {/* Botão de deletar para admin */}
         {isAdmin && (
@@ -137,7 +144,7 @@ const ProductCard = ({ produto, onSelect, onDelete, isAdmin }) => {
               e.stopPropagation();
               onDelete(produto);
             }}
-            className="absolute top-2 right-2 bg-red-500/90 hover:bg-red-600/90 text-white p-2 rounded-full shadow-lg transition-colors duration-200"
+            className="absolute top-3 right-3 bg-red-500/90 hover:bg-red-600/90 text-white p-2 rounded-full shadow-lg transition-all duration-200 transform hover:scale-110 z-10"
             aria-label={`Excluir ${produto.nome}`}
           >
             <FaTrashAlt size={16} />
@@ -166,33 +173,142 @@ ProductCard.defaultProps = {
 /**
  * Componente para lista de bancas
  */
-const BancasList = ({ bancas, produtoName }) => {
+const BancasList = ({ bancas, produtoName, loading, onClose }) => {
   return (
-    <div className="mt-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-      <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-        <FaStore className="text-green-400" />
-        Bancas que vendem {produtoName}
-      </h3>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: 20 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="bg-gradient-to-br from-white via-gray-50 to-white backdrop-blur-xl rounded-3xl shadow-2xl border border-white/60 relative max-w-lg w-full max-h-[85vh] overflow-hidden"
+    >
+      {/* Header com gradiente */}
+      <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-t-3xl p-6 pr-8 relative overflow-hidden">
+        {/* Decoração de fundo */}
+        <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-green-600/20"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
 
-      {bancas.length > 0 ? (
-        <div className="space-y-2">
-          {bancas.map((banca) => (
-            <div key={banca.id}>
-              <Link
-                to={`/bancas/${banca.id}`}
-                className="block text-green-400 hover:text-white hover:bg-green-500/20 rounded-lg px-3 py-2 transition-colors duration-200 text-sm font-medium"
-              >
-                {banca.nome || "Nome da banca não disponível"}
-              </Link>
-            </div>
-          ))}
+        {/* Título */}
+        <div className="flex items-center gap-3 text-white">
+          <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm flex-shrink-0">
+            <FaStore className="text-white text-xl" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-xl truncate">Bancas Disponíveis</h3>
+            <p className="text-white/90 text-sm font-medium truncate">
+              Produto: {produtoName}
+            </p>
+          </div>
+
+          {/* Botão X para fechar */}
+          <button
+            onClick={onClose}
+            className="p-2.5 hover:bg-white/20 rounded-full transition-all duration-300 text-white hover:text-white/80 backdrop-blur-sm flex-shrink-0 ml-2"
+            aria-label="Fechar"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
         </div>
-      ) : (
-        <p className="text-gray-300 text-sm text-center py-4">
-          Este produto ainda não faz parte de nenhuma banca.
-        </p>
-      )}
-    </div>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="p-6">
+        {loading ? (
+          <div className="flex flex-col justify-center items-center py-12">
+            <div className="relative">
+              <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin"></div>
+              <div
+                className="absolute inset-0 w-12 h-12 border-4 border-transparent border-t-green-400 rounded-full animate-spin"
+                style={{
+                  animationDirection: "reverse",
+                  animationDuration: "1.5s",
+                }}
+              ></div>
+            </div>
+            <p className="text-gray-600 text-sm mt-4 font-medium">
+              Buscando bancas...
+            </p>
+          </div>
+        ) : bancas.length > 0 ? (
+          <div className="space-y-3">
+            <div className="text-center mb-4">
+              <span className="bg-green-100 text-green-800 text-xs font-semibold px-3 py-1 rounded-full">
+                {bancas.length} banca{bancas.length !== 1 ? "s" : ""} encontrada
+                {bancas.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+            {bancas.map((banca, index) => (
+              <motion.div
+                key={banca.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
+                <Link to={`/bancas/${banca.id}`} className="block group">
+                  <div className="bg-gradient-to-r from-gray-50 to-white hover:from-green-50 hover:to-green-100 rounded-2xl p-4 transition-all duration-300 border border-gray-200 hover:border-green-300 hover:shadow-lg transform hover:scale-[1.02]">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center text-white font-bold text-sm">
+                          {banca.nome?.charAt(0)?.toUpperCase() || "B"}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 group-hover:text-green-700 transition-colors">
+                            {banca.nome || "Nome da banca não disponível"}
+                          </h4>
+                          <p className="text-gray-500 text-xs">
+                            Clique para ver detalhes
+                          </p>
+                        </div>
+                      </div>
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <svg
+                          className="w-5 h-5 text-green-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <FaStore className="text-gray-400 text-2xl" />
+            </div>
+            <h4 className="text-gray-700 font-semibold mb-2">
+              Nenhuma banca encontrada
+            </h4>
+            <p className="text-gray-500 text-sm">
+              Este produto ainda não faz parte de nenhuma banca.
+            </p>
+          </div>
+        )}
+      </div>
+    </motion.div>
   );
 };
 
@@ -204,6 +320,8 @@ BancasList.propTypes = {
     })
   ).isRequired,
   produtoName: PropTypes.string.isRequired,
+  loading: PropTypes.bool,
+  onClose: PropTypes.func.isRequired,
 };
 
 /**
@@ -222,20 +340,62 @@ const SearchBar = React.memo(({ searchTerm, onSearchChange }) => {
   };
 
   return (
-    <section className="bg-white/10 backdrop-blur-sm p-2 rounded-xl w-full max-w-xl mx-auto mb-16 border border-white/20">
-      <div className="flex items-center gap-3">
-        <div className="relative flex-1">
-          <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-          <input
-            className="w-full pl-10 pr-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-400 transition-colors duration-200"
-            placeholder="Digite para buscar produtos..."
-            value={searchTerm}
-            onChange={handleInputChange}
-            onKeyPress={handleKeyPress}
-          />
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="w-full max-w-3xl mx-auto mb-8"
+    >
+      <div className="bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 relative overflow-hidden">
+        {/* Decorações de fundo */}
+        <div className="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full -translate-y-10 translate-x-10"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-500/10 rounded-full translate-y-8 -translate-x-8"></div>
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg">
+              <FaSearch className="text-white text-xl" />
+            </div>
+            <div className="flex-1">
+              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+                Buscar Produtos
+              </label>
+              <input
+                className="w-full pl-4 pr-4 py-3 bg-white/70 border-2 border-gray-200 rounded-2xl text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 transition-all duration-300 text-lg shadow-inner"
+                placeholder="Digite o nome do produto..."
+                value={searchTerm}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+              />
+            </div>
+            {searchTerm && (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={() => handleInputChange({ target: { value: "" } })}
+                className="p-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl shadow-lg transition-all duration-300 transform hover:scale-105"
+                title="Limpar busca"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </motion.button>
+            )}
+          </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 });
 
@@ -261,13 +421,54 @@ const StatsSection = ({ produtos, categoria }) => {
       transition={{ duration: 0.5 }}
       className="text-center mb-8"
     >
-      <h1 className="text-3xl font-bold text-white mb-2">
-        Catálogo de {categoria.nome}
-      </h1>
-      <p className="text-gray-300 mb-4">
-        {produtos.length} produto{produtos.length !== 1 ? "s" : ""} encontrado
-        {produtos.length !== 1 ? "s" : ""}
-      </p>
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 backdrop-blur-xl rounded-3xl shadow-lg p-8 border border-white/60 max-w-5xl mx-auto relative overflow-hidden">
+        {/* Decorações de fundo */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 rounded-full translate-y-12 -translate-x-12"></div>
+
+        <div className="relative z-10">
+          <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-lg">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+                />
+              </svg>
+            </div>
+            <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent">
+              {categoria.nome}
+            </h1>
+          </div>
+
+          <div className="flex items-center justify-center gap-6 mb-6">
+            <div className="bg-gradient-to-r from-green-100 to-green-200 px-6 py-3 rounded-2xl shadow-lg">
+              <p className="text-green-800 font-bold text-lg">
+                {produtos.length}
+              </p>
+              <p className="text-green-600 text-sm">
+                produto{produtos.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-r from-blue-100 to-blue-200 px-6 py-3 rounded-2xl shadow-lg">
+              <p className="text-blue-800 font-bold text-lg">
+                {produtos.filter((p) => p.images && p.images.length > 0).length}
+              </p>
+              <p className="text-blue-600 text-sm">com imagens</p>
+            </div>
+          </div>
+
+          <div className="w-32 h-1 bg-gradient-to-r from-green-500 via-blue-500 to-purple-500 mx-auto rounded-full shadow-lg"></div>
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -292,6 +493,7 @@ const ProdutosPorCategoria = () => {
   const [bancasProduto, setBancasProduto] = useState([]);
   const [selectedProdutoId, setSelectedProdutoId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [loadingBancas, setLoadingBancas] = useState(false);
   const [error, setError] = useState("");
   const [deleteModal, setDeleteModal] = useState({
     isOpen: false,
@@ -360,6 +562,7 @@ const ProdutosPorCategoria = () => {
 
   // Buscar bancas por produto
   const fetchBancasPorProduto = useCallback(async (produtoId) => {
+    setLoadingBancas(true);
     try {
       console.log("Buscando bancas para o produto:", produtoId);
       const snapshotBancas = await getDocs(collection(db, "bancas"));
@@ -400,6 +603,8 @@ const ProdutosPorCategoria = () => {
     } catch (error) {
       console.error("Erro ao buscar bancas por produto:", error);
       setBancasProduto([]);
+    } finally {
+      setLoadingBancas(false);
     }
   }, []);
 
@@ -433,6 +638,7 @@ const ProdutosPorCategoria = () => {
       if (selectedProdutoId === produtoId) {
         console.log("Fechando detalhes do produto");
         setSelectedProdutoId(null);
+        setBancasProduto([]); // Limpar bancas quando fechar
       } else {
         console.log("Abrindo detalhes do produto:", produtoId);
         setSelectedProdutoId(produtoId);
@@ -450,11 +656,33 @@ const ProdutosPorCategoria = () => {
     setDeleteModal({ isOpen: true, produto });
   }, []);
 
-  // Click outside para fechar detalhes
+  // Função para fechar o modal das bancas
+  const handleCloseBancas = useCallback(() => {
+    setSelectedProdutoId(null);
+    setBancasProduto([]);
+  }, []);
+
+  // Click outside para fechar detalhes - apenas quando modal está aberto
   useEffect(() => {
+    if (!selectedProdutoId) return;
+
     const handleClickOutside = (event) => {
-      if (listRef.current && !listRef.current.contains(event.target)) {
-        setSelectedProdutoId(null);
+      // Verificar se o clique foi fora do modal
+      const modalElement = document.querySelector('[data-modal="bancas"]');
+      if (modalElement && !modalElement.contains(event.target)) {
+        // Verificar se não clicou em outro modal ou menu
+        const otherModal = document.querySelector(
+          '[data-modal]:not([data-modal="bancas"])'
+        );
+        const menuElement = document.querySelector('[role="menu"]');
+
+        if (
+          !otherModal?.contains(event.target) &&
+          !menuElement?.contains(event.target)
+        ) {
+          setSelectedProdutoId(null);
+          setBancasProduto([]);
+        }
       }
     };
 
@@ -462,7 +690,7 @@ const ProdutosPorCategoria = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [selectedProdutoId]);
 
   return (
     <>
@@ -481,14 +709,19 @@ const ProdutosPorCategoria = () => {
         type="website"
       />
 
-      <div
-        className="bg-cover bg-center min-h-screen text-gray-800 relative overflow-hidden"
-        style={{ backgroundImage: `url(${fundo})` }}
-      >
-        <div className="bg-gray-900/90 min-h-screen relative overflow-hidden">
+      <div className="min-h-screen text-gray-800 relative ">
+        <div className="bg-gradient-to-br from-gray-100 via-green-50  to-purple-100 min-h-screen relative overflow-hidden">
+          {/* Elementos decorativos de fundo */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-green-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute top-40 right-20 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl"></div>
+            <div className="absolute bottom-40 right-1/3 w-64 h-64 bg-yellow-400/15 rounded-full blur-3xl"></div>
+          </div>
+
           <MenuTopo />
 
-          <div className="container mx-auto py-8 px-4 overflow-hidden">
+          <div className="container mx-auto py-8 px-1 overflow-hidden relative z-10">
             {/* Header e Estatísticas */}
             <StatsSection produtos={produtos} categoria={categoria} />
 
@@ -505,7 +738,7 @@ const ProdutosPorCategoria = () => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="bg-red-500/20 border border-red-400/30 rounded-lg p-4 mb-6 text-center"
+                  className="bg-red-500/20 border border-red-400/30 rounded-lg p-2 mb-6 text-center"
                 >
                   <p className="text-red-300">{error}</p>
                 </motion.div>
@@ -528,54 +761,137 @@ const ProdutosPorCategoria = () => {
 
             {/* Grid de Produtos */}
             {!loading && (
-              <div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8"
-                ref={listRef}
-              >
-                {produtos.length > 0 ? (
-                  produtos.map((produto) => (
-                    <div key={produto.id}>
-                      <ProductCard
-                        produto={produto}
-                        onSelect={handleProdutoClick}
-                        onDelete={handleDeleteClick}
-                        isAdmin={user?.role === "admin"}
-                      />
-
-                      {selectedProdutoId === produto.id && (
-                        <BancasList
-                          bancas={bancasProduto}
-                          produtoName={produto.nome}
+              <div className="mb-8">
+                {/* Header do Grid */}
+                <div className="flex items-center justify-between mb-8 mt-12">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg">
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 6h16M4 10h16M4 14h16M4 18h16"
                         />
-                      )}
+                      </svg>
                     </div>
-                  ))
-                ) : (
-                  <div className="col-span-full text-center py-12">
-                    <p className="text-gray-300 text-lg">
-                      {searchTerm
-                        ? `Nenhum produto encontrado para "${searchTerm}"`
-                        : "Nenhum produto disponível nesta categoria"}
-                    </p>
+                    <div>
+                      <h3 className="text-gray-800 font-bold text-xl">
+                        Produtos Disponíveis
+                      </h3>
+                      <p className="text-gray-600 text-sm">
+                        Clique nos cards para ver as bancas
+                      </p>
+                    </div>
                   </div>
-                )}
+                </div>
+
+                {/* Grid */}
+                <div
+                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                  ref={listRef}
+                >
+                  {produtos.length > 0 ? (
+                    produtos.map((produto, index) => (
+                      <motion.div
+                        key={produto.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                      >
+                        <ProductCard
+                          produto={produto}
+                          onSelect={handleProdutoClick}
+                          onDelete={handleDeleteClick}
+                          isAdmin={user?.role === "admin"}
+                        />
+
+                        <AnimatePresence>
+                          {selectedProdutoId === produto.id && (
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="fixed inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
+                              onClick={handleCloseBancas}
+                              data-modal="bancas"
+                            >
+                              <div onClick={(e) => e.stopPropagation()}>
+                                <BancasList
+                                  bancas={bancasProduto}
+                                  produtoName={produto.nome}
+                                  loading={loadingBancas}
+                                  onClose={handleCloseBancas}
+                                />
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
+                    ))
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="col-span-full text-center py-16"
+                    >
+                      <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 border border-white/60 shadow-xl max-w-md mx-auto">
+                        <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <svg
+                            className="w-10 h-10 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.562M15 6.343A7.962 7.962 0 0112 9c-2.34 0-4.29-1.009-5.824-2.562"
+                            />
+                          </svg>
+                        </div>
+                        <h4 className="text-gray-800 font-bold text-xl mb-2">
+                          {searchTerm
+                            ? "Nenhum produto encontrado"
+                            : "Nenhum produto disponível"}
+                        </h4>
+                        <p className="text-gray-600 text-sm">
+                          {searchTerm
+                            ? `Não encontramos produtos para "${searchTerm}"`
+                            : "Esta categoria ainda não possui produtos cadastrados"}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </div>
               </div>
             )}
 
             {/* Botão Voltar */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
               className="text-center"
             >
-              <Link
-                to="/todascategorias"
-                className="inline-flex mt-10 items-center text-sm space-x-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 font-semibold text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-              >
-                <FaArrowLeft />
-                Voltar para todas as categorias
-              </Link>
+              <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-lg rounded-3xl p-6 border border-white/20 max-w-md mx-auto">
+                <Link
+                  to="/todascategorias"
+                  className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-green-500 to-green-600 font-bold text-white hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 group"
+                >
+                  <div className="p-2 bg-white/20 rounded-xl group-hover:bg-white/30 transition-colors duration-300">
+                    <FaArrowLeft className="text-white" />
+                  </div>
+                  <span>Voltar para Categorias</span>
+                </Link>
+              </div>
             </motion.div>
           </div>
 

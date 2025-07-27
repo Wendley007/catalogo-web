@@ -1,7 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useContext, useRef } from "react";
+
+import {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import banner from "../../assets/banner.jpg";
@@ -11,18 +18,17 @@ import MenuTopo from "../../components/MenuTopo";
 import Footer from "../../components/Footer";
 import BancaCard from "../../components/BancaCard/BancaCard";
 import StatsSection from "../../components/StatsSection";
-import { Modal } from "../../components/Modal";
+import { Modal, UploadModal } from "../../components/Modal";
 import TermPopup from "../../components/TermPopup";
 import SEO from "../../components/SEO/SEO";
 import ModernCarousel from "../../components/ModernCarousel";
 import HeroSection from "../../components/HeroSection";
+import CategoriaCard from "../../components/CategoriaCard";
 
 import {
-  Eye,
   ChevronRight,
   Star,
   MapPin,
-  Clock,
   Users,
   Award,
   Heart,
@@ -46,33 +52,36 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
-// --------------------------------------------------------------- Carousel de imagens
 
-// Dados das estatísticas da página principal
+// Dados das estatísticas da página principal - Memoizado para performance
 const getMainPageStats = () => [
   {
     icon: Users,
     value: "40+",
     label: "Anos de Tradição",
     color: "text-blue-500",
+    description: "Décadas de experiência e qualidade",
   },
   {
     icon: ShoppingBag,
     value: "32",
     label: "Boxes Disponíveis",
     color: "text-green-500",
+    description: "Espaços para vendedores locais",
   },
   {
     icon: Award,
     value: "100%",
     label: "Produtos Locais",
     color: "text-purple-500",
+    description: "Frescos e de qualidade",
   },
   {
     icon: Heart,
     value: "10000+",
     label: "Famílias Atendidas",
     color: "text-red-500",
+    description: "Comunidade satisfeita",
   },
 ];
 
@@ -80,26 +89,31 @@ const getMainPageStats = () => [
 const getMainPageHeroData = () => ({
   title: "Bem-vindo à Feira Livre de Buritizeiro",
   description:
-    "Descubra produtos frescos e de alta qualidade diretamente da nossa comunidade local",
+    "Descubra produtos frescos e de alta qualidade diretamente da nossa comunidade local.",
   backgroundImage: banner,
-  stats: [
-    {
-      icon: MapPin,
-      title: "Localização",
-      value: "Centro de Buritizeiro",
-    },
-    {
-      icon: Clock,
-      title: "Horário",
-      value: "Domingos: 6h às 12h",
-    },
-    {
-      icon: Star,
-      title: "Tradição",
-      value: "Mais de 40 anos",
-    },
-  ],
 });
+
+// Dados das categorias em destaque
+const getFeaturedCategories = () => [
+  {
+    id: "1",
+    nome: "Frutas Frescas",
+    icon: "🍎",
+    description: "Frutas da estação direto do produtor",
+    color: "from-orange-50 to-red-50",
+    image:
+      "https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+  {
+    id: "2",
+    nome: "Verduras",
+    icon: "🥬",
+    description: "Verduras frescas e orgânicas",
+    color: "from-green-50 to-emerald-50",
+    image:
+      "https://images.pexels.com/photos/1400172/pexels-photo-1400172.jpeg?auto=compress&cs=tinysrgb&w=800",
+  },
+];
 
 // ======================================================= Página Principal
 
@@ -110,6 +124,7 @@ const PaginaPrincipal = () => {
   const [sliderImages, setSliderImages] = useState([]);
   const [selectedBanca, setSelectedBanca] = useState(null);
   const [showEvaluationPopup, setShowEvaluationPopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [modal, setModal] = useState({
     isOpen: false,
     type: "info",
@@ -120,24 +135,26 @@ const PaginaPrincipal = () => {
 
   const [uploadModal, setUploadModal] = useState({
     isOpen: false,
-    imageFile: null,
-    title: "",
-    description: "",
   });
   const vendedoresRef = useRef(null);
   const navigate = useNavigate();
 
-  const defaultSliderImages = [
-    "https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    "https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=1200",
-    "https://images.pexels.com/photos/1656663/pexels-photo-1656663.jpeg?auto=compress&cs=tinysrgb&w=1200",
-  ];
+  // Imagens padrão do carrossel
+  const defaultSliderImages = useMemo(
+    () => [
+      "https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=1200",
+      "https://images.pexels.com/photos/1656663/pexels-photo-1656663.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    ],
+    []
+  );
 
-  const showModal = (type, title, message, onConfirm = null) => {
+  // Funções
+  const showModal = useCallback((type, title, message, onConfirm = null) => {
     setModal({ isOpen: true, type, title, message, onConfirm });
-  };
+  }, []);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setModal({
       isOpen: false,
       type: "",
@@ -145,37 +162,34 @@ const PaginaPrincipal = () => {
       message: "",
       onConfirm: null,
     });
-  };
+  }, []);
 
-  const uploadImageToFirestore = async (
-    imageFile,
-    userId,
-    title = "",
-    description = ""
-  ) => {
-    const storageRef = ref(storage, `slides/${userId}/${uuidV4()}`);
-    try {
-      const snapshot = await uploadBytes(storageRef, imageFile);
-      const downloadUrl = await getDownloadURL(snapshot.ref);
-      const docRef = await addDoc(collection(db, "slides"), {
-        userId: userId,
-        imageUrl: downloadUrl,
-        title: title || "Slide do Carrossel",
-        description:
-          description ||
-          "Descrição do slide do carrossel da Feira Livre de Buritizeiro",
-        createdAt: new Date(),
-      });
-      return { imageUrl: downloadUrl, docId: docRef.id };
-    } catch (error) {
-      console.error("Erro ao fazer upload da imagem:", error);
-      throw new Error("Erro ao fazer upload da imagem. Tente novamente.");
-    }
-  };
+  const uploadImageToFirestore = useCallback(
+    async (imageFile, userId, title = "", description = "") => {
+      const storageRef = ref(storage, `slides/${userId}/${uuidV4()}`);
+      try {
+        const snapshot = await uploadBytes(storageRef, imageFile);
+        const downloadUrl = await getDownloadURL(snapshot.ref);
+        const docRef = await addDoc(collection(db, "slides"), {
+          userId: userId,
+          imageUrl: downloadUrl,
+          title: title || "Slide do Carrossel",
+          description:
+            description ||
+            "Descrição do slide do carrossel da Feira Livre de Buritizeiro",
+          createdAt: new Date(),
+        });
+        return { imageUrl: downloadUrl, docId: docRef.id };
+      } catch (error) {
+        console.error("Erro ao fazer upload da imagem:", error);
+        throw new Error("Erro ao fazer upload da imagem. Tente novamente.");
+      }
+    },
+    []
+  );
 
-  const handleCarouselUpload = async (file) => {
-    console.log("handleCarouselUpload chamado com:", file);
-    if (!file) return;
+  const handleCarouselUpload = useCallback(async () => {
+    console.log("handleCarouselUpload chamado");
 
     if (sliderImages.length >= 10) {
       showModal(
@@ -187,92 +201,89 @@ const PaginaPrincipal = () => {
     }
 
     console.log("Abrindo modal de upload");
-    // Abrir modal para capturar título e descrição
     setUploadModal({
       isOpen: true,
-      imageFile: file,
-      title: "",
-      description: "",
     });
-  };
+  }, [sliderImages.length, showModal]);
 
-  const handleDeleteSlide = (id, imageUrl, title = "imagem") => {
-    if (!id) {
-      console.error("ID não definido. Não é possível excluir a imagem.");
-      return;
-    }
-
-    showModal(
-      "warning",
-      "Confirmar Exclusão",
-      `Tem certeza que deseja excluir a imagem "${title}"?`,
-      async () => {
-        try {
-          await deleteObject(ref(storage, imageUrl));
-          await deleteDoc(doc(db, "slides", id));
-          setSliderImages((prev) => prev.filter((img) => img.id !== id));
-          closeModal();
-          showModal(
-            "success",
-            "Sucesso!",
-            `Imagem "${title}" excluída com sucesso!`
-          );
-        } catch (error) {
-          console.error("Erro ao excluir imagem:", error);
-          showModal(
-            "error",
-            "Erro!",
-            `Erro ao excluir imagem "${title}". Tente novamente.`
-          );
-        }
+  const handleDeleteSlide = useCallback(
+    (id, imageUrl, title = "imagem") => {
+      if (!id) {
+        console.error("ID não definido. Não é possível excluir a imagem.");
+        return;
       }
-    );
-  };
 
-  const handleConfirmUpload = async () => {
-    if (!uploadModal.imageFile) return;
-
-    try {
-      const { imageUrl, docId } = await uploadImageToFirestore(
-        uploadModal.imageFile,
-        user.uid,
-        uploadModal.title,
-        uploadModal.description
+      showModal(
+        "warning",
+        "Confirmar Exclusão",
+        `Tem certeza que deseja excluir a imagem "${title}"?`,
+        async () => {
+          try {
+            await deleteObject(ref(storage, imageUrl));
+            await deleteDoc(doc(db, "slides", id));
+            setSliderImages((prev) => prev.filter((img) => img.id !== id));
+            closeModal();
+            showModal(
+              "success",
+              "Sucesso!",
+              `Imagem "${title}" excluída com sucesso!`
+            );
+          } catch (error) {
+            console.error("Erro ao excluir imagem:", error);
+            showModal(
+              "error",
+              "Erro!",
+              `Erro ao excluir imagem "${title}". Tente novamente.`
+            );
+          }
+        }
       );
+    },
+    [showModal, closeModal]
+  );
 
-      setSliderImages((prev) => [
-        ...prev,
-        {
-          id: docId,
-          imageUrl,
-          title: uploadModal.title || "Slide do Carrossel",
-          description:
-            uploadModal.description ||
-            "Descrição do slide do carrossel da Feira Livre de Buritizeiro",
-        },
-      ]);
+  const handleUploadConfirm = useCallback(
+    async (uploadData) => {
+      if (!uploadData.imageFile) return;
 
-      setUploadModal({
-        isOpen: false,
-        imageFile: null,
-        title: "",
-        description: "",
-      });
-      showModal("success", "Sucesso!", "Imagem cadastrada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao fazer upload da imagem:", error);
-      showModal("error", "Erro!", "Erro ao cadastrar imagem. Tente novamente.");
-    }
-  };
+      try {
+        const { imageUrl, docId } = await uploadImageToFirestore(
+          uploadData.imageFile,
+          user.uid,
+          uploadData.title,
+          uploadData.description
+        );
 
-  const closeUploadModal = () => {
+        setSliderImages((prev) => [
+          ...prev,
+          {
+            id: docId,
+            imageUrl,
+            title: uploadData.title || "Slide do Carrossel",
+            description:
+              uploadData.description ||
+              "Descrição do slide do carrossel da Feira Livre de Buritizeiro",
+          },
+        ]);
+
+        showModal("success", "Sucesso!", "Imagem cadastrada com sucesso!");
+      } catch (error) {
+        console.error("Erro ao fazer upload da imagem:", error);
+        showModal(
+          "error",
+          "Erro!",
+          "Erro ao cadastrar imagem. Tente novamente."
+        );
+      }
+    },
+    [uploadImageToFirestore, user?.uid, showModal]
+  );
+
+  const closeUploadModal = useCallback(() => {
     setUploadModal({
       isOpen: false,
-      imageFile: null,
-      title: "",
-      description: "",
     });
-  };
+  }, []);
 
   // --------------------------------------------------------------- Busca efeitos de dados
 
@@ -314,7 +325,7 @@ const PaginaPrincipal = () => {
     };
 
     fetchSliderImages();
-  }, []);
+  }, [defaultSliderImages]);
 
   useEffect(() => {
     const fetchCategorias = async () => {
@@ -333,64 +344,15 @@ const PaginaPrincipal = () => {
           categoria.produtos = produtosData;
           categoriasData.push(categoria);
         }
-        setCategorias(categoriasData.slice(0, 4));
+        // Ordenar categorias por quantidade de produtos (mais produtos primeiro)
+        const categoriasOrdenadas = categoriasData.sort(
+          (a, b) => (b.produtos?.length || 0) - (a.produtos?.length || 0)
+        );
+        setCategorias(categoriasOrdenadas.slice(0, 2));
       } catch (error) {
         console.error("Erro ao buscar categorias:", error);
-        // Dados simulados para demonstração
-        setCategorias([
-          {
-            id: "1",
-            nome: "Frutas Frescas",
-            produtos: [
-              {
-                images: [
-                  {
-                    url: "https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=800",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "2",
-            nome: "Verduras",
-            produtos: [
-              {
-                images: [
-                  {
-                    url: "https://images.pexels.com/photos/1400172/pexels-photo-1400172.jpeg?auto=compress&cs=tinysrgb&w=800",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "3",
-            nome: "Legumes",
-            produtos: [
-              {
-                images: [
-                  {
-                    url: "https://images.pexels.com/photos/1435904/pexels-photo-1435904.jpeg?auto=compress&cs=tinysrgb&w=800",
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            id: "4",
-            nome: "Temperos",
-            produtos: [
-              {
-                images: [
-                  {
-                    url: "https://images.pexels.com/photos/1656663/pexels-photo-1656663.jpeg?auto=compress&cs=tinysrgb&w=800",
-                  },
-                ],
-              },
-            ],
-          },
-        ]);
+        // Usando dados memoizados para demonstração
+        setCategorias(getFeaturedCategories());
       }
     };
 
@@ -414,7 +376,11 @@ const PaginaPrincipal = () => {
           banca.vendedores = vendedoresData;
           bancasData.push(banca);
         }
-        setBancas(bancasData.slice(0, 3));
+        // Ordenar bancas por quantidade de produtos (mais produtos primeiro)
+        const bancasOrdenadas = bancasData.sort(
+          (a, b) => (b.produtos?.length || 0) - (a.produtos?.length || 0)
+        );
+        setBancas(bancasOrdenadas.slice(0, 3));
       } catch (error) {
         console.error("Erro ao buscar bancas:", error);
         setBancas([
@@ -453,17 +419,40 @@ const PaginaPrincipal = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const handleSelectVendedores = (bancaId) => {
-    setSelectedBanca(selectedBanca === bancaId ? null : bancaId);
-  };
+  // Função para simular carregamento inicial
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, []);
 
-  const handleEvaluationAccept = () => {
+  const handleSelectVendedores = useCallback(
+    (bancaId) => {
+      setSelectedBanca(selectedBanca === bancaId ? null : bancaId);
+    },
+    [selectedBanca]
+  );
+
+  const handleEvaluationAccept = useCallback(() => {
     setShowEvaluationPopup(false);
     navigate("/avaliacao");
-  };
+  }, [navigate]);
+
+  // Renderização condicional de loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Carregando Feira Livre...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-gray-50 scroll-smooth">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 scroll-smooth">
       <MenuTopo />
       <SEO
         title="Feira Livre de Buritizeiro - Produtos Frescos e de Qualidade"
@@ -482,14 +471,16 @@ const PaginaPrincipal = () => {
       {/* Hero Section */}
       <HeroSection {...getMainPageHeroData()} />
 
-      <section className="py-16 scroll-overscroll">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Seção Principal com Carrossel e Categorias */}
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Carousel */}
+            {/* Carrossel */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6 }}
+              className="relative"
             >
               <ModernCarousel
                 images={sliderImages}
@@ -505,52 +496,34 @@ const PaginaPrincipal = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
+              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-10">
                 Categorias em Destaque
               </h2>
 
-              <div className="grid grid-cols-2 gap-4 scroll-container">
-                {categorias.map((categoria) => (
-                  <motion.div
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {categorias.map((categoria, index) => (
+                  <CategoriaCard
                     key={categoria.id}
-                    whileHover={{ scale: 1.05 }}
-                    className="group bg-gradient-to-r from-green-50 to-blue-50 rounded-xl shadow-xl overflow-hidden hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className="relative">
-                      <img
-                        src={
-                          categoria.produtos[0]?.images?.[0]?.url ||
-                          "https://images.pexels.com/photos/1300972/pexels-photo-1300972.jpeg?auto=compress&cs=tinysrgb&w=800"
-                        }
-                        alt={categoria.nome}
-                        className="w-full h-32 object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Link
-                          to={`/categorias/${categoria.id}`}
-                          className="bg-white text-gray-900 px-3 py-1 rounded-xl font-semibold flex items-center space-x-2 hover:bg-gray-100 transition-colors text-sm"
-                        >
-                          <Eye size={16} />
-                          <span>Ver produtos</span>
-                        </Link>
-                      </div>
-                    </div>
-                    <div className="p-3">
-                      <h3 className="font-semibold text-gray-900 text-center text-sm">
-                        {categoria.nome}
-                      </h3>
-                    </div>
-                  </motion.div>
+                    categoria={categoria}
+                    index={index}
+                    variant="compact"
+                  />
                 ))}
               </div>
 
-              <Link
-                to="/todascategorias"
-                className="inline-flex mt-8 items-center text-sm space-x-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 font-semibold text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
               >
-                <span>Ver todas as Categorias</span>
-                <ChevronRight size={20} />
-              </Link>
+                <Link
+                  to="/todascategorias"
+                  className="inline-flex mt-10 items-center text-sm space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 font-semibold text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <span>Ver todas as Categorias</span>
+                  <ChevronRight size={20} />
+                </Link>
+              </motion.div>
             </motion.div>
           </div>
         </div>
@@ -562,16 +535,16 @@ const PaginaPrincipal = () => {
           stats={getMainPageStats()}
           title="Nossa Feira em números"
           subtitle="Décadas de tradição e qualidade comprovada"
-          variant="default"
+          variant="modern"
         />
       </section>
 
-      {/* Vendedores*/}
+      {/* Seção de Bancas Modernizada */}
       <section
         id="bancas"
-        className="py-16 bg-gradient-to-br from-gray-50 to-gray-100 scroll-to-element"
+        className="py-16 bg-gradient-to-br from-gray-50 via-white to-gray-50 scroll-to-element"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -581,77 +554,99 @@ const PaginaPrincipal = () => {
             <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
               Conheça Nossas Bancas
             </h2>
-            <p className="text-xl text-gray-600">
-              Vendedores locais com produtos de qualidade
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Vendedores locais com produtos de qualidade garantida
             </p>
           </motion.div>
 
-          {/* Cards */}
+          {/* Cards de Bancas */}
           <article className="grid grid-cols-1 mt-6 gap-8 md:grid-cols-3 lg:grid-cols-3 mx-2 scroll-container">
-            {bancas.map((banca, index) => (
-              <BancaCard
-                key={banca.id}
-                banca={banca}
-                index={index}
-                showAdminControls={false}
-                showVendedoresDropdown={true}
-                onSelectVendedores={handleSelectVendedores}
-                selectedBanca={selectedBanca}
-                whatsappMessage="Olá! Vi sua banca no site da Feira de Buritizeiro e fiquei interessado!"
-                acessarBancaText="Acessar banca"
-                verVendedoresText="Ver Vendedores"
-                fecharVendedoresText="Fechar Vendedores"
-              />
-            ))}
+            <AnimatePresence>
+              {bancas.map((banca, index) => (
+                <motion.div
+                  key={banca.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                >
+                  <BancaCard
+                    banca={banca}
+                    index={index}
+                    showAdminControls={false}
+                    showVendedoresDropdown={true}
+                    onSelectVendedores={handleSelectVendedores}
+                    selectedBanca={selectedBanca}
+                    whatsappMessage="Olá! Vi sua banca no site da Feira de Buritizeiro e fiquei interessado!"
+                    acessarBancaText="Acessar banca"
+                    verVendedoresText="Ver Vendedores"
+                    fecharVendedoresText="Fechar Vendedores"
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </article>
 
-          <div className="text-center mt-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center mt-12"
+          >
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 to="/bancas"
-                className="inline-flex mt-14 items-center space-x-3 bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 text-white px-10 py-3 rounded-xl font-semibold hover:from-gray-800 hover:via-blue-800 hover:to-purple-800 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 text-sm"
+                className="inline-flex items-center space-x-3 bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 text-white px-10 py-3 rounded-xl font-semibold hover:from-gray-800 hover:via-blue-800 hover:to-purple-800 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
                 <span>Ver todas as Bancas</span>
                 <ChevronRight size={20} />
               </Link>
-            </motion.div>
-          </div>
+              <button
+                onClick={() => setShowEvaluationPopup(true)}
+                className="inline-flex items-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-10 py-3 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+              >
+                <Star size={20} />
+                <span>Avaliar o Site!</span>
+              </button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Contact CTA Section */}
+      {/* Seção de Contato Modernizada */}
       <section
         id="contato"
-        className="py-16 bg-gradient-to-r from-green-600 to-green-700 scroll-to-element"
+        className="py-16 bg-gradient-to-r from-green-600 via-green-700 to-green-800 relative overflow-hidden"
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Elementos decorativos */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full blur-xl"></div>
+          <div className="absolute bottom-20 right-20 w-32 h-32 bg-white rounded-full blur-xl"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 text-center relative">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl font-bold text-white mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
               Venha nos Visitar!
             </h2>
-            <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto leading-relaxed">
               Todos os domingos das 6h às 12h, você encontra produtos frescos e
               de qualidade no coração de Buritizeiro
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 to="/localizacao"
-                className="inline-flex items-center space-x-2 bg-white text-green-700 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors shadow-xl hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-white text-green-700 px-8 py-2 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
                 <MapPin size={20} />
                 <span>Ver Localização</span>
               </Link>
               <a
                 href="tel:+553837421011"
-                className="inline-flex items-center space-x-2 bg-green-800 text-white px-8 py-3 rounded-xl font-semibold hover:bg-green-900 transition-colors shadow-xl hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-green-800 text-white px-8 py-2 rounded-xl font-semibold hover:bg-green-900 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
                 <Phone size={20} />
                 <span>(38) 3742-1011</span>
@@ -661,118 +656,35 @@ const PaginaPrincipal = () => {
         </div>
       </section>
 
-      {/* Action Buttons */}
-      <section className="py-16 bg-gray-50 scroll-momentum">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={() => setShowEvaluationPopup(true)}
-              className="inline-flex items-center space-x-2 bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors shadow-xl hover:shadow-xl transform hover:scale-105"
-            >
-              <Star size={20} />
-              <span>Avalie o Site!</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
       <ScrollTopoButton />
 
       <Footer />
 
-      {/* Modals */}
-      <Modal
-        isOpen={modal.isOpen}
-        onClose={closeModal}
-        type={modal.type}
-        title={modal.title}
-        message={modal.message}
-        onConfirm={modal.onConfirm}
-      />
+      {/* Modais */}
+      <AnimatePresence>
+        <Modal
+          isOpen={modal.isOpen}
+          onClose={closeModal}
+          type={modal.type}
+          title={modal.title}
+          message={modal.message}
+          onConfirm={modal.onConfirm}
+        />
 
-      <TermPopup
-        isOpen={showEvaluationPopup}
-        onClose={() => setShowEvaluationPopup(false)}
-        onAccept={handleEvaluationAccept}
-      />
+        <TermPopup
+          isOpen={showEvaluationPopup}
+          onClose={() => setShowEvaluationPopup(false)}
+          onAccept={handleEvaluationAccept}
+        />
 
-      {/* Modal de Upload de Imagem */}
-      {uploadModal.isOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
-          >
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Adicionar Imagem ao Carrossel
-            </h3>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Título do Slide (opcional)
-                </label>
-                <input
-                  type="text"
-                  value={uploadModal.title}
-                  onChange={(e) =>
-                    setUploadModal((prev) => ({
-                      ...prev,
-                      title: e.target.value,
-                    }))
-                  }
-                  placeholder="Ex: Produtos Frescos"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Descrição do Slide (opcional)
-                </label>
-                <textarea
-                  value={uploadModal.description}
-                  onChange={(e) =>
-                    setUploadModal((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  placeholder="Ex: Descrição detalhada do slide..."
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                />
-              </div>
-
-              <div className="text-xs text-gray-500">
-                <p>• Se não preencher, serão usados valores padrão</p>
-                <p>• Título padrão: &quot;Slide do Carrossel&quot;</p>
-                <p>
-                  • Descrição padrão: &quot;Descrição do slide do carrossel da
-                  Feira Livre de Buritizeiro&quot;
-                </p>
-              </div>
-            </div>
-
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={closeUploadModal}
-                className="flex-1 px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleConfirmUpload}
-                className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
-              >
-                Adicionar Imagem
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+        <UploadModal
+          isOpen={uploadModal.isOpen}
+          onClose={closeUploadModal}
+          onUpload={handleUploadConfirm}
+          title="Adicionar Imagem ao Carrossel"
+          size="md"
+        />
+      </AnimatePresence>
     </main>
   );
 };

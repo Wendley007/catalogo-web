@@ -133,10 +133,22 @@ const BancaCard = ({
       className="bg-white rounded-xl shadow-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105"
     >
       {/* Cabeçalho da Banca */}
-      <div className="p-2 mt-2 text-center relative">
-        <h2 className="text-center drop-shadow-lg flex items-center justify-center text-lg font-semibold uppercase text-gray-800 mb-3">
-          {banca.nome}
-        </h2>
+      <div className="p-4 mt-2 text-center relative">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-left drop-shadow-lg text-lg font-semibold uppercase text-gray-800">
+            {banca.nome}
+          </h2>
+          {(banca.produtos?.length || 0) > 5 && (
+            <div className="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
+              ⭐ Mais Produtos
+            </div>
+          )}
+        </div>
+        <p className="text-center text-sm text-gray-600 mb-3">
+          {banca.produtos?.length || 0} produto
+          {(banca.produtos?.length || 0) !== 1 ? "s" : ""} disponível
+          {(banca.produtos?.length || 0) !== 1 ? "s" : ""}
+        </p>
         <div className="w-16 h-1 bg-gray-200 mx-auto rounded-full"></div>
 
         {/* Controles de Admin */}
@@ -161,7 +173,7 @@ const BancaCard = ({
       </div>
 
       {/* Conteúdo Principal */}
-      <div className="p-4">
+      <div className="p-4 -mt-4">
         {vendedorPrincipal ? (
           <div className="text-center">
             <motion.div
@@ -479,6 +491,7 @@ BancaCard.propTypes = {
   banca: PropTypes.shape({
     id: PropTypes.string.isRequired,
     nome: PropTypes.string.isRequired,
+    produtos: PropTypes.array,
     vendedores: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,

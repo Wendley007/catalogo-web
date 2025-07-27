@@ -1,6 +1,5 @@
-
 import { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import banner from "../../../assets/banner.jpg";
@@ -13,6 +12,7 @@ import Footer from "../../../components/Footer";
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
 import StatsSection from "../../../components/StatsSection";
 import { Modal } from "../../../components/Modal";
+import ConfirmModal from "../../../components/Modal/ConfirmModal";
 import SEO from "../../../components/SEO/SEO";
 import HeroSection from "../../../components/HeroSection";
 import {
@@ -23,7 +23,10 @@ import {
   query,
   updateDoc,
   arrayUnion,
+  deleteDoc,
 } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../../../services/firebaseConnection";
 
 import {
   Plus,
@@ -40,9 +43,11 @@ import {
   MapPin,
   Award,
   Heart,
+  Edit3,
+  Save,
+  X,
+  User,
 } from "lucide-react";
-
-
 
 // Função para gerar estatísticas dos vendedores
 const getVendedoresStats = (vendedores, produtosAdicionados) => [
@@ -64,11 +69,11 @@ const getVendedoresStats = (vendedores, produtosAdicionados) => [
     label: "Qualidade",
     color: "text-purple-500",
   },
-  { 
-    icon: Heart, 
-    value: "Local", 
-    label: "Produção", 
-    color: "text-red-500" 
+  {
+    icon: Heart,
+    value: "Local",
+    label: "Produção",
+    color: "text-red-500",
   },
 ];
 
@@ -85,12 +90,27 @@ const getVendedorHeroData = (banca) => ({
 const Vendedor = () => {
   const { bancaId } = useParams();
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [banca, setBanca] = useState(null);
   const [vendedores, setVendedores] = useState([]);
   const [produtosExistentes, setProdutosExistentes] = useState([]);
   const [produtoSelecionado, setProdutoSelecionado] = useState("");
   const [produtosAdicionados, setProdutosAdicionados] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Estados para edição
+  const [showEditVendedorModal, setShowEditVendedorModal] = useState(false);
+  const [newVendedorName, setNewVendedorName] = useState("");
+  const [newVendedorCity, setNewVendedorCity] = useState("");
+  const [newVendedorImage, setNewVendedorImage] = useState(null);
+  const [selectedVendedor, setSelectedVendedor] = useState(null);
+  const [removeVendedorImage, setRemoveVendedorImage] = useState(false);
+  const [showDeleteConfirmModal, setShowDeleteConfirmModal] = useState(false);
+  const [vendedorToDelete, setVendedorToDelete] = useState(null);
+  const [isEditingBancaName, setIsEditingBancaName] = useState(false);
+  const [newBancaName, setNewBancaName] = useState("");
+  const [showDeleteBancaModal, setShowDeleteBancaModal] = useState(false);
 
   // Modal estados
   const [modal, setModal] = useState({
@@ -106,7 +126,233 @@ const Vendedor = () => {
   };
 
   const closeModal = () => {
-    setModal({ isOpen: false, type: "info", title: "", message: "", icon: null });
+    setModal({
+      isOpen: false,
+      type: "info",
+      title: "",
+      message: "",
+      icon: null,
+    });
+  };
+
+  // Função para abrir modal de confirmação de remoção
+  const openDeleteConfirmModal = (vendedor) => {
+    setVendedorToDelete(vendedor);
+    setShowDeleteConfirmModal(true);
+  };
+
+  // Função para editar nome da banca
+  const handleEditBancaName = async () => {
+    try {
+      if (!newBancaName.trim()) {
+        showModal(
+          "warning",
+          "Atenção!",
+          "Digite um nome para a banca.",
+          AlertTriangle
+        );
+        return;
+      }
+
+      await updateDoc(doc(db, "bancas", bancaId), {
+        nome: newBancaName.trim(),
+      });
+
+      setBanca((prev) => ({ ...prev, nome: newBancaName.trim() }));
+      setIsEditingBancaName(false);
+      setNewBancaName("");
+      showModal(
+        "success",
+        "Sucesso!",
+        "Nome da banca atualizado com sucesso!",
+        CheckCircle
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar nome da banca:", error);
+      showModal("error", "Erro!", "Erro ao atualizar nome da banca.", XCircle);
+    }
+  };
+
+  // Função para remover vendedor
+  const handleDeleteVendedor = async () => {
+    try {
+      await deleteDoc(
+        doc(db, `bancas/${bancaId}/vendedores/${vendedorToDelete.id}`)
+      );
+
+      setVendedores((prev) => prev.filter((v) => v.id !== vendedorToDelete.id));
+      setShowDeleteConfirmModal(false);
+      setVendedorToDelete(null);
+      showModal(
+        "success",
+        "Sucesso!",
+        "Vendedor removido com sucesso!",
+        CheckCircle
+      );
+    } catch (error) {
+      console.error("Erro ao remover vendedor:", error);
+      showModal("error", "Erro!", "Erro ao remover vendedor.", XCircle);
+    }
+  };
+
+  // Função para excluir a banca completa
+  const handleDeleteBanca = async () => {
+    try {
+      // Primeiro, excluir todos os vendedores da banca
+      const vendedoresSnapshot = await getDocs(
+        collection(db, `bancas/${bancaId}/vendedores`)
+      );
+
+      const deleteVendedoresPromises = vendedoresSnapshot.docs.map((doc) =>
+        deleteDoc(doc.ref)
+      );
+
+      await Promise.all(deleteVendedoresPromises);
+
+      // Remover produtos da banca (se houver)
+      if (banca && banca.produtos && banca.produtos.length > 0) {
+        await updateDoc(doc(db, "bancas", bancaId), {
+          produtos: [],
+        });
+      }
+
+      // Depois, excluir a banca
+      await deleteDoc(doc(db, "bancas", bancaId));
+
+      showModal(
+        "success",
+        "Sucesso!",
+        "Banca excluída com sucesso! Redirecionando...",
+        CheckCircle
+      );
+
+      // Redirecionar para a página de bancas após 2 segundos
+      setTimeout(() => {
+        navigate("/bancas");
+      }, 2000);
+    } catch (error) {
+      console.error("Erro ao excluir banca:", error);
+      showModal("error", "Erro!", "Erro ao excluir banca.", XCircle);
+    }
+  };
+
+  // Função para editar vendedor
+  const handleEditVendedor = async (vendedorId) => {
+    try {
+      if (!newVendedorName.trim() || !newVendedorCity.trim()) {
+        showModal(
+          "warning",
+          "Atenção!",
+          "Preencha todos os campos.",
+          AlertTriangle
+        );
+        return;
+      }
+
+      const updateData = {
+        nome: newVendedorName.trim(),
+        cidade: newVendedorCity.trim(),
+      };
+
+      // Se há uma nova imagem, fazer upload
+      if (newVendedorImage) {
+        try {
+          const imageRef = ref(
+            storage,
+            `vendedores/${bancaId}/${vendedorId}/${newVendedorImage.name}`
+          );
+          const snapshot = await uploadBytes(imageRef, newVendedorImage);
+          const downloadURL = await getDownloadURL(snapshot.ref);
+
+          updateData.images = [{ url: downloadURL }];
+        } catch (uploadError) {
+          console.error("Erro ao fazer upload da imagem:", uploadError);
+          showModal(
+            "error",
+            "Erro!",
+            "Erro ao fazer upload da imagem.",
+            XCircle
+          );
+          return;
+        }
+      }
+
+      // Se deve remover a imagem
+      if (removeVendedorImage) {
+        updateData.images = [];
+      }
+
+      await updateDoc(
+        doc(db, `bancas/${bancaId}/vendedores/${vendedorId}`),
+        updateData
+      );
+
+      setVendedores((prev) =>
+        prev.map((v) =>
+          v.id === vendedorId
+            ? {
+                ...v,
+                nome: newVendedorName.trim(),
+                cidade: newVendedorCity.trim(),
+                ...(newVendedorImage && {
+                  images: [
+                    { url: updateData.images?.[0]?.url || v.images?.[0]?.url },
+                  ],
+                }),
+                ...(removeVendedorImage && { images: [] }),
+              }
+            : v
+        )
+      );
+
+      setShowEditVendedorModal(false);
+      setNewVendedorName("");
+      setNewVendedorCity("");
+      setNewVendedorImage(null);
+      setSelectedVendedor(null);
+      setRemoveVendedorImage(false);
+      showModal(
+        "success",
+        "Sucesso!",
+        "Dados do vendedor atualizados com sucesso!",
+        CheckCircle
+      );
+    } catch (error) {
+      console.error("Erro ao atualizar vendedor:", error);
+      showModal(
+        "error",
+        "Erro!",
+        "Erro ao atualizar dados do vendedor.",
+        XCircle
+      );
+    }
+  };
+
+  // Função para iniciar edição do nome da banca
+  const startEditBancaName = () => {
+    setNewBancaName(banca?.nome || "");
+    setIsEditingBancaName(true);
+  };
+
+  // Função para iniciar edição do vendedor
+  const startEditVendedor = (vendedor) => {
+    setSelectedVendedor(vendedor);
+    setNewVendedorName(vendedor.nome || "");
+    setNewVendedorCity(vendedor.cidade || "");
+    setNewVendedorImage(null);
+    setShowEditVendedorModal(true);
+  };
+
+  // Função para cancelar edições
+  const cancelEdit = () => {
+    setShowEditVendedorModal(false);
+    setNewVendedorName("");
+    setNewVendedorCity("");
+    setNewVendedorImage(null);
+    setSelectedVendedor(null);
+    setRemoveVendedorImage(false);
+    setIsEditingBancaName(false);
+    setNewBancaName("");
   };
 
   useEffect(() => {
@@ -336,11 +582,82 @@ const Vendedor = () => {
       <SEO
         title={`${banca?.nome} - Vendedores`}
         description={`Conheça os vendedores da ${banca?.nome} em Feira de Buritizeiro. Produtos de qualidade e variedade.`}
-        keywords={[`${banca?.nome}`, "vendedores", "produtos", "Feira de Buritizeiro"]}
+        keywords={[
+          `${banca?.nome}`,
+          "vendedores",
+          "produtos",
+          "Feira de Buritizeiro",
+        ]}
       />
 
       {/* Hero Section */}
       <HeroSection {...getVendedorHeroData(banca)} />
+
+      {/* Botão para editar nome da banca */}
+      {user && user.role === "admin" && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 mb-8"
+        >
+          <div className="flex flex-col sm:flex-row gap-4">
+            {isEditingBancaName ? (
+              <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-6 border border-white/50 max-w-md w-full">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                  Editar nome da Banca
+                </h3>
+                <input
+                  type="text"
+                  value={newBancaName}
+                  onChange={(e) => setNewBancaName(e.target.value)}
+                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4"
+                  placeholder="Nome da banca"
+                />
+                <div className="flex gap-3 justify-center">
+                  <button
+                    onClick={handleEditBancaName}
+                    className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <Save size={16} />
+                    <span>Salvar</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingBancaName(false);
+                      setNewBancaName("");
+                    }}
+                    className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+                  >
+                    <X size={16} />
+                    <span>Cancelar</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={startEditBancaName}
+                  className="bg-green-100 hover:bg-green-200 text-green-600 px-6 py-3 rounded-xl font-medium transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
+                  title="Editar nome da Banca"
+                >
+                  <Edit3 size={20} />
+                  <span>Editar nome da Banca</span>
+                </button>
+
+                <button
+                  onClick={() => setShowDeleteBancaModal(true)}
+                  className="bg-red-100 hover:bg-red-200 text-red-600 px-6 py-3 rounded-xl font-medium transition-colors flex items-center space-x-2 shadow-lg hover:shadow-xl"
+                  title="Excluir Banca"
+                >
+                  <Trash2 size={20} />
+                  <span>Excluir Banca</span>
+                </button>
+              </>
+            )}
+          </div>
+        </motion.div>
+      )}
 
       {/* Estatísticas Section */}
       <StatsSection
@@ -363,9 +680,9 @@ const Vendedor = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-16"
           >
-            <h2 className="text-3xl text-center lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-12">
+            <h3 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent text-center mb-16">
               Nossos Vendedores
-            </h2>
+            </h3>
 
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {vendedores.map((vendedor, index) => (
@@ -380,15 +697,17 @@ const Vendedor = () => {
                   <div className="bg-gradient-to-r bg-white via-teal-50 to-green-100 p-6 text-center">
                     <div className="w-36 h-36 mx-auto relative">
                       <div className="absolute inset-0 bg-gradient-to-r from-green-300 to-blue-300 rounded-full blur-lg"></div>
-                      <img
-                        src={
-                          vendedor.images && vendedor.images.length > 0
-                            ? vendedor.images[0].url
-                            : "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400"
-                        }
-                        alt={`Imagem de perfil de ${vendedor.nome}`}
-                        className="relative w-full h-full rounded-full object-cover shadow-2xl border-1 border-white"
-                      />
+                      {vendedor.images && vendedor.images.length > 0 ? (
+                        <img
+                          src={vendedor.images[0].url}
+                          alt={`Imagem de perfil de ${vendedor.nome}`}
+                          className="relative w-full h-full rounded-full object-cover shadow-2xl border-1 border-white"
+                        />
+                      ) : (
+                        <div className="relative w-full h-full rounded-full bg-gradient-to-r from-gray-300 to-gray-400 shadow-2xl border-1 border-white flex items-center justify-center">
+                          <User size={48} className="text-gray-600" />
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -400,6 +719,26 @@ const Vendedor = () => {
                       <MapPin size={16} />
                       <span>{vendedor.cidade}</span>
                     </p>
+
+                    {/* Botões de editar e remover vendedor - apenas para admin */}
+                    {user && user.role === "admin" && (
+                      <div className="flex gap-2 mb-4">
+                        <button
+                          onClick={() => startEditVendedor(vendedor)}
+                          className="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center"
+                          title="Editar Vendedor"
+                        >
+                          <Edit3 size={16} />
+                        </button>
+                        <button
+                          onClick={() => openDeleteConfirmModal(vendedor)}
+                          className="flex-1 bg-red-100 hover:bg-red-200 text-red-600 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center"
+                          title="Remover Vendedor"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
 
                     <a
                       href={`https://api.whatsapp.com/send?phone=${vendedor?.whatsapp}&text=Olá ${vendedor?.nome}! Vi sua ${banca?.nome} no site da Feira de Buritizeiro e fiquei interessado.`}
@@ -417,7 +756,7 @@ const Vendedor = () => {
           </motion.div>
 
           {/* Admin gerencimento dos produtos */}
-          {user?.role === "admin" && (
+          {user && user.role === "admin" && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -510,7 +849,7 @@ const Vendedor = () => {
                         {produto.nome}
                       </h3>
 
-                      {user?.role === "admin" && (
+                      {user && user.role === "admin" && (
                         <button
                           onClick={() => handleRemoverProduto(produto.id)}
                           className="w-full inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 text-white py-2 px-4 rounded-xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-lg transform hover:scale-105"
@@ -587,6 +926,154 @@ const Vendedor = () => {
         title={modal.title}
         message={modal.message}
         icon={modal.icon}
+      />
+
+      {/* Modal de Edição do Vendedor */}
+      <Modal
+        isOpen={showEditVendedorModal}
+        onClose={cancelEdit}
+        type="info"
+        size="xl"
+      >
+        <div className="text-center p-6 max-h-[80vh] overflow-y-auto">
+          <h3 className="text-xl font-bold text-gray-900 mb-6">
+            Editar Vendedor
+          </h3>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                Nome do Vendedor
+              </label>
+              <input
+                type="text"
+                value={newVendedorName}
+                onChange={(e) => setNewVendedorName(e.target.value)}
+                className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Nome do vendedor"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                Cidade
+              </label>
+              <input
+                type="text"
+                value={newVendedorCity}
+                onChange={(e) => setNewVendedorCity(e.target.value)}
+                className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Cidade"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+                Foto de Perfil
+              </label>
+
+              {/* Mostrar imagem atual se existir */}
+              {selectedVendedor?.images &&
+                selectedVendedor.images.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-600 mb-2">Foto atual:</p>
+                    <img
+                      src={selectedVendedor.images[0].url}
+                      alt="Foto atual"
+                      className="w-20 h-20 object-cover rounded-lg mx-auto"
+                    />
+                  </div>
+                )}
+
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setNewVendedorImage(e.target.files[0])}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+              {newVendedorImage && (
+                <div className="mt-2">
+                  <img
+                    src={URL.createObjectURL(newVendedorImage)}
+                    alt="Preview"
+                    className="w-20 h-20 object-cover rounded-lg mx-auto"
+                  />
+                  <p className="text-xs text-gray-500 text-center mt-1">
+                    {newVendedorImage.name}
+                  </p>
+                </div>
+              )}
+
+              {/* Opção para remover foto */}
+              {selectedVendedor?.images &&
+                selectedVendedor.images.length > 0 && (
+                  <div className="mt-3">
+                    <label className="flex items-center space-x-2 text-sm text-red-600">
+                      <input
+                        type="checkbox"
+                        checked={removeVendedorImage}
+                        onChange={(e) =>
+                          setRemoveVendedorImage(e.target.checked)
+                        }
+                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                      />
+                      <span>Remover foto atual</span>
+                    </label>
+                  </div>
+                )}
+            </div>
+          </div>
+
+          <div className="flex justify-center space-x-3 mt-6">
+            <button
+              onClick={() =>
+                selectedVendedor && handleEditVendedor(selectedVendedor.id)
+              }
+              className="px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+            >
+              <Save size={16} />
+              <span>Salvar</span>
+            </button>
+            <button
+              onClick={cancelEdit}
+              className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors flex items-center space-x-2"
+            >
+              <X size={16} />
+              <span>Cancelar</span>
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Modal de Confirmação para Remover Vendedor */}
+      <ConfirmModal
+        isOpen={showDeleteConfirmModal}
+        onClose={() => {
+          setShowDeleteConfirmModal(false);
+          setVendedorToDelete(null);
+        }}
+        onConfirm={handleDeleteVendedor}
+        title="Remover Vendedor"
+        message={`Tem certeza que deseja remover o vendedor "${vendedorToDelete?.nome}"? Esta ação não pode ser desfeita.`}
+        confirmText="Remover"
+        cancelText="Cancelar"
+        type="danger"
+      />
+
+      {/* Modal de Confirmação para Excluir Banca */}
+      <ConfirmModal
+        isOpen={showDeleteBancaModal}
+        onClose={() => setShowDeleteBancaModal(false)}
+        onConfirm={handleDeleteBanca}
+        title="Excluir Banca"
+        message={`Tem certeza que deseja excluir a banca "${
+          banca?.nome
+        }" com todos os seus vendedores${
+          banca?.produtos && banca.produtos.length > 0 ? " e produtos" : ""
+        }? Esta ação não pode ser desfeita.`}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        type="danger"
       />
     </main>
   );

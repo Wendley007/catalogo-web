@@ -1,11 +1,11 @@
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import logo1 from "../../assets/logo1.png";
-import fundo from "../../assets/fundo.jpg";
 import { useEffect, useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../../services/firebaseConnection";
 import SEO from "../../components/SEO/SEO";
+import HeroSection from "../../components/HeroSection/HeroSection";
+import { Users, ShoppingBag, Heart, Award } from "lucide-react";
+import fundo from "../../assets/fundo.jpg";
+import logo1 from "../../assets/logo1.png";
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
@@ -14,79 +14,83 @@ const Home = () => {
     async function handleLogout() {
       await signOut(auth);
       setLoading(false);
-      setLoading(false);
     }
 
     handleLogout();
   }, []);
 
+  // Dados das estatísticas
+  const stats = [
+    {
+      icon: Users,
+      value: "40+",
+      label: "Anos de Tradição",
+    },
+    {
+      icon: ShoppingBag,
+      value: "32",
+      label: "Boxes Disponíveis",
+    },
+    {
+      icon: Award,
+      value: "100%",
+      label: "Produtos Locais",
+    },
+    {
+      icon: Heart,
+      value: "10000+",
+      label: "Famílias Atendidas",
+    },
+  ];
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-white">Carregando...</p>
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-600 to-green-800">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p className="text-white text-lg">Carregando...</p>
+        </div>
       </div>
     );
   }
 
   return (
     <>
-      <SEO 
-        title="Página Inicial"
-        description="Bem-vindo à Feira Livre de Buritizeiro. Descubra produtos frescos e de qualidade em um ambiente tradicional e acolhedor."
-        keywords={["feira", "buritizeiro", "produtos frescos", "hortifruti", "tradição"]}
+      <SEO
+        title="Feira Livre de Buritizeiro - Viva Bem"
+        description="Bem-vindo à Feira Livre de Buritizeiro. Descubra produtos frescos e de qualidade em um ambiente tradicional e acolhedor. Mais de 40 anos de tradição no coração da cidade."
+        keywords={[
+          "feira",
+          "buritizeiro",
+          "produtos frescos",
+          "hortifruti",
+          "tradição",
+          "mercado municipal",
+          "produtos locais",
+        ]}
         image="/logo.png"
         url={window.location.href}
         type="website"
       />
-      <main
-        className="bg-cover bg-no-repeat bg-center bg-fixed min-h-screen "
-        style={{ backgroundImage: `url(${fundo})` }}
-      >
-        <div
-          className="w-full min-h-screen flex justify-center items-center flex-col gap-4"
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.75)" }}
-        >
-          <section className="flex h-full items-center justify-center">
-            <div className="px-6 text-center text-white md:px-12">
-              <Link to="/" className="flex items-center">
-                <motion.img
-                  src={logo1}
-                  alt="Logo"
-                  className="w-36 ml-8 h-34"
-                  whileHover={{ scale: 1.1 }}
-                />
-              </Link>
 
-              <h1 className="mb-6 text-5xl font-bold">Viva Bem</h1>
-              <h3 className="mb-8 text-3xl font-bold">Buritizeiro</h3>
-
-              <div className="absolute top-0 right-0 mt-6 mr-6">
-                <Link to="/Login">
-                  <button
-                    type="button"
-                    className="inline-block rounded border-neutral-50 px-6 pb-[6px] pt-2 text-sm leading-normal text-neutral-50 transition duration-150 ease-in-out hover:border-neutral-100 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-neutral-100 focus:border-neutral-100 focus:text-neutral-100 focus:outline-none focus:ring-0 active:border-neutral-200 active:text-neutral-200 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
-                    data-te-ripple-init
-                    data-te-ripple-color="light"
-                  >
-                    Login
-                  </button>
-                </Link>
-              </div>
-
-              <div className="flex flex-col">
-                <Link
-                  to="/paginaprincipal"
-                  className="inline-block rounded-2xl border-2 border-neutral-50 px-6 pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-neutral-50 transition duration-150 ease-in-out hover:border-neutral-100 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-neutral-100 focus:border-neutral-100 focus:text-neutral-100 focus:outline-none focus:ring-0 active:border-neutral-200 active:text-neutral-200 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10"
-                >
-                  Acessar
-                </Link>
-              </div>
-            </div>
-            {/* Decorativo elementos */}
-            <div className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
-            <div className="absolute bottom-20 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-          </section>
-        </div>
+      <main className="min-h-screen">
+        <HeroSection
+          title="Viva Bem"
+          subtitle="Buritizeiro"
+          description="Descubra produtos frescos e de alta qualidade diretamente da nossa comunidade local. Mais de 40 anos de tradição no coração de Buritizeiro."
+          backgroundImage={fundo}
+          logo={logo1}
+          stats={stats}
+          showQuickInfo={true}
+          primaryButton={{
+            text: "Explorar Feira",
+            to: "/paginaprincipal",
+          }}
+          secondaryButton={{
+            text: "Área do Vendedor",
+            to: "/bancas/",
+          }}
+        />
       </main>
     </>
   );

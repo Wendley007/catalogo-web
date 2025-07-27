@@ -108,7 +108,8 @@ const Historia = () => {
         <section className="py-20 scroll-overscroll">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              <aside className="lg:col-span-1">
+              <aside className="lg:col-span-1 space-y-8">
+                {/* Card de Informações da Feira */}
                 <section className="bg-white rounded-2xl shadow-lg p-8 sticky top-24 scroll-with-header">
                   <h2 className="text-3xl lg:text-4xl font-bold text-gradient-primary mb-6">
                     Feira de Buritizeiro
@@ -162,12 +163,12 @@ const Historia = () => {
                   </div>
                 </section>
 
-                {/* Cards de características */}
-                <section className="bg-white rounded-2xl shadow-lg p-8 sticky mt-24 scroll-with-header">
+                {/* Card de Características */}
+                <section className="bg-white rounded-2xl shadow-lg p-8 sticky top-24 scroll-with-header">
                   <h3 className="text-xl font-bold text-gray-900 mb-4">
                     Por que escolher nossa feira?
                   </h3>
-                  <article className="grid grid-cols-2 gap-3">
+                  <article className="grid grid-cols-2 gap-4">
                     {asideFeatures.map((feature, index) => (
                       <motion.div
                         key={index}
@@ -175,15 +176,15 @@ const Historia = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
                         whileHover={{ y: -5 }}
-                        className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 text-center hover:shadow-md transition-all duration-300"
+                        className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 text-center hover:shadow-md transition-all duration-300"
                       >
-                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mx-auto mb-3">
-                          <feature.icon className="text-white" size={16} />
+                        <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+                          <feature.icon className="text-white" size={18} />
                         </div>
-                        <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                        <h4 className="text-sm font-semibold text-gray-900 mb-2">
                           {feature.title}
                         </h4>
-                        <p className="text-xs text-gray-600 leading-tight">
+                        <p className="text-xs text-gray-600 leading-relaxed">
                           {feature.description}
                         </p>
                       </motion.div>

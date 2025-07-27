@@ -183,12 +183,21 @@ const UserMenu = ({ isOpen, onToggle }) => {
 
   // Fecha o menu se clicar fora
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleClickOutside = (e) => {
+      // Verificar se o clique foi fora do menu e não em um modal
+      const modalElement = document.querySelector('[data-modal]');
+      if (modalElement && modalElement.contains(e.target)) {
+        return; // Não fechar se clicou em um modal
+      }
+      
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         onToggle();
       }
     };
-    if (isOpen) document.addEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen, onToggle]);
 
@@ -225,7 +234,7 @@ const UserMenu = ({ isOpen, onToggle }) => {
     <section ref={menuRef} className="relative">
       {isOpen && (
         <div
-          className="absolute right-0 -mr-24 mt-10 w-72 bg-white rounded-xl shadow-2xl border border-gray-300 z-50 py-3"
+          className="absolute right-0 -mr-24 mt-10 w-72 bg-white rounded-xl shadow-2xl border border-gray-300 z-[9998] py-3"
           role="menu"
           aria-label="Menu do usuário"
         >

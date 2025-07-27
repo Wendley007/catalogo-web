@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
 import {
@@ -25,6 +25,7 @@ import {
  * @param {string} props.confirmText - Texto do botão de confirmação
  * @param {string} props.cancelText - Texto do botão de cancelar
  * @param {string} props.closeText - Texto do botão de fechar
+
  */
 const Modal = ({
   isOpen,
@@ -40,7 +41,9 @@ const Modal = ({
   confirmText = "Confirmar",
   cancelText = "Cancelar",
   closeText = "Fechar",
-}) => {
+
+  }) => {
+
   // Gerenciamento de teclas e scroll
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -60,13 +63,24 @@ const Modal = ({
 
   // Função para obter ícone baseado no tipo
   const getIcon = () => {
-    if (CustomIcon) return <CustomIcon />;
+    if (CustomIcon) {
+      // Se CustomIcon já é um elemento JSX, retorná-lo diretamente
+      if (React.isValidElement(CustomIcon)) {
+        return CustomIcon;
+      }
+      // Se CustomIcon é um componente, renderizá-lo
+      if (typeof CustomIcon === 'function' || typeof CustomIcon === 'object') {
+        return <CustomIcon />;
+      }
+      return null;
+    }
 
     const iconProps = { size: 48 };
     switch (type) {
       case "success":
         return <CheckCircle className="text-green-500" {...iconProps} />;
       case "error":
+      case "danger":
         return <XCircle className="text-red-500" {...iconProps} />;
       case "warning":
         return <AlertTriangle className="text-yellow-500" {...iconProps} />;
@@ -83,6 +97,7 @@ const Modal = ({
       case "success":
         return "bg-green-500 hover:bg-green-600";
       case "error":
+      case "danger":
         return "bg-red-500 hover:bg-red-600";
       case "warning":
         return "bg-yellow-500 hover:bg-yellow-600";
@@ -108,6 +123,8 @@ const Modal = ({
         return "max-w-md";
     }
   };
+
+
 
   // Renderizar conteúdo customizado ou padrão
   const renderContent = () => {
@@ -144,7 +161,7 @@ const Modal = ({
           )}
           <button
             onClick={onClose}
-            className={`px-6 py-2 ${getButtonColor()} text-white rounded-xl font-medium transition-colors`}
+            className={`px-6 py-2 ${onConfirm ? 'bg-yellow-500 hover:bg-yellow-600' : getButtonColor()} text-white rounded-xl font-medium transition-colors`}
           >
             {onConfirm ? cancelText : closeText}
           </button>
@@ -157,7 +174,7 @@ const Modal = ({
     <AnimatePresence>
       {isOpen && (
         <section
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
           aria-modal="true"
           role="dialog"
           onClick={(e) => {
@@ -196,11 +213,11 @@ const Modal = ({
 Modal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  type: PropTypes.oneOf(["success", "error", "warning", "info", "confirm", "custom"]),
+  type: PropTypes.oneOf(["success", "error", "danger", "warning", "info", "confirm", "custom"]),
   title: PropTypes.string,
   message: PropTypes.string,
   onConfirm: PropTypes.func,
-  icon: PropTypes.elementType,
+  icon: PropTypes.oneOfType([PropTypes.elementType, PropTypes.element, PropTypes.node]),
   children: PropTypes.node,
   size: PropTypes.oneOf(["sm", "md", "lg", "xl"]),
   showCloseButton: PropTypes.bool,

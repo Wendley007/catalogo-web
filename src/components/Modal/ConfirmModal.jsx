@@ -1,6 +1,5 @@
 import Modal from "./Modal";
 import PropTypes from "prop-types";
-import { AlertTriangle } from "lucide-react";
 
 /**
  * Componente especializado para modais de confirmação
@@ -24,32 +23,6 @@ const ConfirmModal = ({
   cancelText = "Cancelar",
   type = "warning",
 }) => {
-  const getIcon = () => {
-    switch (type) {
-      case "danger":
-        return <AlertTriangle className="text-red-500" size={48} />;
-      case "warning":
-        return <AlertTriangle className="text-yellow-500" size={48} />;
-      case "info":
-        return <AlertTriangle className="text-blue-500" size={48} />;
-      default:
-        return <AlertTriangle className="text-yellow-500" size={48} />;
-    }
-  };
-
-  const getConfirmButtonColor = () => {
-    switch (type) {
-      case "danger":
-        return "bg-red-500 hover:bg-red-600";
-      case "warning":
-        return "bg-yellow-500 hover:bg-yellow-600";
-      case "info":
-        return "bg-blue-500 hover:bg-blue-600";
-      default:
-        return "bg-yellow-500 hover:bg-yellow-600";
-    }
-  };
-
   return (
     <Modal
       isOpen={isOpen}
@@ -61,30 +34,7 @@ const ConfirmModal = ({
       confirmText={confirmText}
       cancelText={cancelText}
       showCloseButton={false}
-      icon={getIcon}
-    >
-      <div className="text-center">
-        <div className="flex justify-center mb-4">{getIcon()}</div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-          {title}
-        </h3>
-        <p className="text-gray-700 dark:text-gray-300 mb-6">{message}</p>
-        <div className="flex space-x-3 justify-center">
-          <button
-            onClick={onConfirm}
-            className={`px-6 py-2 ${getConfirmButtonColor()} text-white rounded-xl font-medium transition-colors`}
-          >
-            {confirmText}
-          </button>
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
-          >
-            {cancelText}
-          </button>
-        </div>
-      </div>
-    </Modal>
+    />
   );
 };
 
@@ -97,7 +47,7 @@ ConfirmModal.propTypes = {
   message: PropTypes.string,
   confirmText: PropTypes.string,
   cancelText: PropTypes.string,
-  type: PropTypes.oneOf(["warning", "danger", "info"]),
+  type: PropTypes.oneOf(["warning", "danger", "error", "info"]),
 };
 
 // Props padrão
@@ -109,4 +59,4 @@ ConfirmModal.defaultProps = {
   type: "warning",
 };
 
-export default ConfirmModal; 
+export default ConfirmModal;

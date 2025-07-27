@@ -1,13 +1,13 @@
 
-import { useEffect, useState, useContext, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { db } from "../../../services/firebaseConnection";
 import { AuthContext } from "../../../contexts/AuthContext";
+import { db } from "../../../services/firebaseConnection";
 import banner from "../../../assets/banner.jpg";
 import BancaCard from "../../../components/BancaCard/BancaCard";
 import StatsSection from "../../../components/StatsSection";
-import { Modal } from "../../../components/Modal";
+
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
 import MenuTopo from "../../../components/MenuTopo";
 import Footer from "../../../components/Footer";
@@ -17,21 +17,16 @@ import {
   collection,
   getDocs,
   query,
-  deleteDoc,
-  doc,
-  updateDoc,
 } from "firebase/firestore";
 import {
-  Edit3,
   ChevronRight,
   Search,
   Users,
-  Plus,
   Loader,
   Store,
-  User,
   Award,
   Leaf,
+  Plus,
 } from "lucide-react";
 
 
@@ -81,19 +76,10 @@ const getBancasHeroData = () => ({
 // ======================================================= Página Principal de Bancas
 
 const Bancas = () => {
+  const { user } = useContext(AuthContext);
   const [bancas, setBancas] = useState([]);
   const [selectedBanca, setSelectedBanca] = useState(null);
-  const [selectedBancaToDelete, setSelectedBancaToDelete] = useState(null);
-  const [selectedVendedorToDelete, setSelectedVendedorToDelete] =
-    useState(null);
-  const [selectedBancaToEdit, setSelectedBancaToEdit] = useState(null);
-  const [newBancaName, setNewBancaName] = useState("");
-  const [selectedVendedorToEdit, setSelectedVendedorToEdit] = useState(null);
-  const [newVendedorName, setNewVendedorName] = useState("");
-  const [newVendedorCity, setNewVendedorCity] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const [searchProduct, setSearchProduct] = useState("");
-  const { user } = useContext(AuthContext);
   const vendedoresRef = useRef(null);
   const [filteredBancas, setFilteredBancas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -118,7 +104,11 @@ const Bancas = () => {
           banca.produtos = produtosData;
           bancasData.push(banca);
         }
-        setBancas(bancasData);
+        // Ordenar bancas por quantidade de produtos (mais produtos primeiro)
+        const bancasOrdenadas = bancasData.sort((a, b) => 
+          (b.produtos?.length || 0) - (a.produtos?.length || 0)
+        );
+        setBancas(bancasOrdenadas);
       } catch (error) {
         console.error("Erro ao buscar bancas:", error);
       } finally {
@@ -148,108 +138,7 @@ const Bancas = () => {
     setSelectedBanca(selectedBanca === bancaId ? null : bancaId);
   };
 
-  const updateBancaName = async (bancaId, novoNome) => {
-    try {
-      const bancaRef = doc(db, "bancas", bancaId);
-      await updateDoc(bancaRef, { nome: novoNome });
 
-      setBancas((prevBancas) =>
-        prevBancas.map((banca) =>
-          banca.id === bancaId ? { ...banca, nome: novoNome } : banca
-        )
-      );
-
-      setSuccessMessage("Nome alterado com sucesso!");
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (error) {
-      console.error("Erro ao atualizar o nome da banca:", error);
-    }
-  };
-
-  const handleDeleteBanca = async (bancaId) => {
-    try {
-      const vendedoresRef = collection(db, `bancas/${bancaId}/vendedores`);
-      const vendedoresSnapshot = await getDocs(vendedoresRef);
-      vendedoresSnapshot.forEach(async (vendedorDoc) => {
-        await deleteDoc(
-          doc(db, `bancas/${bancaId}/vendedores`, vendedorDoc.id)
-        );
-      });
-
-      await deleteDoc(doc(db, "bancas", bancaId));
-
-      setBancas((prevBancas) =>
-        prevBancas.filter((banca) => banca.id !== bancaId)
-      );
-
-      setSuccessMessage("Banca e vendedores excluídos com sucesso!");
-      setSelectedBancaToDelete(null);
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (error) {
-      console.error("Erro ao excluir a banca:", error);
-    }
-  };
-
-  const handleConfirmDeleteVendedor = async () => {
-    try {
-      if (selectedVendedorToDelete) {
-        const { bancaId, id } = selectedVendedorToDelete;
-        await deleteDoc(doc(db, `bancas/${bancaId}/vendedores/${id}`));
-        setBancas((prevBancas) =>
-          prevBancas.map((banca) =>
-            banca.id === bancaId
-              ? {
-                  ...banca,
-                  vendedores: banca.vendedores.filter(
-                    (vendedor) => vendedor.id !== id
-                  ),
-                }
-              : banca
-          )
-        );
-        setSuccessMessage("Vendedor excluído com sucesso!");
-        setSelectedVendedorToDelete(null);
-        setTimeout(() => setSuccessMessage(""), 3000);
-      }
-    } catch (error) {
-      console.error("Erro ao excluir o vendedor:", error);
-    }
-  };
-
-  const handleEditVendedor = async (
-    bancaId,
-    vendedorId,
-    novoNome,
-    novaCidade
-  ) => {
-    try {
-      await updateDoc(doc(db, `bancas/${bancaId}/vendedores/${vendedorId}`), {
-        nome: novoNome,
-        cidade: novaCidade,
-      });
-      setBancas((prevBancas) =>
-        prevBancas.map((banca) =>
-          banca.id === bancaId
-            ? {
-                ...banca,
-                vendedores: banca.vendedores.map((vendedor) =>
-                  vendedor.id === vendedorId
-                    ? { ...vendedor, nome: novoNome, cidade: novaCidade }
-                    : vendedor
-                ),
-              }
-            : banca
-        )
-      );
-      setSuccessMessage("Vendedor editado com sucesso!");
-      setSelectedVendedorToEdit(null);
-      setNewVendedorName("");
-      setNewVendedorCity("");
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (error) {
-      console.error("Erro ao editar o vendedor:", error);
-    }
-  };
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -293,7 +182,6 @@ const Bancas = () => {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-6 items-center justify-between relative z-10">
-            {/* Espaço de pesquisa */}
             <div className="flex-1 max-w-2xl">
               <div className="relative">
                 <Search
@@ -314,10 +202,10 @@ const Bancas = () => {
             {user && user.role === "admin" && (
               <Link
                 to="/novoperfil"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3  rounded-xl font-medium text-sm hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-xl font-medium text-sm hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Plus size={20} />
-                <span>Cadastrar Nova Banca</span>
+                <span>Novo Perfil</span>
               </Link>
             )}
           </div>
@@ -362,15 +250,8 @@ const Bancas = () => {
                       key={banca.id}
                       banca={banca}
                       index={index}
-                      showAdminControls={user && user.role === "admin"}
+                      showAdminControls={false}
                       showVendedoresDropdown={true}
-                      onEditBanca={(banca) => {
-                        setSelectedBancaToEdit(banca);
-                        setNewBancaName(banca.nome);
-                      }}
-                      onDeleteBanca={(banca) => setSelectedBancaToDelete(banca)}
-                      onEditVendedor={handleEditVendedor}
-                      onDeleteVendedor={(vendedorData) => setSelectedVendedorToDelete(vendedorData)}
                       onSelectVendedores={handleSelectVendedores}
                       selectedBanca={selectedBanca}
                       whatsappMessage={`Olá! Vi essa ${banca?.nome} no site da Feira de Buritizeiro e fiquei interessado!`}
@@ -416,139 +297,7 @@ const Bancas = () => {
       <ScrollTopoButton />
       <Footer />
 
-      {/* Modals */}
-      <Modal
-        isOpen={!!selectedBancaToDelete}
-        onClose={() => setSelectedBancaToDelete(null)}
-        type="warning"
-        title="Confirmar Exclusão"
-        message={`Tem certeza que deseja excluir a banca "${selectedBancaToDelete?.nome}"? Esta ação não pode ser desfeita.`}
-        onConfirm={() => {
-          handleDeleteBanca(selectedBancaToDelete.id);
-          setSelectedBancaToDelete(null);
-        }}
-      />
 
-      <Modal
-        isOpen={!!selectedVendedorToDelete}
-        onClose={() => setSelectedVendedorToDelete(null)}
-        type="warning"
-        title="Confirmar Exclusão"
-        message={`Tem certeza que deseja excluir o vendedor "${selectedVendedorToDelete?.nome}"?`}
-        onConfirm={handleConfirmDeleteVendedor}
-      />
-
-      <Modal
-        isOpen={!!selectedBancaToEdit}
-        onClose={() => {
-          setSelectedBancaToEdit(null);
-          setNewBancaName("");
-        }}
-        type="edit"
-      >
-        <div className="text-center">
-          <Edit3 className="mx-auto mb-4 text-blue-500" size={48} />
-          <h3 className="text-xl font-bold text-gray-900 mb-6">
-            Editar Nome da Banca
-          </h3>
-          <input
-            type="text"
-            className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 mb-6 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            placeholder="Nome da banca"
-            value={newBancaName}
-            onChange={(e) => setNewBancaName(e.target.value)}
-          />
-          <div className="flex space-x-3 justify-center">
-            <button
-              onClick={() => {
-                updateBancaName(selectedBancaToEdit.id, newBancaName);
-                setSelectedBancaToEdit(null);
-                setNewBancaName("");
-              }}
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
-            >
-              Salvar
-            </button>
-            <button
-              onClick={() => {
-                setSelectedBancaToEdit(null);
-                setNewBancaName("");
-              }}
-              className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={!!selectedVendedorToEdit}
-        onClose={() => {
-          setSelectedVendedorToEdit(null);
-          setNewVendedorName("");
-          setNewVendedorCity("");
-        }}
-        type="edit"
-      >
-        <div className="text-center">
-          <User className="mx-auto mb-4 text-blue-500" size={48} />
-          <h3 className="text-xl font-bold text-gray-900 mb-6">
-            Editar Vendedor
-          </h3>
-          <div className="space-y-4 mb-6">
-            <input
-              type="text"
-              className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="Nome do vendedor"
-              value={newVendedorName}
-              onChange={(e) => setNewVendedorName(e.target.value)}
-            />
-            <input
-              type="text"
-              className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="Cidade do vendedor"
-              value={newVendedorCity}
-              onChange={(e) => setNewVendedorCity(e.target.value)}
-            />
-          </div>
-          <div className="flex space-x-3 justify-center">
-            <button
-              onClick={() => {
-                if (newVendedorName && newVendedorCity) {
-                  handleEditVendedor(
-                    selectedVendedorToEdit.bancaId,
-                    selectedVendedorToEdit.id,
-                    newVendedorName,
-                    newVendedorCity
-                  );
-                }
-              }}
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-medium transition-colors"
-            >
-              Salvar
-            </button>
-            <button
-              onClick={() => {
-                setSelectedVendedorToEdit(null);
-                setNewVendedorName("");
-                setNewVendedorCity("");
-              }}
-              className="px-6 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-medium transition-colors"
-            >
-              Cancelar
-            </button>
-          </div>
-        </div>
-      </Modal>
-
-      <Modal
-        isOpen={!!successMessage}
-        onClose={() => setSuccessMessage("")}
-        type="success"
-        title="Sucesso!"
-        message={successMessage}
-      />
     </main>
   );
 };

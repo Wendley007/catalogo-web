@@ -7,11 +7,11 @@ import PropTypes from "prop-types";
 
 const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
   console.log("ModernCarousel props:", { isAdmin, onAddImage: !!onAddImage });
-  
+
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { 
-      loop: true, 
-      align: "center", 
+    {
+      loop: true,
+      align: "center",
       skipSnaps: false,
       dragFree: false,
       containScroll: "trimSnaps",
@@ -59,7 +59,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
 
   const onTouchEnd = useCallback(() => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > 50;
     const isRightSwipe = distance < -50;
@@ -121,7 +121,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
   }
 
   return (
-    <section 
+    <section
       className="relative group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -131,8 +131,8 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
       aria-label="Carrossel de imagens"
     >
       {/* Carousel container */}
-      <div 
-        className="overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-700 scroll-snap-horizontal scroll-momentum" 
+      <div
+        className="overflow-hidden rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-700 scroll-snap-horizontal scroll-momentum"
         ref={emblaRef}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
@@ -149,7 +149,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
                 {!imageLoading[index] && (
                   <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse rounded-2xl" />
                 )}
-                
+
                 <img
                   src={image.imageUrl}
                   alt={image.alt || `Slide ${index + 1} do carrossel`}
@@ -158,10 +158,10 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
                   onLoad={() => handleImageLoad(index)}
                   onError={() => handleImageError(index)}
                 />
-                
+
                 {/* Overlay gradiente melhorado */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                
+
                 {/* Informações do slide */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                   <h3 className="text-xl md:text-2xl font-bold mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
@@ -210,17 +210,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
           whileTap={{ scale: 0.9 }}
           onClick={() => {
             console.log("Botão de upload clicado");
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-              const file = e.target.files[0];
-              console.log("Arquivo selecionado:", file);
-              if (file) {
-                onAddImage(file);
-              }
-            };
-            input.click();
+            onAddImage();
           }}
           className="absolute top-4 left-4 w-10 h-10 bg-green-500/90 hover:bg-green-600/90 text-white rounded-full flex items-center justify-center shadow-xl backdrop-blur-sm transition-all duration-300 z-20"
           aria-label="Adicionar nova imagem"
@@ -229,11 +219,11 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
         </motion.button>
       )}
 
-      {/* Botões de navegação melhorados */}
+      {/* Botões de navegação */}
       <motion.button
         initial={{ opacity: 0, x: -20 }}
-        animate={{ 
-          opacity: isHovered ? 1 : 0.3, 
+        animate={{
+          opacity: isHovered ? 1 : 0.3,
           x: 0,
         }}
         whileHover={{ scale: 1.1, x: -2 }}
@@ -244,11 +234,11 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
       >
         <ChevronLeft size={20} className="md:w-6 md:h-6" />
       </motion.button>
-      
+
       <motion.button
         initial={{ opacity: 0, x: 20 }}
-        animate={{ 
-          opacity: isHovered ? 1 : 0.3, 
+        animate={{
+          opacity: isHovered ? 1 : 0.3,
           x: 0,
         }}
         whileHover={{ scale: 1.1, x: 2 }}
@@ -260,7 +250,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
         <ChevronRight size={20} className="md:w-6 md:h-6" />
       </motion.button>
 
-      {/* Indicadores de pontos melhorados */}
+      {/* Indicadores de pontos */}
       <div className="flex justify-center space-x-2 md:space-x-3 mt-4 md:mt-6 scroll-horizontal">
         {scrollSnaps.map((_, index) => (
           <motion.button
@@ -309,4 +299,4 @@ ModernCarousel.defaultProps = {
 
 ModernCarousel.displayName = "ModernCarousel";
 
-export default ModernCarousel; 
+export default ModernCarousel;

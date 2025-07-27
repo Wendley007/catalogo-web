@@ -10,14 +10,17 @@ import {
   ExternalLink,
   Heart,
   ArrowUp,
+  Users,
+  Award,
+  Leaf,
 } from "lucide-react";
 import logo1 from "../assets/logo1.png";
-import ifnmgLogo from "../assets/ifnmg.jpg";
 import prefeituraLogo from "../assets/logo_Buritizeiro.jpg";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
+  // Links rápidos de navegação
   const quickLinks = [
     { to: "/paginaprincipal", label: "Início", icon: "🏠" },
     { to: "/historia", label: "Nossa História", icon: "📖" },
@@ -27,6 +30,7 @@ const Footer = () => {
     { to: "/avaliacao", label: "Avaliação", icon: "⭐" },
   ];
 
+  // Links das redes sociais
   const socialLinks = [
     {
       href: "https://www.facebook.com/buritizeiroprefeitura/?locale=pt_BR",
@@ -44,13 +48,8 @@ const Footer = () => {
     },
   ];
 
+  // Informações dos parceiros
   const partners = [
-    {
-      name: "IFNMG Pirapora",
-      href: "https://www.ifnmg.edu.br/pirapora",
-      logo: ifnmgLogo,
-      description: "Instituto Federal do Norte de Minas Gerais",
-    },
     {
       name: "Prefeitura de Buritizeiro",
       href: "https://www.buritizeiro.mg.gov.br/",
@@ -59,10 +58,12 @@ const Footer = () => {
     },
   ];
 
+  // Função para rolar ao topo da página
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Informações de contato
   const contactInfo = [
     {
       icon: MapPin,
@@ -92,18 +93,61 @@ const Footer = () => {
     },
   ];
 
+  // Estatísticas da feira
+  const stats = [
+    {
+      icon: Users,
+      value: "40+",
+      label: "Anos de Tradição",
+    },
+    {
+      icon: Award,
+      value: "100%",
+      label: "Produtos Locais",
+    },
+    {
+      icon: Leaf,
+      value: "32",
+      label: "Boxes Disponíveis",
+    },
+  ];
+
   return (
-    <footer className="bg-gray-900 text-white relative overflow-hidden" role="contentinfo">
-      {/* Background Pattern */}
+    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white relative overflow-hidden" role="contentinfo">
+      {/* Elementos decorativos de fundo */}
       <div className="absolute inset-0 opacity-5" aria-hidden="true">
-        <div className="absolute top-10 left-10 w-20 h-20 bg-green-500 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-20 w-32 h-32 bg-green-400 rounded-full blur-xl"></div>
-        <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-green-600 rounded-full blur-xl"></div>
+        <div className="absolute top-10 left-10 w-20 h-20 bg-green-500 rounded-full blur-xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-32 h-32 bg-green-400 rounded-full blur-xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-green-600 rounded-full blur-xl animate-pulse delay-500"></div>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        
+        {/* Seção de estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="text-center"
+              >
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Icon className="text-green-400" size={32} />
+                </div>
+                <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
+                <div className="text-gray-300 text-sm">{stat.label}</div>
+              </motion.div>
+            );
+          })}
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-          {/* Logo and Description */}
+          
+          {/* Logo e descrição */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
               <div className="flex w-20 h-18 items-center justify-center">
@@ -115,7 +159,9 @@ const Footer = () => {
                 />
               </div>
               <div>
-                <h3 className="text-xl -ml-4 font-bold">Viva Bem</h3>
+                <h3 className="text-xl -ml-4 font-bold bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent">
+                  Viva Bem
+                </h3>
                 <p className="text-gray-400 -ml-4 text-sm">Buritizeiro</p>
               </div>
             </div>
@@ -125,7 +171,7 @@ const Footer = () => {
               frescos, tradição e comunidade em um só lugar.
             </p>
 
-            {/* Social Links */}
+            {/* Links das redes sociais */}
             <div className="flex space-x-4" role="group" aria-label="Redes sociais">
               {socialLinks.map((social, index) => {
                 const Icon = social.icon;
@@ -135,9 +181,9 @@ const Footer = () => {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center transition-all duration-300 hover:bg-gray-700 transform hover:scale-110 ${social.color} focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900`}
+                    className={`w-12 h-12 bg-gray-800/50 backdrop-blur-sm rounded-xl flex items-center justify-center transition-all duration-300 hover:bg-gray-700/50 transform hover:scale-110 ${social.color} focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900`}
                     aria-label={social.ariaLabel}
-                    whileHover={{ scale: 1.1 }}
+                    whileHover={{ scale: 1.1, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Icon size={20} />
@@ -147,7 +193,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Links rápidos */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-green-400">
               Links Rápidos
@@ -161,17 +207,17 @@ const Footer = () => {
                 >
                   <Link
                     to={link.to}
-                    className="flex items-center space-x-2 text-gray-300 hover:text-green-400 transition-colors duration-300 text-sm group"
+                    className="flex items-center space-x-3 text-gray-300 hover:text-green-400 transition-colors duration-300 text-sm group"
                   >
                     <span className="text-lg">{link.icon}</span>
-                    <span>{link.label}</span>
+                    <span className="group-hover:font-medium">{link.label}</span>
                   </Link>
                 </motion.div>
               ))}
             </nav>
           </div>
 
-          {/* Contact Info */}
+          {/* Informações de contato */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-green-400">
               Contato
@@ -214,7 +260,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Partners */}
+          {/* Parceiros */}
           <div>
             <h4 className="text-lg font-semibold mb-6 text-green-400">
               Parceiros
@@ -226,8 +272,8 @@ const Footer = () => {
                   href={partner.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-3 p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-                  whileHover={{ scale: 1.02 }}
+                  className="flex items-center space-x-3 p-4 bg-gray-800/50 backdrop-blur-sm rounded-xl hover:bg-gray-700/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                  whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden">
@@ -256,8 +302,8 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
+        {/* Seção inferior */}
+        <div className="border-t border-gray-800/50 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2 text-sm text-gray-400">
               <span>© {currentYear} Feira Livre de Buritizeiro</span>
@@ -272,12 +318,12 @@ const Footer = () => {
                 <span>para nossa comunidade</span>
               </div>
 
-              {/* Scroll to Top Button */}
+              {/* Botão de voltar ao topo */}
               <motion.button
                 onClick={scrollToTop}
-                className="p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                className="p-3 bg-gray-800/50 backdrop-blur-sm rounded-xl hover:bg-gray-700/50 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
                 aria-label="Voltar ao topo"
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <ArrowUp size={16} />
