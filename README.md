@@ -1,4 +1,4 @@
-# Catálogo Web
+# Catálogo Web 
 
 Catálogo online para divulgação de feirantes e seus produtos. Desenvolvido com React, Tailwind CSS e Firebase.
 
