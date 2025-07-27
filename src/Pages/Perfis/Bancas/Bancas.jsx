@@ -1,15 +1,18 @@
-/* eslint-disable react/prop-types */
+
 import { useEffect, useState, useContext, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { db } from "../../../services/firebaseConnection";
 import { AuthContext } from "../../../contexts/AuthContext";
 import banner from "../../../assets/banner.jpg";
-import { FaWhatsapp } from "react-icons/fa";
-
+import BancaCard from "../../../components/BancaCard/BancaCard";
+import StatsSection from "../../../components/StatsSection";
+import { Modal } from "../../../components/Modal";
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
 import MenuTopo from "../../../components/MenuTopo";
 import Footer from "../../../components/Footer";
+import SEO from "../../../components/SEO/SEO";
+import HeroSection from "../../../components/HeroSection";
 import {
   collection,
   getDocs,
@@ -19,116 +22,22 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import {
-  Trash2,
   Edit3,
-  ChevronDown,
   ChevronRight,
-  X,
   Search,
   Users,
-  MapPin,
   Plus,
-  XCircle,
-  CheckCircle,
   Loader,
   Store,
   User,
-  AlertCircle,
   Award,
   Leaf,
 } from "lucide-react";
 
-//  --------------------------------------------------------------- Modal Component
-const Modal = ({
-  isOpen,
-  onClose,
-  type,
-  title,
-  message,
-  onConfirm,
-  children,
-}) => {
-  const getIcon = () => {
-    const iconProps = { size: 48 };
-    switch (type) {
-      case "success":
-        return <CheckCircle className="text-green-500" {...iconProps} />;
-      case "error":
-        return <XCircle className="text-red-500" {...iconProps} />;
-      case "warning":
-        return <AlertCircle className="text-yellow-500" {...iconProps} />;
-      default:
-        return <AlertCircle className="text-blue-500" {...iconProps} />;
-    }
-  };
 
-  const getButtonColor = () => {
-    switch (type) {
-      case "success":
-        return "bg-green-500 hover:bg-green-600";
-      case "error":
-        return "bg-red-500 hover:bg-red-600";
-      case "warning":
-        return "bg-yellow-500 hover:bg-yellow-600";
-      default:
-        return "bg-blue-500 hover:bg-blue-600";
-    }
-  };
 
-  return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.section
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
-        >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
-            className="bg-white dark:bg-zinc-800 ring-1 ring-gray-200 dark:ring-gray-600 rounded-xl shadow-2xl p-8 max-w-md w-full mx-4 text-center relative"
-          >
-            {!children && (
-              <>
-                <div className="flex justify-center mb-4">{getIcon()}</div>
-                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-                  {title}
-                </h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-6">
-                  {message}
-                </p>
-                <div className="flex space-x-3 justify-center">
-                  {onConfirm && (
-                    <button
-                      onClick={onConfirm}
-                      className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl font-medium transition-colors"
-                    >
-                      Confirmar
-                    </button>
-                  )}
-                  <button
-                    onClick={onClose}
-                    className={`px-6 py-2 ${getButtonColor()} text-white rounded-xl font-medium transition-colors`}
-                  >
-                    {onConfirm ? "Cancelar" : "Fechar"}
-                  </button>
-                </div>
-              </>
-            )}
-            {children}
-          </motion.div>
-        </motion.section>
-      )}
-    </AnimatePresence>
-  );
-};
-
-// --------------------------------------------------------------- Estatísticas das bancas
-
-const StatsSection = ({ bancas }) => {
+// Função para gerar estatísticas das bancas
+const getBancasStats = (bancas) => {
   const totalVendedores = bancas.reduce(
     (acc, banca) => acc + banca.vendedores.length,
     0
@@ -138,7 +47,7 @@ const StatsSection = ({ bancas }) => {
     0
   );
 
-  const stats = [
+  return [
     {
       icon: Store,
       value: bancas.length,
@@ -159,53 +68,15 @@ const StatsSection = ({ bancas }) => {
     },
     { icon: Award, value: "100%", label: "Qualidade", color: "text-red-500" },
   ];
-
-  return (
-    <section className="py-16 bg-gradient-to-r from-green-50 to-blue-50 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12 relative z-10"
-        >
-          <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
-            {" "}
-            Nossas Bancas em números
-          </h2>
-          <p className="text-xl text-gray-700 max-w-3xl mx-auto">
-            Conectando produtores locais com a comunidade
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-          {stats.map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                className="bg-white/80 backdrop-blur-lg  rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-500 text-center group hover:scale-105 border border-white/20"
-              >
-                <div
-                  className={`w-16 h-16 bg-gradient-to-br from-white to-gray-100 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:scale-125 transition-all duration-500 shadow-lg`}
-                >
-                  <Icon className={stat.color} size={32} />
-                </div>
-                <h3 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
-                  {stat.value}
-                </h3>
-                <p className="text-gray-700 font-semibold">{stat.label}</p>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-  );
 };
+
+// Dados do hero da página de Bancas
+const getBancasHeroData = () => ({
+  title: "Nossas Bancas",
+  description: "Conheça nossos vendedores e descubra produtos frescos e de qualidade",
+  backgroundImage: banner,
+  icon: Store,
+});
 
 // ======================================================= Página Principal de Bancas
 
@@ -392,45 +263,24 @@ const Bancas = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50">
+      <SEO
+        title="Bancas - Feira Livre de Buritizeiro"
+        description="Conheça todas as bancas da Feira Livre de Buritizeiro. Encontre vendedores, produtos e informações de contato."
+        keywords={["bancas feira", "vendedores feira", "feira livre bancas", "produtos feira"]}
+      />
       <MenuTopo />
 
       {/* Seção Hero */}
-      <section
-        className="bg-cover bg-no-repeat bg-center py-20"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.738), rgba(0, 0, 0, 0.728)), url(${banner})`,
-        }}
-      >
-        {/* Background */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-white/20 rounded-full blur-xl"></div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center relative z-10"
-          >
-            <div className="flex justify-center mb-6">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <Store size={40} className="text-white" />
-              </div>
-            </div>
-            <h1 className="text-4xl lg:text-5xl text-white font-bold mb-4 drop-shadow-2xl">
-              Nossas Bancas
-            </h1>
-            <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed">
-              Conheça nossos vendedores e descubra produtos frescos e de
-              qualidade
-            </p>
-          </motion.div>
-        </div>
-      </section>
+      <HeroSection {...getBancasHeroData()} />
 
       {/* Seção de Estatísticas */}
-      <StatsSection bancas={bancas} />
+      <StatsSection
+        stats={getBancasStats(bancas)}
+        title="Nossas Bancas em números"
+        subtitle="Conectando produtores locais com a comunidade"
+        variant="glass"
+      />
 
       {/* Seção de pesquisa */}
       <section className="py-10 bg-gradient-to-br bg-white relative overflow-hidden">
@@ -508,257 +358,26 @@ const Bancas = () => {
                 /* Cards*/
                 <article className="grid grid-cols-1 mt-6 gap-8 md:grid-cols-3 lg:grid-cols-3 mx-2">
                   {filteredBancas.map((banca, index) => (
-                    <motion.div
+                    <BancaCard
                       key={banca.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.1 }}
-                      className="bg-white rounded-xl shadow-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-                    >
-                      <div className="p-2 mt-2 text-center relative">
-                        <h2 className="text-center drop-shadow-lg flex items-center justify-center text-lg font-semibold uppercase text-gray-800 mb-3">
-                          {banca.nome}
-                        </h2>
-                        <div className="w-16 h-1 bg-gray-200 mx-auto rounded-full"></div>
-
-                        {user && user.role === "admin" && (
-                          <div className="absolute top-4 right-4 flex space-x-2">
-                            <button
-                              onClick={() => {
-                                setSelectedBancaToEdit(banca);
-                                setNewBancaName(banca.nome);
-                              }}
-                              className="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center text-blue-600 transition-all duration-300 transform hover:scale-105"
-                            >
-                              <Edit3 size={16} />
-                            </button>
-                            <button
-                              onClick={() => setSelectedBancaToDelete(banca)}
-                              className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center text-red-600 transition-all duration-300 transform hover:scale-105"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="p-4">
-                        {banca.vendedores && banca.vendedores.length > 0 ? (
-                          <div className="text-center">
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ duration: 0.5 }}
-                              className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl flex flex-col items-center justify-center"
-                            >
-                              <div className="relative inline-block mb-6">
-                                <div className="absolute inset-0 bg-gradient-to-r from-green-300 to-blue-300 rounded-full blur-lg"></div>
-                                <img
-                                  src={
-                                    banca.vendedores[0].images?.[0]?.url ||
-                                    "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400"
-                                  }
-                                  alt={banca.vendedores[0].nome}
-                                  className="relative w-28 h-28 rounded-full object-cover shadow-xs border-white"
-                                />
-                              </div>
-                              <h4 className="font-bold text-gray-900 -mt-2 text-xl mb-2">
-                                {banca.vendedores[0].nome}
-                              </h4>
-                              <p className="text-gray-600 mb-4 text-sm flex items-center justify-center space-x-1">
-                                <MapPin size={10} />
-                                <span>{banca.vendedores[0].cidade}</span>
-                              </p>
-
-                              {user && user.role === "admin" && (
-                                <div className="flex justify-center space-x-3">
-                                  <button
-                                    onClick={() => {
-                                      setSelectedVendedorToEdit({
-                                        bancaId: banca.id,
-                                        ...banca.vendedores[0],
-                                      });
-                                      setNewVendedorName(
-                                        banca.vendedores[0].nome
-                                      );
-                                      setNewVendedorCity(
-                                        banca.vendedores[0].cidade
-                                      );
-                                    }}
-                                    className="w-10 h-10 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center text-blue-600 transition-all duration-300 transform hover:scale-105"
-                                  >
-                                    <Edit3 size={16} />
-                                  </button>
-                                  <button
-                                    onClick={() =>
-                                      setSelectedVendedorToDelete({
-                                        bancaId: banca.id,
-                                        ...banca.vendedores[0],
-                                      })
-                                    }
-                                    className="w-10 h-10 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center text-red-600 transition-all duration-300 transform hover:scale-105"
-                                  >
-                                    <Trash2 size={16} />
-                                  </button>
-                                </div>
-                              )}
-
-                              <a
-                                href={`https://api.whatsapp.com/send?phone=${banca.vendedores[0].whatsapp}&text=Olá! Vi sua banca no site da Feira de Buritizeiro e fiquei interessado!`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center text-sm space-x-2 mt-4 px-4 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                              >
-                                <FaWhatsapp size={18} />
-                                <span>Conversar no WhatsApp</span>
-                              </a>
-                            </motion.div>
-                          </div>
-                        ) : (
-                          <p>Nenhum vendedor disponível nesta banca.</p>
-                        )}
-
-                        {/* Botões de Ação */}
-                        <div className="relative">
-                          <div className="flex space-x-4 mt-4">
-                            <Link
-                              to={`/bancas/${banca.id}`}
-                              className="inline-flex text-xs items-center font-medium bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 shadow-xl py-3 rounded-xl hover:from-pink-600 hover:to-red-600 duration-300 focus:outline-none focus:shadow-outline transition-colors mr-2"
-                            >
-                              Acessar Banca
-                            </Link>
-                            <button
-                              type="button"
-                              className="flex-1 text-xs bg-gradient-to-r font-medium from-gray-700 to-gray-800 text-white py-2 px-4 rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
-                              onClick={() => handleSelectVendedores(banca.id)}
-                            >
-                              <span className="mr-2">
-                                {selectedBanca === banca.id
-                                  ? "Fechar Vendedores"
-                                  : "Ver Vendedores"}
-                              </span>
-                              <ChevronDown
-                                className={`w-4 h-4 transition-transform ${
-                                  selectedBanca === banca.id ? "rotate-180" : ""
-                                }`}
-                              />
-                            </button>
-                          </div>
-                          {/* Vendedores adicionais */}
-                          <AnimatePresence>
-                            {selectedBanca === banca.id && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                className="absolute top-full ring-1 ring-gray-300 ml-5 mt-2 max-h-60 w-64 bg-gray-100 hover:bg-gray-50 transition-colors rounded-xl shadow-xl z-10"
-                                ref={vendedoresRef}
-                              >
-                                <div className="flex bg-gradient-to-t from-gray-200 to-gray-300 justify-end py-1 px-1 rounded-t-xl">
-                                  <button
-                                    onClick={() => handleSelectVendedores(null)}
-                                    className="text-gray-600 w-6 h-6 flex items-center justify-center hover:text-gray-900 rounded-full bg-gray-100 text-sm font-bold"
-                                  >
-                                    <X size={18} />
-                                  </button>
-                                </div>
-
-                                {banca.vendedores.length > 1 ? (
-                                  <ul className="list-none">
-                                    {banca.vendedores
-                                      .slice(1)
-                                      .map((vendedor, index) => (
-                                        <div key={vendedor.id}>
-                                          <li className="px-4 py-3 items-center relative">
-                                            <div className="flex items-center justify-between w-full">
-                                              <div className="flex items-center gap-2">
-                                                <img
-                                                  src={
-                                                    vendedor.images &&
-                                                    vendedor.images.length > 0
-                                                      ? vendedor.images[0].url
-                                                      : "placeholder.jpg"
-                                                  }
-                                                  alt={`Imagem de perfil de ${vendedor.nome}`}
-                                                  className="object-cover w-12 h-12 rounded-full"
-                                                />
-                                                <div>
-                                                  <div className="text-sm font-bold">
-                                                    {vendedor.nome}
-                                                  </div>
-                                                  <div className="text-gray-600 mb-4 gap-1 text-sm flex items-center justify-center space-x-1">
-                                                    <MapPin size={10} />
-                                                    {vendedor.cidade}
-                                                  </div>
-                                                </div>
-                                              </div>
-                                              <a
-                                                href={`https://api.whatsapp.com/send?phone=${vendedor?.whatsapp}&text=Olá! Vi essa ${banca?.nome} no site da Feira de Buritizeiro e fiquei interessado!`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                                                title="Conversar no WhatsApp"
-                                              >
-                                                <FaWhatsapp size={18} />
-                                              </a>
-                                            </div>
-
-                                            {user && user.role === "admin" && (
-                                              <div className="flex justify-center -mt-2 space-x-2">
-                                                <button
-                                                  onClick={() => {
-                                                    setSelectedVendedorToEdit({
-                                                      bancaId: banca.id,
-                                                      ...vendedor,
-                                                    });
-                                                    setNewVendedorName(
-                                                      vendedor.nome
-                                                    );
-                                                    setNewVendedorCity(
-                                                      vendedor.cidade
-                                                    );
-                                                  }}
-                                                  className="w-6 h-6 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center text-blue-600 transition-all duration-300 transform hover:scale-105"
-                                                >
-                                                  <Edit3 size={14} />
-                                                </button>
-                                                <button
-                                                  onClick={() =>
-                                                    setSelectedVendedorToDelete(
-                                                      {
-                                                        bancaId: banca.id,
-                                                        ...vendedor,
-                                                      }
-                                                    )
-                                                  }
-                                                  className="w-6 h-6 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center text-red-600 transition-all duration-300 transform hover:scale-105"
-                                                >
-                                                  <Trash2 size={14} />
-                                                </button>
-                                              </div>
-                                            )}
-                                          </li>
-
-                                          {/* Linha divisória entre vendedores adicionais */}
-                                          {index <
-                                            banca.vendedores.slice(1).length -
-                                              1 && (
-                                            <div className="h-px w-3/4 bg-gray-300 mx-auto my-1" />
-                                          )}
-                                        </div>
-                                      ))}
-                                  </ul>
-                                ) : (
-                                  <p className="px-4 py-3 text-sm text-gray-600">
-                                    Nenhum outro vendedor disponível nesta
-                                    Banca.
-                                  </p>
-                                )}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      </div>
-                    </motion.div>
+                      banca={banca}
+                      index={index}
+                      showAdminControls={user && user.role === "admin"}
+                      showVendedoresDropdown={true}
+                      onEditBanca={(banca) => {
+                        setSelectedBancaToEdit(banca);
+                        setNewBancaName(banca.nome);
+                      }}
+                      onDeleteBanca={(banca) => setSelectedBancaToDelete(banca)}
+                      onEditVendedor={handleEditVendedor}
+                      onDeleteVendedor={(vendedorData) => setSelectedVendedorToDelete(vendedorData)}
+                      onSelectVendedores={handleSelectVendedores}
+                      selectedBanca={selectedBanca}
+                      whatsappMessage={`Olá! Vi essa ${banca?.nome} no site da Feira de Buritizeiro e fiquei interessado!`}
+                      acessarBancaText="Acessar Banca"
+                      verVendedoresText="Ver Vendedores"
+                      fecharVendedoresText="Fechar Vendedores"
+                    />
                   ))}
                 </article>
               ) : (
@@ -930,7 +549,7 @@ const Bancas = () => {
         title="Sucesso!"
         message={successMessage}
       />
-    </div>
+    </main>
   );
 };
 

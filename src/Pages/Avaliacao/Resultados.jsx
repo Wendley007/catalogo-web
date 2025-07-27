@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FaSpinner } from "react-icons/fa";
+import SEO from "../../components/SEO/SEO";
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, ChartDataLabels);
 
@@ -180,6 +181,10 @@ const Resultados = () => {
       className="bg-cover bg-center min-h-screen text-gray-800"
       style={{ backgroundImage: `url(${fundo})` }}
     >
+      <SEO
+        title="Resultados das Avaliações"
+        description="Veja os resultados detalhados das avaliações realizadas sobre o catálogo de feiras livres."
+      />
       <div className="bg-gray-800 bg-opacity-75 min-h-screen">
         <MenuTopo />
         <div className="max-w-4xl mx-auto px-4 py-8">

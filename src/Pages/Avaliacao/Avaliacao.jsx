@@ -11,6 +11,7 @@ import MenuTopo from "../../components/MenuTopo";
 import fundo from "../../assets/fundo.jpg";
 import Footer from "../../components/Footer";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import SEO from "../../components/SEO/SEO";
 
 const Avaliacao = () => {
   const { user } = useContext(AuthContext);
@@ -104,6 +105,10 @@ const Avaliacao = () => {
 
   return (
     <>
+      <SEO
+        title="Avalie a Feira Livre de Buritizeiro"
+        description="Deixe sua avaliação sobre a Feira Livre de Buritizeiro. Ajude a melhorar a experiência dos usuários."
+      />
       <div
         className="bg-cover bg-center min-h-screen text-gray-800 relative"
         style={{ backgroundImage: `url(${fundo})` }}

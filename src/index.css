@@ -78,9 +78,418 @@
   html {
     font-family: "Poppins", sans-serif;
     scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+    scroll-padding-bottom: 2rem;
+    scroll-padding-left: 1rem;
+    scroll-padding-right: 1rem;
+    overflow-x: hidden;
   }
 
   body {
     @apply bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+    line-height: 1.6;
+    font-feature-settings: "kern" 1, "liga" 1;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* =============================================================================
+     SCROLL BEHAVIOR - Melhorias de scroll
+     ============================================================================= */
+  
+  /* Prevenir movimento do fundo durante interação */
+  input, textarea, select, button, a {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Prevenir scroll horizontal em dispositivos móveis */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevenir movimento do fundo */
+  .bg-cover {
+    background-attachment: fixed;
+  }
+
+  /* Prevenir scroll durante interação */
+  .overflow-hidden {
+    overflow: hidden !important;
+  }
+
+  /* Prevenir movimento em inputs */
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    transform: none !important;
+  }
+
+  /* Prevenir piscamento durante digitação */
+  input, textarea {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  /* Prevenir re-renderização desnecessária */
+  .transition-colors {
+    transition-property: color, background-color, border-color;
+  }
+
+  /* Prevenir piscamento em elementos com backdrop-blur */
+  .backdrop-blur-sm {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Prevenir movimento em dispositivos móveis */
+  @media (max-width: 768px) {
+    html, body {
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    .bg-cover {
+      background-attachment: scroll;
+    }
+    
+    /* Prevenir zoom em inputs */
+    input[type="text"], input[type="search"], textarea {
+      font-size: 16px;
+    }
+  }
+
+  /* Scroll para elementos específicos */
+  .scroll-to-element {
+    scroll-behavior: smooth;
+    scroll-margin-top: 2rem;
+    scroll-margin-bottom: 2rem;
+  }
+
+  /* Scroll horizontal suave */
+  .scroll-horizontal {
+    scroll-behavior: smooth;
+    scroll-padding-left: 1rem;
+    scroll-padding-right: 1rem;
+  }
+
+  /* Scroll vertical suave */
+  .scroll-vertical {
+    scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+    scroll-padding-bottom: 2rem;
+  }
+
+  /* Scroll com offset para headers fixos */
+  .scroll-with-header {
+    scroll-margin-top: 5rem;
+  }
+
+  /* Scroll com offset para footers */
+  .scroll-with-footer {
+    scroll-margin-bottom: 3rem;
+  }
+
+  /* Melhorar scroll em containers */
+  .scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-secondary) transparent;
+    scroll-behavior: smooth;
+  }
+
+  .scroll-container::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb {
+    background-color: var(--border-secondary);
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+  }
+
+  .scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-muted);
+  }
+
+  .scroll-container::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Scroll para elementos com animação */
+  .scroll-animate {
+    scroll-behavior: smooth;
+    transition: scroll-behavior 0.3s ease;
+  }
+
+  /* Scroll com snap */
+  .scroll-snap {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+  }
+
+  .scroll-snap-item {
+    scroll-snap-align: start;
+  }
+
+  /* Scroll com momentum (iOS) */
+  .scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Scroll com overscroll */
+  .scroll-overscroll {
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+  }
+
+  /* Scroll com snap horizontal */
+  .scroll-snap-horizontal {
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+  }
+
+  .scroll-snap-horizontal-item {
+    scroll-snap-align: center;
+  }
+}
+
+/* =============================================================================
+   UTILITÁRIOS CUSTOMIZADOS
+   ============================================================================= */
+@layer utilities {
+  /* =============================================================================
+     EFEITOS DE TEXTO
+     ============================================================================= */
+  
+  /* Texto com gradiente */
+  .text-gradient {
+    @apply bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-secondary {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-600 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-accent {
+    @apply bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent;
+  }
+
+  /* =============================================================================
+     EFEITOS DE FUNDO
+     ============================================================================= */
+  
+  /* Efeito glassmorphism */
+  .glass-effect {
+    @apply bg-white/10 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-effect-dark {
+    @apply bg-black/10 backdrop-blur-md border border-white/10;
+  }
+
+  /* Gradientes de fundo */
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-green-500 to-emerald-600;
+  }
+
+  .bg-gradient-secondary {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-600;
+  }
+
+  .bg-gradient-accent {
+    @apply bg-gradient-to-r from-yellow-500 to-orange-500;
+  }
+
+  /* =============================================================================
+     EFEITOS DE SOMBRA
+     ============================================================================= */
+  
+  .shadow-soft {
+    box-shadow: var(--shadow-sm);
+  }
+
+  .shadow-medium {
+    box-shadow: var(--shadow-md);
+  }
+
+  .shadow-strong {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .shadow-extra {
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* =============================================================================
+     EFEITOS DE CARTA
+     ============================================================================= */
+  
+  .card-shadow {
+    @apply shadow-lg hover:shadow-xl transition-shadow duration-300;
+  }
+
+  .card-glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+
+  .card-dark {
+    @apply bg-gray-800/80 backdrop-blur-md border border-gray-700/20 shadow-lg;
+  }
+
+  /* =============================================================================
+     EFEITOS DE BOTÃO
+     ============================================================================= */
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-secondary {
+    @apply bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:from-blue-600 hover:to-indigo-700 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-accent {
+    @apply bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-outline {
+    @apply border-2 border-green-500 text-green-600 px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:bg-green-500 hover:text-white transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  }
+
+  /* =============================================================================
+     EFEITOS DE ANIMAÇÃO
+     ============================================================================= */
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  /* =============================================================================
+     EFEITOS DE HOVER
+     ============================================================================= */
+  
+  .hover-lift {
+    @apply transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300 hover:shadow-lg hover:shadow-green-500/25;
+  }
+
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+
+  /* =============================================================================
+     EFEITOS DE FOCUS
+     ============================================================================= */
+  
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  }
+
+  .focus-ring-blue {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+
+  /* =============================================================================
+     EFEITOS DE LOADING
+     ============================================================================= */
+  
+  .loading-spinner {
+    @apply animate-spin rounded-full border-2 border-gray-300 border-t-green-500;
+  }
+
+  .loading-pulse {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+
+  /* =============================================================================
+     EFEITOS DE RESPONSIVIDADE
+     ============================================================================= */
+  
+  .container-responsive {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .text-responsive {
+    @apply text-sm sm:text-base lg:text-lg;
+  }
+
+  .spacing-responsive {
+    @apply space-y-4 sm:space-y-6 lg:space-y-8;
+  }
+
+  /* =============================================================================
+     UTILITÁRIOS DE SCROLL
+     ============================================================================= */
+  
+  /* Scroll suave para âncoras */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+
+  /* Scroll com offset para navegação */
+  .scroll-offset {
+    scroll-margin-top: 5rem;
+  }
+
+  /* Scroll com snap vertical */
+  .scroll-snap-y {
+    scroll-snap-type: y mandatory;
+  }
+
+  /* Scroll com snap horizontal */
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+  }
+
+  /* Scroll com momentum */
+  .scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Scroll com overscroll */
+  .scroll-contain {
+    overscroll-behavior: contain;
+  }
+
+  /* Scroll com padding */
+  .scroll-padding {
+    scroll-padding: 2rem;
+  }
+
+  /* Scroll com margin */
+  .scroll-margin {
+    scroll-margin: 2rem;
   }
 }

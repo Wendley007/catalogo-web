@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
+import { Modal } from "./Modal";
 import {
   Menu,
   X,
@@ -16,15 +17,19 @@ import {
   LogOut,
   UserPlus,
   Clock,
-  CheckCircle,
-  XCircle,
   Edit3,
   ChevronRight,
 } from "lucide-react";
 
 import logo1 from "../assets/logo1.png";
 
-// --------------------------------------------------------------- Componente para item do menu
+// =============================================================================
+// COMPONENTES AUXILIARES
+// =============================================================================
+
+/**
+ * Componente para item do menu de navegação
+ */
 const MenuItem = ({ to, icon: Icon, children, onClick }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
@@ -45,44 +50,9 @@ const MenuItem = ({ to, icon: Icon, children, onClick }) => {
   );
 };
 
-// ---------------------------------------------------------------  Modal para feedback
-const Modal = ({ isOpen, message, success, onClose }) => {
-  if (!isOpen) return null;
-
-  return (
-    <section className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm mx-4">
-        <div className="flex items-center justify-center mb-4">
-          {success ? (
-            <CheckCircle className="text-green-500" size={32} />
-          ) : (
-            <XCircle className="text-red-500" size={32} />
-          )}
-        </div>
-        <h3
-          className={`text-lg font-semibold text-center mb-2 ${
-            success ? "text-green-700" : "text-red-700"
-          }`}
-        >
-          {success ? "Sucesso!" : "Erro!"}
-        </h3>
-        <p className="text-gray-600 text-center text-sm mb-4">{message}</p>
-        <button
-          onClick={onClose}
-          className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
-            success
-              ? "bg-green-500 hover:bg-green-600 text-white"
-              : "bg-red-500 hover:bg-red-600 text-white"
-          }`}
-        >
-          Fechar
-        </button>
-      </div>
-    </section>
-  );
-};
-
-// --------------------------------------------------------------- Componente de contagem regressiva
+/**
+ * Componente para exibir contagem regressiva
+ */
 const CountdownItem = ({ value, label }) => (
   <section className="text-center flex items-baseline gap-[2px]">
     <div className="text-sm font-bold">{value.toString().padStart(2, "0")}</div>
@@ -90,7 +60,71 @@ const CountdownItem = ({ value, label }) => (
   </section>
 );
 
-// Função para calcular tempo restante
+/**
+ * Componente para exibir status da feira
+ */
+const FeiraStatus = ({ feiraAberta, timeRemaining }) => {
+  return (
+    <div
+      className={`flex items-center space-x-4 px-4 py-0 rounded-lg ${
+        feiraAberta ? "bg-green-500/30" : "bg-black/0"
+      } backdrop-blur-sm`}
+    >
+      <Clock className="text-white mt-1" size={20} />
+      <div className="text-white">
+        {feiraAberta ? (
+          <div className="text-center">
+            <p className="text-sm font-semibold">Feira Aberta!</p>
+            <p className="text-xs opacity-80 hidden md:block">
+              Aproveite até 12h
+            </p>
+          </div>
+        ) : (
+          <div>
+            <p className="text-xs font-medium mb-1 hidden md:block">
+              Próxima abertura em:
+            </p>
+            <p className="text-xs mb-1 font-semibold md:hidden">Abre em:</p>
+            <div className="flex space-x-3">
+              {timeRemaining.days > 0 && (
+                <CountdownItem value={timeRemaining.days} label="dias" />
+              )}
+              <CountdownItem value={timeRemaining.hours} label="h" />
+              <CountdownItem value={timeRemaining.minutes} label="min" />
+              <CountdownItem value={timeRemaining.seconds} label="s" />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Componente para o logo
+ */
+const Logo = () => (
+  <Link to="/" className="flex items-center space-x-3">
+    <motion.img
+      src={logo1}
+      alt="Logo"
+      className="w-16 h-16 drop-shadow-lg"
+      whileHover={{ scale: 1.1 }}
+    />
+    <div className="hidden sm:block">
+      <h1 className="text-xl font-bold -ml-2 text-white">Viva Bem</h1>
+      <p className="text-sm -ml-2 text-white/80">Buritizeiro</p>
+    </div>
+  </Link>
+);
+
+// =============================================================================
+// FUNÇÕES UTILITÁRIAS
+// =============================================================================
+
+/**
+ * Calcula o tempo restante até a próxima abertura da feira
+ */
 const calculateTimeRemaining = () => {
   const now = new Date();
   const dayOfWeek = now.getDay();
@@ -130,8 +164,13 @@ const calculateTimeRemaining = () => {
   };
 };
 
-// --------------------------------------------------------------- Menu do usuário para desktop
+// =============================================================================
+// COMPONENTES DE MENU
+// =============================================================================
 
+/**
+ * Menu do usuário para desktop
+ */
 const UserMenu = ({ isOpen, onToggle }) => {
   const menuRef = useRef(null);
   const { user, updateUserProfile, signOut } = useContext(AuthContext);
@@ -212,7 +251,7 @@ const UserMenu = ({ isOpen, onToggle }) => {
                       <input
                         value={newName}
                         onChange={(e) => setNewName(e.target.value)}
-                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
                         placeholder="Novo nome"
                       />
                       <div className="flex mt-2 space-x-2">
@@ -286,16 +325,18 @@ const UserMenu = ({ isOpen, onToggle }) => {
 
       <Modal
         isOpen={modalOpen}
-        message={modalMessage}
-        success={modalSuccess}
         onClose={() => setModalOpen(false)}
+        type={modalSuccess ? "success" : "error"}
+        title={modalSuccess ? "Sucesso!" : "Erro!"}
+        message={modalMessage}
       />
     </section>
   );
 };
 
-// ---------------------------------------------------------------  Menu lateral mobile
-
+/**
+ * Menu lateral mobile
+ */
 const MobileMenu = ({ isOpen, onClose, menuItems }) => {
   const { user, handleLogout } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -307,6 +348,7 @@ const MobileMenu = ({ isOpen, onClose, menuItems }) => {
   };
 
   if (!isOpen) return null;
+
   return (
     <>
       {/* Backdrop com blur */}
@@ -452,8 +494,13 @@ const MobileMenu = ({ isOpen, onClose, menuItems }) => {
   );
 };
 
-// --------------------------------------------------------------- Componente principal do MenuTopo
+// =============================================================================
+// COMPONENTE PRINCIPAL
+// =============================================================================
 
+/**
+ * Componente principal do MenuTopo
+ */
 const MenuTopo = () => {
   const [timeRemaining, setTimeRemaining] = useState({
     days: 0,
@@ -466,6 +513,7 @@ const MenuTopo = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { user } = useContext(AuthContext);
 
+  // Atualiza o tempo restante a cada segundo
   useEffect(() => {
     const updateTime = () => {
       const { feiraAberta, days, hours, minutes, seconds } =
@@ -479,6 +527,7 @@ const MenuTopo = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Define os itens do menu baseado no papel do usuário
   const menuItems = [
     { to: "/paginaprincipal", icon: Home, label: "Início" },
     { to: "/historia", icon: Info, label: "História" },
@@ -494,57 +543,15 @@ const MenuTopo = () => {
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-3">
-              <motion.img
-                src={logo1}
-                alt="Logo"
-                className="w-16 h-16 drop-shadow-lg"
-                whileHover={{ scale: 1.1 }}
-              />
-              <div className="hidden sm:block">
-                <h1 className="text-xl font-bold -ml-2 text-white">Viva Bem</h1>
-                <p className="text-sm -ml-2 text-white/80">Buritizeiro</p>
-              </div>
-            </Link>
+            <Logo />
 
-            {/* Countdown/Status */}
-            <div
-              className={`hidden md:flex items-center space-x-4 px-4 py-0 rounded-lg ${
-                feiraAberta ? "bg-green-500/30" : "bg-black/0"
-              } backdrop-blur-sm`}
-            >
-              <Clock className="text-white mt-1" size={20} />
-              <div className="text-white">
-                {feiraAberta ? (
-                  <div className="text-center">
-                    <p className="text-sm font-semibold">Feira Aberta!</p>
-                    <p className="text-xs opacity-80">Aproveite até 12h</p>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-xs font-medium mb-1">
-                      Próxima abertura em:
-                    </p>
-                    <div className="flex space-x-3">
-                      {timeRemaining.days > 0 && (
-                        <CountdownItem
-                          value={timeRemaining.days}
-                          label="dias"
-                        />
-                      )}
-                      <CountdownItem value={timeRemaining.hours} label="h" />
-                      <CountdownItem
-                        value={timeRemaining.minutes}
-                        label="min"
-                      />
-                      <CountdownItem value={timeRemaining.seconds} label="s" />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Status da Feira */}
+            <FeiraStatus
+              feiraAberta={feiraAberta}
+              timeRemaining={timeRemaining}
+            />
 
-            {/* Desktop Navigation */}
+            {/* Navegação Desktop */}
             <nav className="hidden lg:flex items-center space-x-4">
               {menuItems.map((item, index) => (
                 <MenuItem key={index} to={item.to} icon={item.icon}>
@@ -552,6 +559,7 @@ const MenuTopo = () => {
                 </MenuItem>
               ))}
 
+              {/* Menu do usuário */}
               <div className="flex items-center space-x-2">
                 <UserMenu
                   isOpen={isUserMenuOpen}
@@ -574,7 +582,6 @@ const MenuTopo = () => {
                           {user.name?.[0]?.toUpperCase() || "U"}
                         </div>
                       )}
-                      {/* <span className="text-sm font-medium">{user.name}</span> */}
                     </>
                   ) : (
                     <span className="text-sm font-medium">Conta</span>
@@ -584,56 +591,7 @@ const MenuTopo = () => {
               </div>
             </nav>
 
-            {/* Mobile contagem regressiva */}
-
-            <section
-              className={`md:hidden flex px-4 py-2 rounded-lg ${
-                feiraAberta ? "bg-green-500/5" : "bg-black/5"
-              } backdrop-blur-sm`}
-            >
-              <div className="flex items-center justify-center space-x-3 text-white">
-                <Clock size={16} />
-                {feiraAberta ? (
-                  <div className="text-center">
-                    <p className="text-sm font-semibold">Feira Aberta!</p>
-                  </div>
-                ) : (
-                  <div className="text-center">
-                    <p className="text-xs mb-1 font-semibold">Abre em:</p>
-                    <div className="flex space-x-2 text-xs text-white">
-                      {timeRemaining.days > 0 && (
-                        <span>
-                          <span className="font-semibold">
-                            {timeRemaining.days}
-                          </span>
-                          <span className="ml-[2px]  opacity-80">dias</span>
-                        </span>
-                      )}
-                      <span>
-                        <span className="font-semibold">
-                          {timeRemaining.hours}
-                        </span>
-                        <span className="ml-[2px] opacity-80">h</span>
-                      </span>
-                      <span>
-                        <span className="font-semibold">
-                          {timeRemaining.minutes}
-                        </span>
-                        <span className="ml-[2px] opacity-80">m</span>
-                      </span>
-                      <span>
-                        <span className="font-semibold">
-                          {timeRemaining.seconds}
-                        </span>
-                        <span className="ml-[2px] opacity-80">s</span>
-                      </span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-
-            {/* Mobile menu button */}
+            {/* Botão do menu mobile */}
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className="lg:hidden p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
@@ -644,7 +602,7 @@ const MenuTopo = () => {
         </section>
       </header>
 
-      {/* Mobile Menu */}
+      {/* Menu Mobile */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}

@@ -4,10 +4,10 @@ import { AuthContext } from "../contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 
 /**
- * Componente para proteger rotas que requerem autenticação
+ * Componente para proteger rotas que requerem permissão de administrador
  */
-export default function Private({ children, redirectTo = "/login" }) {
-  const { signed, loadingAuth } = useContext(AuthContext);
+export default function AdminRoute({ children, redirectTo = "/paginaprincipal" }) {
+  const { signed, loadingAuth, user } = useContext(AuthContext);
 
   // Loading state com componente visual
   if (loadingAuth) {
@@ -23,6 +23,11 @@ export default function Private({ children, redirectTo = "/login" }) {
 
   // Redireciona se não estiver autenticado
   if (!signed) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Redireciona se não for administrador
+  if (user?.role !== "admin") {
     return <Navigate to={redirectTo} replace />;
   }
 
@@ -30,11 +35,11 @@ export default function Private({ children, redirectTo = "/login" }) {
   return children;
 }
 
-Private.propTypes = {
+AdminRoute.propTypes = {
   children: PropTypes.node.isRequired,
   redirectTo: PropTypes.string,
 };
 
-Private.defaultProps = {
-  redirectTo: "/login",
-};
+AdminRoute.defaultProps = {
+  redirectTo: "/paginaprincipal",
+}; 

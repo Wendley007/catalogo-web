@@ -1,36 +1,53 @@
 import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import Private from "./routes/Private";
+import AdminRoute from "./routes/AdminRoute";
+import ScrollTopo from "./components/ScrollTopo";
+
+// Páginas públicas
 import Home from "./Pages/Home/Home";
 import Historia from "./Pages/Historia/Historia";
 import Localizacao from "./Pages/Localizacao/localizacao";
 import PaginaPrincipal from "./Pages/PaginaPrincipal/PaginaPrincipal";
-import Novo from "./Pages/Categorias/Novo/Novo";
 import Login from "./Pages/Login/Login";
 import Registro from "./Pages/Registro/Registro";
-import { AuthProvider } from "./contexts/AuthContext";
-import Private from "./routes/Private";
 import TodasCategorias from "./Pages/Categorias/Todascategorias/Todascategorias";
 import ProdutosPorCategoria from "./Pages/Categorias/ProdutosPorCategoria/ProdutosPorCategoria";
-import NovoPerfil from "./Pages/Perfis/NovoPerfil/NovoPerfil";
 import Bancas from "./Pages/Perfis/Bancas/Bancas";
 import Vendedor from "./Pages/Perfis/Vendedor/Vendedor";
-import Admin from "./Pages/Admin/Admin";
-import Resultados from "./Pages/Avaliacao/Resultados";
 import Avaliacao from "./Pages/Avaliacao/Avaliacao";
-import ScrollTopo from "./components/ScrollTopo";
+import Resultados from "./Pages/Avaliacao/Resultados";
+import NotFound from "./Pages/NotFound/NotFound";
 
+// Páginas protegidas
+import Novo from "./Pages/Categorias/Novo/Novo";
+import NovoPerfil from "./Pages/Perfis/NovoPerfil/NovoPerfil";
+import Admin from "./Pages/Admin/Admin";
+
+/**
+ * Componente principal de rotas da aplicação
+ */
 const Rotas = () => {
   return (
     <AuthProvider>
       <ScrollTopo />
-
+      
       <Routes>
+        {/* Rotas Públicas */}
         <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="login" element={<Login />} />
-        <Route path="registro" element={<Registro />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Registro />} />
         <Route path="/historia" element={<Historia />} />
         <Route path="/localizacao" element={<Localizacao />} />
         <Route path="/paginaprincipal" element={<PaginaPrincipal />} />
+        <Route path="/todascategorias" element={<TodasCategorias />} />
+        <Route path="/categorias/:idCategoria" element={<ProdutosPorCategoria />} />
+        <Route path="/bancas" element={<Bancas />} />
+        <Route path="/bancas/:bancaId" element={<Vendedor />} />
+        <Route path="/avaliacao" element={<Avaliacao />} />
+        <Route path="/resultados" element={<Resultados />} />
+
+        {/* Rotas Protegidas - Requerem Autenticação */}
         <Route
           path="/novo"
           element={
@@ -39,16 +56,27 @@ const Rotas = () => {
             </Private>
           }
         />
-        <Route path="/todascategorias" element={<TodasCategorias />} />
         <Route
-          path="/categorias/:idCategoria"
-          element={<ProdutosPorCategoria />}
+          path="/novoperfil"
+          element={
+            <Private>
+              <NovoPerfil />
+            </Private>
+          }
         />
-        <Route path="/novoperfil" element={<NovoPerfil />} />
-        <Route path="/bancas" element={<Bancas />} />
-        <Route path="/bancas/:bancaId" element={<Vendedor />} />
-        <Route path="/avaliacao" element={<Avaliacao />} />
-        <Route path="/resultados" element={<Resultados />} />
+
+        {/* Rotas de Administrador - Requerem Role Admin */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
+        />
+
+        {/* Rota 404 - Deve ser sempre a última */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </AuthProvider>
   );

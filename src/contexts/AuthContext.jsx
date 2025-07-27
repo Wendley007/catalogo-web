@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 import { createContext, useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { onAuthStateChanged, updateProfile, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../services/firebaseConnection";
@@ -95,6 +95,10 @@ const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export { AuthContext, AuthProvider };

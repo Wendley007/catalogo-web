@@ -1,11 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
+import { motion } from "framer-motion";
 import logo from "../../assets/logo.png";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../../components/Input";
 import fundo from "../../assets/fundo.jpg";
+import SEO from "../../components/SEO/SEO";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -63,11 +65,8 @@ const Registro = () => {
   });
 
   const [message, setMessage] = useState("");
-  const [lastLoggedInEmail, setLastLoggedInEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [canRedirect, setCanRedirect] = useState(false);
-  const [remainingTime, setRemainingTime] = useState(0);
-  const [isResending, setIsResending] = useState(false);
   const [isAdminDisabled, setIsAdminDisabled] = useState(false);
 
   useEffect(() => {
@@ -76,10 +75,6 @@ const Registro = () => {
     };
 
     handleLogout();
-    const lastEmail = localStorage.getItem("lastLoggedInEmail");
-    if (lastEmail) {
-      setLastLoggedInEmail(lastEmail);
-    }
   }, []);
 
   const countAdmins = async () => {
@@ -248,25 +243,17 @@ const Registro = () => {
     }
   };
 
-  useEffect(() => {
-    let timer;
-    if (remainingTime > 0 && isResending) {
-      timer = setInterval(() => {
-        setRemainingTime((prevTime) => prevTime - 1);
-      }, 1000);
-    } else if (remainingTime === 0) {
-      setIsResending(false);
-      setMessage("");
-    }
 
-    return () => clearInterval(timer);
-  }, [remainingTime, isResending]);
 
   return (
     <div
       className="relative bg-cover bg-no-repeat bg-center h-full"
       style={{ backgroundImage: `url(${fundo})` }}
     >
+      <SEO
+        title="Registro - Feira Livre de Buritizeiro"
+        description="Cadastre-se na Feira Livre de Buritizeiro para ter acesso a todas as funcionalidades."
+      />
       <div
         className="w-full min-h-screen flex justify-center items-center flex-col gap-4"
         style={{ backgroundColor: "rgba(0, 0, 0, 0.75)" }}
@@ -290,11 +277,13 @@ const Registro = () => {
             <div>
               <Input
                 type="text"
-                placeholder="Digite seu nome..."
+                placeholder="Digite seu nome completo..."
                 name="name"
+                label="Nome Completo"
+                required
                 error={errors.name?.message}
                 register={register}
-                maxLength={10}
+                maxLength={35}
               />
             </div>
             <div>
@@ -302,11 +291,11 @@ const Registro = () => {
                 type="email"
                 placeholder="Digite seu email..."
                 name="email"
-                value={lastLoggedInEmail}
-                onChange={(e) => setLastLoggedInEmail(e.target.value)}
+                label="Email"
+                required
                 error={errors.email?.message}
                 register={register}
-                maxLength={25}
+                maxLength={35}
               />
             </div>
           </div>
@@ -315,6 +304,8 @@ const Registro = () => {
               type="password"
               placeholder="Digite sua senha..."
               name="password"
+              label="Senha"
+              required
               error={errors.password?.message}
               register={register}
             />
@@ -322,17 +313,24 @@ const Registro = () => {
           <div className="mb-6">
             <label
               htmlFor="role"
-              className="block text-sm font-semibold text-white mb-2 text-center"
+              className="block text-sm font-medium text-gray-200 mb-2"
             >
               Tipo de usuário
+              <span className="text-red-400 ml-1">*</span>
             </label>
 
             <select
               id="role"
               {...register("role")}
-              className="block w-full px-2 py-3 bg-zinc-900 text-gray-200 border border-gray-600 rounded-md focus:outline-none transition-colors"
+              className={`
+                w-full px-4 py-3 rounded-lg border-2 transition-all duration-200
+                bg-white/10 backdrop-blur-sm text-white
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400
+                border-gray-600 hover:border-gray-500
+                ${errors.role ? "border-red-400 focus:border-red-400 focus:ring-red-500/50" : ""}
+              `}
             >
-              <option value="" disabled selected>
+              <option value="" disabled>
                 Selecione uma opção
               </option>
               <option value="cliente">Cliente</option>
@@ -341,9 +339,20 @@ const Registro = () => {
               </option>
             </select>
 
+            {errors.role && (
+              <motion.p 
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-2 text-sm text-red-400 flex items-center gap-1"
+              >
+                <span className="w-1 h-1 bg-red-400 rounded-full" />
+                {errors.role.message}
+              </motion.p>
+            )}
+
             {isAdminDisabled && (
-              <p className="mt-2 text-sm text-red-400 text-center">
-                O acesso de administrador está desativado.
+              <p className="mt-2 text-sm text-yellow-400 text-center">
+                ⚠️ O acesso de administrador está temporariamente desativado.
               </p>
             )}
           </div>

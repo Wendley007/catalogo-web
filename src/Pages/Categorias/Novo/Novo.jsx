@@ -11,6 +11,7 @@ import { v4 as uuidV4 } from "uuid";
 import toast from "react-hot-toast";
 import { db } from "../../../services/firebaseConnection";
 import { addDoc, collection, getDocs } from "firebase/firestore";
+import SEO from "../../../components/SEO/SEO";
 
 const ImageUploadButton = ({ onChange }) => (
   <label className="relative inline-flex items-center justify-center w-48 h-20 md:w-48 border-2 border-gray-300 rounded-lg overflow-hidden transition duration-300 ease-in-out hover:bg-gray-800 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-gray-500">
@@ -210,6 +211,10 @@ const NovoProdutoForm = () => {
       className="bg-cover bg-center text-sm text-gray-200 relative min-h-screen"
       style={{ backgroundImage: `url(${fundo})` }}
     >
+      <SEO
+        title="Cadastro de Produto"
+        description="Página para cadastrar novo produto no sistema."
+      />
       <div className="bg-gray-700 min-h-screen bg-opacity-65 h-full relative z-10">
         <MenuTopo />
         <form

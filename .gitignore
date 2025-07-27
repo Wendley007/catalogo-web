@@ -7,19 +7,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependências
 node_modules
+.pnp
+.pnp.js
+
+# Builds de produção
 dist
 dist-ssr
+build/
 *.local
 
-# Environment variables
+# Variáveis de ambiente
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-# Editor directories and files
+# Diretórios e arquivos de editores
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -34,8 +40,94 @@ dist-ssr
 .firebase/
 firebase-debug.log
 firestore-debug.log
+firebase-debug.*.log
 
-# Build artifacts
-build/
+# Artefatos de build
 *.tgz
 *.tar.gz
+
+# Diretório de cobertura usado por ferramentas como istanbul
+coverage/
+*.lcov
+
+# Cobertura de teste nyc
+.nyc_output
+
+# Diretórios de dependências
+jspm_packages/
+
+# Diretório de cache opcional do npm
+.npm
+
+# Cache opcional do eslint
+.eslintcache
+
+# Cache do microbundle
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Histórico opcional do REPL
+.node_repl_history
+
+# Saída do 'npm pack'
+*.tgz
+
+# Arquivo de integridade do Yarn
+.yarn-integrity
+
+# Cache do parcel-bundler (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Saída de build do Next.js
+.next
+
+# Saída de build/geração do Nuxt.js
+.nuxt
+
+# Saídas de build do Storybook
+.out
+.storybook-out
+
+# Pastas temporárias
+tmp/
+temp/
+
+# Dados de runtime
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Diretório para libs instrumentadas geradas por jscoverage/JSCover
+lib-cov
+
+# Armazenamento intermediário do Grunt (https://gruntjs.com/creating-plugins#storing-task-files)
+.grunt
+
+# Diretório de dependências do Bower (https://bower.io/)
+bower_components
+
+# Configuração do node-waf
+.lock-wscript
+
+# Addons binários compilados (https://nodejs.org/api/addons.html)
+build/Release
+
+# Cache do TypeScript
+*.tsbuildinfo
+
+# Cache opcional do stylelint
+.stylelintcache
+
+# Armazena versões do VSCode usadas para testar extensões do VSCode
+.vscode-test
+
+# yarn v2
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*

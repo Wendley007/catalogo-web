@@ -1,6 +1,5 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-// eslint-disable-next-line no-unused-vars
+/* eslint-disable no-unused-vars */
 import { useState, useEffect, useContext } from "react";
 import { FiUpload, FiTrash, FiArrowLeft } from "react-icons/fi";
 import { useForm } from "react-hook-form";
@@ -14,6 +13,7 @@ import { v4 as uuidV4 } from "uuid";
 import toast from "react-hot-toast";
 import { db } from "../../../services/firebaseConnection";
 import { addDoc, collection, getDocs } from "firebase/firestore";
+import SEO from "../../../components/SEO/SEO";
 
 const NovoVendedorSchema = yup.object().shape({
   nome: yup.string().required("O nome do vendedor é obrigatório."),
@@ -228,6 +228,10 @@ const NovoVendedorForm = () => {
       className="bg-cover bg-center text-sm text-gray-200 relative min-h-screen"
       style={{ backgroundImage: `url(${fundo})` }}
     >
+      <SEO
+        title="Cadastro de Vendedor"
+        description="Página para cadastrar novos vendedores no sistema."
+      />
       <div className="bg-gray-700 min-h-screen bg-opacity-65 h-full relative z-10">
         <MenuTopo />
         <form

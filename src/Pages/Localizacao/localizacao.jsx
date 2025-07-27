@@ -2,7 +2,9 @@ import banner from "../../assets/banner.jpg";
 import localizacao from "../../assets/localização.png";
 import MenuTopo from "../../components/MenuTopo";
 import Footer from "../../components/Footer";
+import HeroSection from "../../components/HeroSection";
 import { motion } from "framer-motion";
+import SEO from "../../components/SEO/SEO";
 import {
   MapPin,
   Clock,
@@ -61,52 +63,38 @@ const Localizacao = () => {
     },
   ];
 
+  // Dados do hero da página de localização
+  const getLocalizacaoHeroData = () => ({
+    title: "Nossa Localização",
+    description: "Encontre a Feira Livre de Buritizeiro no coração da cidade",
+    backgroundImage: banner,
+    icon: MapPin,
+  });
+
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 scroll-smooth">
+      <SEO
+        title="Localização - Feira Livre de Buritizeiro"
+        description="Encontre a Feira Livre de Buritizeiro no coração da cidade. Rua Professor Antonio Candido, S/N - Centro, Buritizeiro - MG. Todos os domingos das 6h às 12h."
+        keywords={["localização feira", "Buritizeiro MG", "endereço feira", "como chegar", "feira livre localização"]}
+      />
       <MenuTopo />
 
       {/* Hero Section */}
-      <section
-        className="bg-cover bg-no-repeat bg-center py-20"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.738), rgba(0, 0, 0, 0.728)), url(${banner})`,
-        }}
-      >
-        {/* Background Elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-white/20 rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-white/20 rounded-full blur-xl"></div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <div className="text-center">
-              <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <MapPin size={40} className="text-white" />
-                </div>
-              </div>
-              <h1 className="text-4xl text-white lg:text-5xl font-bold mb-4">
-                Nossa Localização
-              </h1>
-              <p className="text-xl text-white max-w-3xl mx-auto leading-relaxed">
-                Encontre-nos no coração de Buritizeiro, Minas Gerais
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+      <HeroSection {...getLocalizacaoHeroData()} />
 
       {/* Main Content */}
-      <section className="py-20">
+      <section className="py-20 scroll-overscroll">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Mapa Interativo */}
-            <div className="order-2 lg:order-1">
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="order-2 lg:order-1"
+            >
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden hover-lift">
                 <div className="p-6 bg-gradient-to-r from-green-600 to-green-700">
                   <h2 className="text-2xl font-bold text-white mb-2">
                     Localização no Mapa
@@ -173,18 +161,27 @@ const Localizacao = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Informações */}
-            <div className="order-1 lg:order-2 space-y-8">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="order-1 lg:order-2 space-y-8 scroll-container"
+            >
               {/* Cards de Informações */}
               <div className="grid grid-cols-1 gap-6">
                 {informacoes.map((info, index) => {
                   const Icon = info.icon;
                   return (
-                    <div
+                    <motion.div
                       key={index}
-                      className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      whileHover={{ scale: 1.02, y: -2 }}
+                      className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
                     >
                       <div className="flex items-center space-x-4">
                         <div
@@ -199,13 +196,18 @@ const Localizacao = () => {
                           <p className="text-gray-600">{info.descricao}</p>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
 
               {/* Contato */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="bg-white rounded-xl shadow-lg p-6"
+              >
                 <h3 className="text-xl font-bold text-gray-900 mb-6">
                   Informações de Contato
                 </h3>
@@ -231,10 +233,15 @@ const Localizacao = () => {
                     </a>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Como Chegar */}
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="bg-white rounded-xl shadow-lg p-6"
+              >
                 <h3 className="text-xl font-bold text-gray-900 mb-6">
                   Como Chegar
                 </h3>
@@ -243,7 +250,13 @@ const Localizacao = () => {
                   {comoChegar.map((opcao, index) => {
                     const Icon = opcao.icon;
                     return (
-                      <div key={index} className="flex items-start space-x-3">
+                      <motion.div 
+                        key={index}
+                        initial={{ opacity: 0, x: -10 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
+                        className="flex items-start space-x-3"
+                      >
                         <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
                           <Icon className="text-green-600" size={20} />
                         </div>
@@ -255,36 +268,44 @@ const Localizacao = () => {
                             {opcao.descricao}
                           </p>
                         </div>
-                      </div>
+                      </motion.div>
                     );
                   })}
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-green-600 to-green-700">
+      <section className="py-20 bg-gradient-to-r from-green-600 to-green-700 scroll-momentum">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Venha nos Visitar!
-          </h2>
-          <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-            Todos os domingos das 6h às 12h, você encontra produtos frescos e de
-            qualidade no coração de Buritizeiro
-          </p>
-          <a
-            href={linkGoogleMaps}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center space-x-2 bg-white text-green-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105"
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <Navigation size={20} />
-            <span>Ver Direções no Google Maps</span>
-            <ExternalLink size={16} />
-          </a>
+            <h2 className="text-3xl font-bold text-white mb-4">
+              Venha nos Visitar!
+            </h2>
+            <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
+              Todos os domingos das 6h às 12h, você encontra produtos frescos e de
+              qualidade no coração de Buritizeiro
+            </p>
+            <motion.a
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              href={linkGoogleMaps}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center space-x-2 bg-white text-green-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors transform hover:scale-105"
+            >
+              <Navigation size={20} />
+              <span>Ver Direções no Google Maps</span>
+              <ExternalLink size={16} />
+            </motion.a>
+          </motion.div>
         </div>
       </section>
 
