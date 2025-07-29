@@ -5,7 +5,7 @@ import { FiUpload, FiTrash, FiArrowLeft } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import MenuTopo from "../../../components/MenuTopo";
+import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import { Link } from "react-router-dom";
 import fundo from "../../../assets/fundo.jpg";
 import { AuthContext } from "../../../contexts/AuthContext";

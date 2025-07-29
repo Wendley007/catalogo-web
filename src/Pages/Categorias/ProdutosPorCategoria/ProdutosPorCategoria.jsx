@@ -12,7 +12,7 @@ import {
   query,
 } from "firebase/firestore";
 
-import MenuTopo from "../../../components/MenuTopo";
+import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import Footer from "../../../components/Footer";
 import ConfirmModal from "../../../components/Modal/ConfirmModal";
 import SEO from "../../../components/SEO/SEO";

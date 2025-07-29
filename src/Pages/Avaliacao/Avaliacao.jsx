@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import MenuTopo from "../../components/MenuTopo";
+import MenuTopo from "../../components/MenuTopo/MenuTopo";
 import fundo from "../../assets/fundo.jpg";
 import Footer from "../../components/Footer";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";

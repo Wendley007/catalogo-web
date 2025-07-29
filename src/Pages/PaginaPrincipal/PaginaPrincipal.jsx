@@ -14,7 +14,7 @@ import "slick-carousel/slick/slick-theme.css";
 import banner from "../../assets/banner.jpg";
 import { db, storage } from "../../services/firebaseConnection";
 import ScrollTopoButton from "../../components/ScrollTopoButton";
-import MenuTopo from "../../components/MenuTopo";
+import MenuTopo from "../../components/MenuTopo/MenuTopo";
 import Footer from "../../components/Footer";
 import BancaCard from "../../components/BancaCard/BancaCard";
 import StatsSection from "../../components/StatsSection";
@@ -487,6 +487,7 @@ const PaginaPrincipal = () => {
                 onDeleteSlide={handleDeleteSlide}
                 isAdmin={user?.role === "admin"}
                 onAddImage={handleCarouselUpload}
+                key={`carousel-${sliderImages.length}`}
               />
             </motion.div>
 
@@ -535,7 +536,7 @@ const PaginaPrincipal = () => {
           stats={getMainPageStats()}
           title="Nossa Feira em números"
           subtitle="Décadas de tradição e qualidade comprovada"
-          variant="modern"
+          variant="glass"
         />
       </section>
 
@@ -561,29 +562,27 @@ const PaginaPrincipal = () => {
 
           {/* Cards de Bancas */}
           <article className="grid grid-cols-1 mt-6 gap-8 md:grid-cols-3 lg:grid-cols-3 mx-2 scroll-container">
-            <AnimatePresence>
-              {bancas.map((banca, index) => (
-                <motion.div
-                  key={banca.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                >
-                  <BancaCard
-                    banca={banca}
-                    index={index}
-                    showAdminControls={false}
-                    showVendedoresDropdown={true}
-                    onSelectVendedores={handleSelectVendedores}
-                    selectedBanca={selectedBanca}
-                    whatsappMessage="Olá! Vi sua banca no site da Feira de Buritizeiro e fiquei interessado!"
-                    acessarBancaText="Acessar banca"
-                    verVendedoresText="Ver Vendedores"
-                    fecharVendedoresText="Fechar Vendedores"
-                  />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            {bancas.map((banca, index) => (
+              <motion.div
+                key={banca.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <BancaCard
+                  banca={banca}
+                  index={index}
+                  showAdminControls={false}
+                  showVendedoresDropdown={true}
+                  onSelectVendedores={handleSelectVendedores}
+                  selectedBanca={selectedBanca}
+                  whatsappMessage="Olá! Vi sua banca no site da Feira de Buritizeiro e fiquei interessado!"
+                  acessarBancaText="Acessar banca"
+                  verVendedoresText="Ver Vendedores"
+                  fecharVendedoresText="Fechar Vendedores"
+                />
+              </motion.div>
+            ))}
           </article>
 
           <motion.div
@@ -662,28 +661,37 @@ const PaginaPrincipal = () => {
 
       {/* Modais */}
       <AnimatePresence>
-        <Modal
-          isOpen={modal.isOpen}
-          onClose={closeModal}
-          type={modal.type}
-          title={modal.title}
-          message={modal.message}
-          onConfirm={modal.onConfirm}
-        />
+        {modal.isOpen && (
+          <Modal
+            key="main-modal"
+            isOpen={modal.isOpen}
+            onClose={closeModal}
+            type={modal.type}
+            title={modal.title}
+            message={modal.message}
+            onConfirm={modal.onConfirm}
+          />
+        )}
 
-        <TermPopup
-          isOpen={showEvaluationPopup}
-          onClose={() => setShowEvaluationPopup(false)}
-          onAccept={handleEvaluationAccept}
-        />
+        {showEvaluationPopup && (
+          <TermPopup
+            key="evaluation-popup"
+            isOpen={showEvaluationPopup}
+            onClose={() => setShowEvaluationPopup(false)}
+            onAccept={handleEvaluationAccept}
+          />
+        )}
 
-        <UploadModal
-          isOpen={uploadModal.isOpen}
-          onClose={closeUploadModal}
-          onUpload={handleUploadConfirm}
-          title="Adicionar Imagem ao Carrossel"
-          size="md"
-        />
+        {uploadModal.isOpen && (
+          <UploadModal
+            key="upload-modal"
+            isOpen={uploadModal.isOpen}
+            onClose={closeUploadModal}
+            onUpload={handleUploadConfirm}
+            title="Adicionar Imagem ao Carrossel"
+            size="md"
+          />
+        )}
       </AnimatePresence>
     </main>
   );

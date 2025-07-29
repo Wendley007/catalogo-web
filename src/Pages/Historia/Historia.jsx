@@ -1,5 +1,5 @@
 import banner from "../../assets/banner.jpg";
-import MenuTopo from "../../components/MenuTopo";
+import MenuTopo from "../../components/MenuTopo/MenuTopo";
 import Footer from "../../components/Footer";
 import HeroSection from "../../components/HeroSection";
 import { Info } from "lucide-react";

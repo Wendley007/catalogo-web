@@ -9,7 +9,7 @@ import BancaCard from "../../../components/BancaCard/BancaCard";
 import StatsSection from "../../../components/StatsSection";
 
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
-import MenuTopo from "../../../components/MenuTopo";
+import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import Footer from "../../../components/Footer";
 import SEO from "../../../components/SEO/SEO";
 import HeroSection from "../../../components/HeroSection";

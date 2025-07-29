@@ -7,7 +7,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { db } from "../../../services/firebaseConnection";
 import { AuthContext } from "../../../contexts/AuthContext";
 
-import MenuTopo from "../../../components/MenuTopo";
+import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import Footer from "../../../components/Footer";
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
 import StatsSection from "../../../components/StatsSection";

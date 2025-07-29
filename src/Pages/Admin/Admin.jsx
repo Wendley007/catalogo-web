@@ -5,7 +5,7 @@ import { updateUserRole } from "../../services/userService";
 import { db } from "../../services/firebaseConnection";
 import { FaSpinner, FaSearch, FaUsers, FaShieldAlt, FaTrashAlt } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import MenuTopo from "../../components/MenuTopo";
+import MenuTopo from "../../components/MenuTopo/MenuTopo";
 import Footer from "../../components/Footer";
 import { ConfirmModal } from "../../components/Modal";
 import SEO from "../../components/SEO/SEO";

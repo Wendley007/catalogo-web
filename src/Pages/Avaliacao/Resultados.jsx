@@ -5,7 +5,7 @@ import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { motion } from "framer-motion";
-import MenuTopo from "../../components/MenuTopo";
+import MenuTopo from "../../components/MenuTopo/MenuTopo";
 import fundo from "../../assets/fundo.jpg";
 import Footer from "../../components/Footer";
 import { Link } from "react-router-dom";

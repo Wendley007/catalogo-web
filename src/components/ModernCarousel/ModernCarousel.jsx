@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, memo } from "react";
 import { motion } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
@@ -6,7 +6,6 @@ import { ChevronLeft, ChevronRight, Trash2, Upload } from "lucide-react";
 import PropTypes from "prop-types";
 
 const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
-  console.log("ModernCarousel props:", { isAdmin, onAddImage: !!onAddImage });
 
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
@@ -33,11 +32,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
     [emblaApi]
   );
 
-  const onInit = useCallback((api) => setScrollSnaps(api.scrollSnapList()), []);
-  const onSelect = useCallback(
-    (api) => setSelectedIndex(api.selectedScrollSnap()),
-    []
-  );
+
 
   const handleImageLoad = useCallback((index) => {
     setImageLoading((prev) => ({ ...prev, [index]: true }));
@@ -101,11 +96,26 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
 
   useEffect(() => {
     if (!emblaApi) return;
-    onInit(emblaApi);
-    onSelect(emblaApi);
-    emblaApi.on("reInit", onInit);
-    emblaApi.on("select", onSelect);
-  }, [emblaApi, onInit, onSelect]);
+    
+    const handleInit = () => {
+      setScrollSnaps(emblaApi.scrollSnapList());
+    };
+    
+    const handleSelect = () => {
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+    };
+    
+    handleInit();
+    handleSelect();
+    
+    emblaApi.on("reInit", handleInit);
+    emblaApi.on("select", handleSelect);
+    
+    return () => {
+      emblaApi.off("reInit", handleInit);
+      emblaApi.off("select", handleSelect);
+    };
+  }, [emblaApi]);
 
   if (!images || images.length === 0) {
     return (
@@ -141,7 +151,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
         <div className="flex">
           {images.map((image, index) => (
             <div
-              key={index}
+              key={image.id || index}
               className="flex-[0_0_100%] relative scroll-snap-horizontal-item"
             >
               <div className="relative scroll-vertical">
@@ -208,10 +218,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
           animate={{ opacity: isHovered ? 1 : 0.7, scale: 1 }}
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          onClick={() => {
-            console.log("Botão de upload clicado");
-            onAddImage();
-          }}
+          onClick={onAddImage}
           className="absolute top-4 left-4 w-10 h-10 bg-green-500/90 hover:bg-green-600/90 text-white rounded-full flex items-center justify-center shadow-xl backdrop-blur-sm transition-all duration-300 z-20"
           aria-label="Adicionar nova imagem"
         >
@@ -254,7 +261,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
       <div className="flex justify-center space-x-2 md:space-x-3 mt-4 md:mt-6 scroll-horizontal">
         {scrollSnaps.map((_, index) => (
           <motion.button
-            key={index}
+            key={`indicator-${index}`}
             onClick={() => scrollTo(index)}
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
@@ -299,4 +306,4 @@ ModernCarousel.defaultProps = {
 
 ModernCarousel.displayName = "ModernCarousel";
 
-export default ModernCarousel;
+export default memo(ModernCarousel);

@@ -5,7 +5,7 @@ import { AuthContext } from "../../../contexts/AuthContext";
 import { db } from "../../../services/firebaseConnection";
 import { collection, getDocs, query } from "firebase/firestore";
 import banner from "../../../assets/banner.jpg";
-import MenuTopo from "../../../components/MenuTopo";
+import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import Footer from "../../../components/Footer";
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
 import BancaCard from "../../../components/BancaCard/BancaCard";

@@ -1,6 +1,6 @@
 import banner from "../../assets/banner.jpg";
 import localizacao from "../../assets/localização.png";
-import MenuTopo from "../../components/MenuTopo";
+import MenuTopo from "../../components/MenuTopo/MenuTopo";
 import Footer from "../../components/Footer";
 import HeroSection from "../../components/HeroSection";
 import { motion } from "framer-motion";
