@@ -95,7 +95,9 @@ const ProductImage = ({ images, name }) => {
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full ${
-                  index === currentImageIndex ? "bg-white" : "bg-white/50 dark:bg-gray-300/50"
+                  index === currentImageIndex
+                    ? "bg-white"
+                    : "bg-white/50 dark:bg-gray-300/50"
                 }`}
               />
             ))}
@@ -129,7 +131,7 @@ const ProductCard = ({ produto, onSelect, onDelete, isAdmin }) => {
 
   return (
     <div className="cursor-pointer" onClick={handleClick}>
-              <section className="relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50 dark:border-gray-700/50">
+      <section className="relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50 dark:border-gray-700/50">
         <ProductImage images={produto.images} name={produto.nome} />
 
         {/* Etiqueta simples */}
@@ -186,12 +188,12 @@ const BancasList = ({ bancas, produtoName, loading, onClose }) => {
       <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-t-3xl p-6 pr-8 relative overflow-hidden">
         {/* Decoração de fundo */}
         <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-green-600/20"></div>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 dark:bg-gray-600/10 rounded-full -translate-y-16 translate-x-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 dark:bg-gray-600/10 rounded-full translate-y-12 -translate-x-12"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 dark:bg-gray-600/10 rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 dark:bg-gray-600/10 rounded-full translate-y-12 -translate-x-12"></div>
 
         {/* Título */}
         <div className="flex items-center gap-3 text-white">
-                      <div className="p-2 bg-white/20 dark:bg-gray-700/20 rounded-xl backdrop-blur-sm flex-shrink-0">
+          <div className="p-2 bg-white/20 dark:bg-gray-700/20 rounded-xl backdrop-blur-sm flex-shrink-0">
             <FaStore className="text-white text-xl" />
           </div>
           <div className="flex-1 min-w-0">
@@ -204,7 +206,7 @@ const BancasList = ({ bancas, produtoName, loading, onClose }) => {
           {/* Botão X para fechar */}
           <button
             onClick={onClose}
-                          className="p-2.5 hover:bg-white/20 dark:hover:bg-gray-700/20 rounded-full transition-all duration-300 text-white hover:text-white/80 backdrop-blur-sm flex-shrink-0 ml-2"
+            className="p-2.5 hover:bg-white/20 dark:hover:bg-gray-700/20 rounded-full transition-all duration-300 text-white hover:text-white/80 backdrop-blur-sm flex-shrink-0 ml-2"
             aria-label="Fechar"
           >
             <svg
@@ -486,9 +488,9 @@ StatsSection.propTypes = {
 const ProdutosPorCategoria = () => {
   // Adicionar classe has-header para espaçamento do MenuTopo
   useEffect(() => {
-    document.body.classList.add('has-header');
+    document.body.classList.add("has-header");
     return () => {
-      document.body.classList.remove('has-header');
+      document.body.classList.remove("has-header");
     };
   }, []);
 
@@ -720,194 +722,194 @@ const ProdutosPorCategoria = () => {
       <main className="min-h-screen bg-white dark:bg-gray-900">
         <MenuTopo />
 
-          <div className="container mx-auto py-8 px-1 overflow-hidden relative z-10">
-            {/* Header e Estatísticas */}
-            <StatsSection produtos={produtos} categoria={categoria} />
+        <div className="container mx-auto py-8 px-1 overflow-hidden relative z-10">
+          {/* Header e Estatísticas */}
+          <StatsSection produtos={produtos} categoria={categoria} />
 
-            {/* Barra de Busca */}
-            <SearchBar
-              searchTerm={searchTerm}
-              onSearchChange={handleSearchChange}
-            />
+          {/* Barra de Busca */}
+          <SearchBar
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+          />
 
-            {/* Mensagem de Erro */}
-            <AnimatePresence>
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="bg-red-500/20 border border-red-400/30 rounded-lg p-2 mb-6 text-center"
-                >
-                  <p className="text-red-300">{error}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Loading */}
-            {loading && (
+          {/* Mensagem de Erro */}
+          <AnimatePresence>
+            {error && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex justify-center items-center py-12"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="bg-red-500/20 border border-red-400/30 rounded-lg p-2 mb-6 text-center"
               >
-                <div className="text-center">
-                  <FaSpinner className="animate-spin text-white text-3xl mx-auto mb-4" />
-                  <p className="text-white">Carregando produtos...</p>
-                </div>
+                <p className="text-red-300">{error}</p>
               </motion.div>
             )}
+          </AnimatePresence>
 
-            {/* Grid de Produtos */}
-            {!loading && (
-              <div className="mb-8">
-                {/* Header do Grid */}
-                <div className="flex items-center justify-between mb-8 mt-12">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg">
-                      <svg
-                        className="w-6 h-6 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="text-gray-800 font-bold text-xl">
-                        Produtos Disponíveis
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm">
-                        Clique nos cards para ver as bancas
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grid */}
-                <div
-                  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-                  ref={listRef}
-                >
-                  {produtos.length > 0 ? (
-                    produtos.map((produto, index) => (
-                      <motion.div
-                        key={produto.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
-                      >
-                        <ProductCard
-                          produto={produto}
-                          onSelect={handleProdutoClick}
-                          onDelete={handleDeleteClick}
-                          isAdmin={user?.role === "admin"}
-                        />
-
-                        <AnimatePresence>
-                          {selectedProdutoId === produto.id && (
-                            <motion.div
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              exit={{ opacity: 0 }}
-                              transition={{ duration: 0.3 }}
-                              className="fixed inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
-                              onClick={handleCloseBancas}
-                              data-modal="bancas"
-                            >
-                              <div onClick={(e) => e.stopPropagation()}>
-                                <BancasList
-                                  bancas={bancasProduto}
-                                  produtoName={produto.nome}
-                                  loading={loadingBancas}
-                                  onClose={handleCloseBancas}
-                                />
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </motion.div>
-                    ))
-                  ) : (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="col-span-full text-center py-16"
-                    >
-                      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl p-8 border border-white/60 dark:border-gray-700/60 shadow-xl max-w-md mx-auto">
-                        <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <svg
-                            className="w-10 h-10 text-gray-500"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.562M15 6.343A7.962 7.962 0 0112 9c-2.34 0-4.29-1.009-5.824-2.562"
-                            />
-                          </svg>
-                        </div>
-                        <h4 className="text-gray-800 dark:text-gray-200 font-bold text-xl mb-2">
-                          {searchTerm
-                            ? "Nenhum produto encontrado"
-                            : "Nenhum produto disponível"}
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">
-                          {searchTerm
-                            ? `Não encontramos produtos para "${searchTerm}"`
-                            : "Esta categoria ainda não possui produtos cadastrados"}
-                        </p>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Botão Voltar */}
+          {/* Loading */}
+          {loading && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, duration: 0.5 }}
-              className="text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex justify-center items-center py-12"
             >
-              <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-lg rounded-3xl p-6 border border-white/20 max-w-md mx-auto">
-                <Link
-                  to="/todascategorias"
-                  className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-green-500 to-green-600 font-bold text-white hover:from-green-600 hover:to-green-700 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 group"
-                >
-                  <div className="p-2 bg-white/20 rounded-xl group-hover:bg-white/30 transition-colors duration-300">
-                    <FaArrowLeft className="text-white" />
-                  </div>
-                  <span>Voltar para Categorias</span>
-                </Link>
+              <div className="text-center">
+                <FaSpinner className="animate-spin text-white text-3xl mx-auto mb-4" />
+                <p className="text-white">Carregando produtos...</p>
               </div>
             </motion.div>
-          </div>
+          )}
 
-          <Footer />
+          {/* Grid de Produtos */}
+          {!loading && (
+            <div className="mb-8">
+              {/* Header do Grid */}
+              <div className="flex items-center justify-between mb-8 mt-12">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg">
+                    <svg
+                      className="w-6 h-6 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-gray-800 dark:text-gray-300 font-bold text-xl">
+                      Produtos Disponíveis
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      Clique nos cards para ver as bancas
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-          {/* Modal de Confirmação de Exclusão */}
-          <ConfirmModal
-            isOpen={deleteModal.isOpen}
-            onClose={() => setDeleteModal({ isOpen: false, produto: null })}
-            onConfirm={handleDeleteProduto}
-            title="Confirmar Exclusão"
-            message={`Você tem certeza que deseja excluir o produto "${deleteModal.produto?.nome}"?`}
-            confirmText="Excluir"
-            cancelText="Cancelar"
-            type="danger"
-          />
-        </main>
+              {/* Grid */}
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+                ref={listRef}
+              >
+                {produtos.length > 0 ? (
+                  produtos.map((produto, index) => (
+                    <motion.div
+                      key={produto.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                    >
+                      <ProductCard
+                        produto={produto}
+                        onSelect={handleProdutoClick}
+                        onDelete={handleDeleteClick}
+                        isAdmin={user?.role === "admin"}
+                      />
+
+                      <AnimatePresence>
+                        {selectedProdutoId === produto.id && (
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="fixed inset-0 bg-gradient-to-br from-black/60 via-black/50 to-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4"
+                            onClick={handleCloseBancas}
+                            data-modal="bancas"
+                          >
+                            <div onClick={(e) => e.stopPropagation()}>
+                              <BancasList
+                                bancas={bancasProduto}
+                                produtoName={produto.nome}
+                                loading={loadingBancas}
+                                onClose={handleCloseBancas}
+                              />
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ))
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="col-span-full text-center py-16"
+                  >
+                    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl p-8 border border-white/60 dark:border-gray-700/60 shadow-xl max-w-md mx-auto">
+                      <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg
+                          className="w-10 h-10 text-gray-500"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.29-1.009-5.824-2.562M15 6.343A7.962 7.962 0 0112 9c-2.34 0-4.29-1.009-5.824-2.562"
+                          />
+                        </svg>
+                      </div>
+                      <h4 className="text-gray-800 dark:text-gray-200 font-bold text-xl mb-2">
+                        {searchTerm
+                          ? "Nenhum produto encontrado"
+                          : "Nenhum produto disponível"}
+                      </h4>
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
+                        {searchTerm
+                          ? `Não encontramos produtos para "${searchTerm}"`
+                          : "Esta categoria ainda não possui produtos cadastrados"}
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Botão Voltar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="text-center"
+          >
+            <div className="bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-lg rounded-3xl p-4 border border-white/20 max-w-md mx-auto">
+              <Link
+                to="/todascategorias"
+                className="inline-flex items-center text-sm space-x-2 px-8 gap-3 py-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 font-semibold text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <div className="p-2 bg-white/20 rounded-xl group-hover:bg-white/30 transition-colors duration-300">
+                  <FaArrowLeft className="text-white" />
+                </div>
+                <span>Voltar para Categorias</span>
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        <Footer />
+
+        {/* Modal de Confirmação de Exclusão */}
+        <ConfirmModal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false, produto: null })}
+          onConfirm={handleDeleteProduto}
+          title="Confirmar Exclusão"
+          message={`Você tem certeza que deseja excluir o produto "${deleteModal.produto?.nome}"?`}
+          confirmText="Excluir"
+          cancelText="Cancelar"
+          type="danger"
+        />
+      </main>
     </>
   );
 };

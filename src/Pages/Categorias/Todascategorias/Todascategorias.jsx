@@ -83,9 +83,9 @@ const TodasCategorias = () => {
 
   // Adicionar classe has-header para espaçamento do MenuTopo
   useEffect(() => {
-    document.body.classList.add('has-header');
+    document.body.classList.add("has-header");
     return () => {
-      document.body.classList.remove('has-header');
+      document.body.classList.remove("has-header");
     };
   }, []);
 
@@ -120,10 +120,10 @@ const TodasCategorias = () => {
         // Buscar categorias
         const snapshotCategorias = await getDocs(collection(db, "categorias"));
         const categoriasData = [];
-        
+
         for (const doc of snapshotCategorias.docs) {
           const categoria = { id: doc.id, ...doc.data() };
-          
+
           // Buscar produtos da categoria
           const produtosSnapshot = await getDocs(
             query(collection(db, `categorias/${categoria.id}/produtos`))
@@ -132,11 +132,11 @@ const TodasCategorias = () => {
             id: produtoDoc.id,
             ...produtoDoc.data(),
           }));
-          
+
           categoria.produtos = produtosData;
           categoriasData.push(categoria);
         }
-        
+
         setCategorias(categoriasData);
 
         // Buscar bancas
@@ -219,10 +219,10 @@ const TodasCategorias = () => {
         try {
           // Aqui você implementaria a lógica de exclusão
           // await deleteDoc(doc(db, "categorias", categoria.id));
-          
+
           // Atualizar a lista local
           setCategorias(categorias.filter((cat) => cat.id !== categoria.id));
-          
+
           showModal(
             "success",
             "Sucesso",
@@ -322,7 +322,7 @@ const TodasCategorias = () => {
             {user && user.role === "admin" && (
               <Link
                 to="/novo"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 dark:from-green-700 dark:to-green-800 text-white px-8 py-3  rounded-xl font-medium text-sm hover:from-green-700 hover:to-green-800 dark:hover:from-green-800 dark:hover:to-green-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center text-sm space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 font-semibold text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Plus size={20} />
                 <span>Cadastrar Produtos</span>
@@ -409,7 +409,10 @@ const TodasCategorias = () => {
           ) : (
             <div className="text-center py-16 relative z-10">
               <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl p-12 shadow-xl border border-white/50 dark:border-gray-700/50 max-w-md mx-auto">
-                <Search className="mx-auto mb-4 text-gray-400 dark:text-gray-500" size={64} />
+                <Search
+                  className="mx-auto mb-4 text-gray-400 dark:text-gray-500"
+                  size={64}
+                />
                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                   Nenhuma categoria encontrada
                 </h3>
@@ -460,4 +463,3 @@ const TodasCategorias = () => {
 };
 
 export default TodasCategorias;
-
