@@ -12,6 +12,8 @@ import {
   Save,
 } from "lucide-react";
 import PropTypes from "prop-types";
+import OptimizedImage from "../OptimizedImage/OptimizedImage";
+import defaultProfileImage from "../../assets/perfil.webp";
 
 /**
  * Componente reutilizável para exibir cards de bancas
@@ -54,8 +56,7 @@ const BancaCard = ({
   const vendedoresRef = useRef(null);
 
   // Imagem padrão para vendedores
-  const defaultVendedorImage =
-    "https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=400";
+  const defaultVendedorImage = defaultProfileImage;
 
   // Vendedor principal (primeiro da lista)
   const vendedorPrincipal = banca.vendedores?.[0];
@@ -130,12 +131,12 @@ const BancaCard = ({
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="bg-white rounded-xl shadow-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+      className="bg-white dark:bg-gray-800 rounded-xl shadow-xl hover:shadow-xl transition-all duration-300 transform hover:scale-105"
     >
       {/* Cabeçalho da Banca */}
       <div className="p-4 mt-2 text-center relative">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-left drop-shadow-lg text-lg font-semibold uppercase text-gray-800">
+          <h2 className="text-left drop-shadow-lg text-lg font-semibold uppercase text-gray-800 dark:text-gray-100">
             {banca.nome}
           </h2>
           {(banca.produtos?.length || 0) > 5 && (
@@ -144,26 +145,26 @@ const BancaCard = ({
             </div>
           )}
         </div>
-        <p className="text-center text-sm text-gray-600 mb-3">
+        <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-3">
           {banca.produtos?.length || 0} produto
           {(banca.produtos?.length || 0) !== 1 ? "s" : ""} disponível
           {(banca.produtos?.length || 0) !== 1 ? "s" : ""}
         </p>
-        <div className="w-16 h-1 bg-gray-200 mx-auto rounded-full"></div>
+        <div className="w-16 h-1 bg-gray-200 dark:bg-gray-600 mx-auto rounded-full"></div>
 
         {/* Controles de Admin */}
         {showAdminControls && (
           <div className="absolute top-4 right-4 flex space-x-2">
             <button
               onClick={() => onEditBanca?.(banca)}
-              className="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center text-blue-600 transition-all duration-300 transform hover:scale-105"
+              className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-300 transform hover:scale-105"
               title="Editar Banca"
             >
               <Edit3 size={16} />
             </button>
             <button
               onClick={() => onDeleteBanca?.(banca)}
-              className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center text-red-600 transition-all duration-300 transform hover:scale-105"
+              className="w-8 h-8 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-full flex items-center justify-center text-red-600 dark:text-red-400 transition-all duration-300 transform hover:scale-105"
               title="Excluir Banca"
             >
               <Trash2 size={16} />
@@ -180,7 +181,7 @@ const BancaCard = ({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl flex flex-col items-center justify-center relative"
+              className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-gray-700 dark:to-gray-800 p-4 rounded-xl flex flex-col items-center justify-center relative"
             >
               {/* Avatar do Vendedor */}
               <div className="relative inline-block mb-6">
@@ -190,7 +191,7 @@ const BancaCard = ({
                     vendedorPrincipal.images?.[0]?.url || defaultVendedorImage
                   }
                   alt={vendedorPrincipal.nome}
-                  className="relative w-28 h-28 rounded-full object-cover shadow-xs border-white"
+                  className="relative w-28 h-28 rounded-full object-cover shadow-xs border-white dark:border-gray-700"
                 />
               </div>
 
@@ -202,14 +203,14 @@ const BancaCard = ({
                     type="text"
                     value={editVendedorName}
                     onChange={(e) => setEditVendedorName(e.target.value)}
-                    className="w-full text-base border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-bold text-gray-900 bg-white"
+                    className="w-full text-base border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-bold text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
                     placeholder="Nome do vendedor"
                   />
                   <input
                     type="text"
                     value={editVendedorCity}
                     onChange={(e) => setEditVendedorCity(e.target.value)}
-                    className="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-gray-900 bg-white"
+                    className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700"
                     placeholder="Cidade do vendedor"
                   />
                   <div className="flex justify-center space-x-2">
@@ -234,11 +235,11 @@ const BancaCard = ({
               ) : (
                 // Modo de visualização para vendedor principal
                 <div className="relative">
-                  <h4 className="font-bold text-gray-900 -mt-2 text-xl mb-2 text-center">
+                  <h4 className="font-bold text-gray-900 dark:text-gray-100 -mt-2 text-xl mb-2 text-center">
                     {vendedorPrincipal.nome}
                   </h4>
 
-                  <p className="text-gray-600 mb-2 text-sm flex items-center justify-center space-x-1">
+                  <p className="text-gray-600 dark:text-gray-400 mb-2 text-sm flex items-center justify-center space-x-1">
                     <MapPin size={10} />
                     <span>{vendedorPrincipal.cidade}</span>
                   </p>
@@ -250,7 +251,7 @@ const BancaCard = ({
                         onClick={() =>
                           handleStartEditVendedor(vendedorPrincipal)
                         }
-                        className="w-8 h-8 bg-blue-100 hover:bg-blue-200 rounded-full flex items-center justify-center text-blue-600 transition-all duration-300 transform hover:scale-105"
+                        className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 transition-all duration-300 transform hover:scale-105"
                         title="Editar Vendedor"
                       >
                         <Edit3 size={14} />
@@ -262,7 +263,7 @@ const BancaCard = ({
                             id: vendedorPrincipal.id,
                           })
                         }
-                        className="w-8 h-8 bg-red-100 hover:bg-red-200 rounded-full flex items-center justify-center text-red-600 transition-all duration-300 transform hover:scale-105"
+                        className="w-8 h-8 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 rounded-full flex items-center justify-center text-red-600 dark:text-red-400 transition-all duration-300 transform hover:scale-105"
                         title="Excluir Vendedor"
                       >
                         <Trash2 size={14} />
@@ -290,7 +291,7 @@ const BancaCard = ({
             </motion.div>
           </div>
         ) : (
-          <p className="text-center text-gray-600 py-8">
+          <p className="text-center text-gray-600 dark:text-gray-400 py-8">
             Nenhum vendedor disponível nesta banca.
           </p>
         )}
@@ -310,7 +311,7 @@ const BancaCard = ({
             {showVendedoresDropdown && (
               <button
                 type="button"
-                className="flex-1 text-xs bg-gradient-to-r font-medium from-gray-700 to-gray-800 text-white py-2 px-4 rounded-xl hover:from-gray-800 hover:to-gray-900 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="flex-1 text-xs bg-gradient-to-r font-medium from-gray-700 to-gray-800 dark:from-gray-600 dark:to-gray-700 text-white py-2 px-4 rounded-xl hover:from-gray-800 hover:to-gray-900 dark:hover:from-gray-500 dark:hover:to-gray-600 transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:scale-105"
                 onClick={handleToggleVendedores}
               >
                 <span className="mr-2">
@@ -333,13 +334,13 @@ const BancaCard = ({
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
-                className="absolute top-full ring-1 ring-gray-300 ml-5 mt-2 max-h-60 w-64 bg-gray-100 hover:bg-gray-50 transition-colors rounded-xl shadow-xl z-10"
+                className="absolute top-full ring-1 ring-gray-300 dark:ring-gray-600 ml-5 mt-2 max-h-60 w-64 bg-gray-100 dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors rounded-xl shadow-xl z-10"
               >
                 {/* Cabeçalho do Dropdown */}
-                <div className="flex bg-gradient-to-t from-gray-200 to-gray-300 justify-end py-1 px-1 rounded-t-xl">
+                <div className="flex bg-gradient-to-t from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 justify-end py-1 px-1 rounded-t-xl">
                   <button
                     onClick={handleToggleVendedores}
-                    className="text-gray-600 w-6 h-6 flex items-center justify-center hover:text-gray-900 rounded-full bg-gray-100 text-sm font-bold"
+                    className="text-gray-600 dark:text-gray-400 w-6 h-6 flex items-center justify-center hover:text-gray-900 dark:hover:text-gray-100 rounded-full bg-gray-100 dark:bg-gray-600 text-sm font-bold"
                   >
                     <X size={18} />
                   </button>
@@ -355,13 +356,15 @@ const BancaCard = ({
                       >
                         <div className="flex items-center justify-between w-full">
                           <div className="flex items-center gap-2">
-                            <img
+                            <OptimizedImage
                               src={
                                 vendedor.images?.[0]?.url ||
                                 defaultVendedorImage
                               }
                               alt={`Imagem de perfil de ${vendedor.nome}`}
                               className="object-cover w-12 h-12 rounded-full"
+                              lazy={true}
+                              fallback={defaultVendedorImage}
                             />
                             <div className="flex-1 min-w-0">
                               {editingVendedor === vendedor.id ? (
@@ -373,7 +376,7 @@ const BancaCard = ({
                                     onChange={(e) =>
                                       setEditVendedorName(e.target.value)
                                     }
-                                    className="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
+                                    className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-600"
                                     placeholder="Nome do vendedor"
                                   />
                                   <input
@@ -382,7 +385,7 @@ const BancaCard = ({
                                     onChange={(e) =>
                                       setEditVendedorCity(e.target.value)
                                     }
-                                    className="w-full text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
+                                    className="w-full text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-600"
                                     placeholder="Cidade do vendedor"
                                   />
                                   <div className="flex space-x-1">
@@ -407,10 +410,10 @@ const BancaCard = ({
                               ) : (
                                 // Modo de visualização
                                 <div>
-                                  <div className="text-sm font-bold truncate">
+                                  <div className="text-sm font-bold truncate text-gray-900 dark:text-gray-100">
                                     {vendedor.nome}
                                   </div>
-                                  <div className="text-gray-600 text-xs flex items-center space-x-1">
+                                  <div className="text-gray-600 dark:text-gray-400 text-xs flex items-center space-x-1">
                                     <MapPin size={10} />
                                     <span className="truncate">
                                       {vendedor.cidade}
@@ -422,7 +425,7 @@ const BancaCard = ({
                                         onClick={() =>
                                           handleStartEditVendedor(vendedor)
                                         }
-                                        className="w-6 h-6 bg-blue-100 hover:bg-blue-200 rounded flex items-center justify-center text-blue-600 text-xs"
+                                        className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-900/50 rounded flex items-center justify-center text-blue-600 dark:text-blue-400 text-xs"
                                         title="Editar Vendedor"
                                       >
                                         <Edit3 size={10} />
@@ -434,7 +437,7 @@ const BancaCard = ({
                                             id: vendedor.id,
                                           })
                                         }
-                                        className="w-6 h-6 bg-red-100 hover:bg-red-200 rounded flex items-center justify-center text-red-600 text-xs"
+                                        className="w-6 h-6 bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 rounded flex items-center justify-center text-red-600 dark:text-red-400 text-xs"
                                         title="Excluir Vendedor"
                                       >
                                         <Trash2 size={10} />
@@ -467,13 +470,13 @@ const BancaCard = ({
                   </ul>
                 ) : (
                   <div className="px-4 py-6 text-center">
-                    <div className="text-gray-500 mb-2">
+                    <div className="text-gray-500 dark:text-gray-400 mb-2">
                       <Users size={24} className="mx-auto mb-2" />
                     </div>
-                    <p className="text-sm text-gray-600 font-medium">
+                    <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
                       Nenhum outro vendedor disponível nesta banca.
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Apenas o vendedor principal está ativo.
                     </p>
                   </div>

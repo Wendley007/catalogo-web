@@ -41,13 +41,13 @@ const HeroSection = ({
                 initial={{ opacity: 0, y: -50 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
-                className="mb-6"
+                className=""
               >
                 <Link to="/" className="inline-block">
                   <motion.img
                     src={logo}
                     alt="Logo"
-                    className="w-40 h-40 md:w-48 md:h-48 mx-auto"
+                    className="w-24 h-24 md:w-48 md:h-48 mx-auto"
                     whileHover={{ scale: 1.05, rotate: 2 }}
                     transition={{ duration: 0.3 }}
                   />
@@ -61,7 +61,7 @@ const HeroSection = ({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6 }}
-                className="flex justify-center mb-6"
+                className="flex justify-center mb-4"
               >
                 <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                   <Icon size={40} className="text-white" />
@@ -74,7 +74,7 @@ const HeroSection = ({
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="mb-6"
+              className="mb-4"
             >
               <h1 className="text-4xl md:text-6xl font-bold mb-2 bg-gradient-to-r from-white to-green-200 bg-clip-text text-transparent">
                 {title}

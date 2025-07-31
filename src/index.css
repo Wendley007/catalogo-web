@@ -93,6 +93,21 @@
     position: relative;
   }
 
+  /* Espaçamento para páginas com header fixo */
+  body.has-header {
+    padding-top: 4rem;
+  }
+
+  /* Remover espaçamento para páginas de autenticação */
+  body:not(.has-header) {
+    padding-top: 0 !important;
+  }
+
+  /* Forçar remoção de padding em páginas específicas */
+  body.auth-page {
+    padding-top: 0 !important;
+  }
+
   /* =============================================================================
      SCROLL BEHAVIOR - Melhorias de scroll
      ============================================================================= */

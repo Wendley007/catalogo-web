@@ -8,12 +8,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import MenuTopo from "../../components/MenuTopo/MenuTopo";
-import fundo from "../../assets/fundo.jpg";
+import fundo from "../../assets/fundo.webp";
 import Footer from "../../components/Footer";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import SEO from "../../components/SEO/SEO";
 
 const Avaliacao = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const { user } = useContext(AuthContext);
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -324,9 +332,9 @@ const Avaliacao = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="fixed inset-0 bg-gray-500 bg-opacity-80 flex items-center justify-center z-20"
+                className="fixed inset-0 bg-gray-500 dark:bg-gray-700 bg-opacity-80 flex items-center justify-center z-20"
               >
-                <div className="bg-white p-6 text-sm uppercase rounded-lg text-center text-green-700">
+                <div className="bg-white dark:bg-gray-800 p-6 text-sm uppercase rounded-lg text-center text-green-700 dark:text-green-400">
                   <p className="font-bold">Avaliação enviada com sucesso!</p>
                   <button
                     className="mt-4 text-sm text-white bg-green-500 py-1 px-2 rounded-md"
@@ -343,9 +351,9 @@ const Avaliacao = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="fixed inset-0 bg-gray-500 bg-opacity-80 flex items-center justify-center z-20"
+                className="fixed inset-0 bg-gray-500 dark:bg-gray-700 bg-opacity-80 flex items-center justify-center z-20"
               >
-                <div className="bg-white p-6 text-sm uppercase rounded-lg text-center text-red-500">
+                <div className="bg-white dark:bg-gray-800 p-6 text-sm uppercase rounded-lg text-center text-red-500 dark:text-red-400">
                   <p className="font-bold">Erro ao enviar avaliação!</p>
                   <button
                     className="mt-4 text-sm text-white bg-red-500 py-1 px-2 rounded-md"
@@ -362,9 +370,9 @@ const Avaliacao = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className="fixed inset-0 bg-gray-700 bg-opacity-80 flex items-center justify-center z-20"
+                className="fixed inset-0 bg-gray-700 dark:bg-gray-800 bg-opacity-80 flex items-center justify-center z-20"
               >
-                <div className="bg-white p-6 rounded-lg text-red-700">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg text-red-700 dark:text-red-400">
                   <p className="font-bold">
                     O limite de 100 avaliações foi atingido!
                   </p>

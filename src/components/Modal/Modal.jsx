@@ -51,12 +51,12 @@ const Modal = ({
     };
 
     if (isOpen) {
-      document.body.style.overflow = "hidden"; // Impede scroll
+      document.body.style.overflow = "hidden"; // Impede scroll do body
       window.addEventListener("keydown", handleKeyDown);
     }
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = ""; // Restaura scroll do body
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
@@ -139,7 +139,7 @@ const Modal = ({
 
         {/* Título */}
         {title && (
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
             {title}
           </h3>
         )}
@@ -174,7 +174,7 @@ const Modal = ({
     <AnimatePresence>
       {isOpen && (
         <section
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 dark:bg-black/70 backdrop-blur-sm p-4 overflow-hidden"
           aria-modal="true"
           role="dialog"
           onClick={(e) => {
@@ -187,7 +187,7 @@ const Modal = ({
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
             onClick={(e) => e.stopPropagation()}
-            className={`bg-white dark:bg-zinc-800 ring-1 ring-gray-200 dark:ring-gray-600 rounded-xl shadow-2xl p-8 ${getSizeClasses()} w-full mx-4 text-center relative`}
+            className={`bg-white dark:bg-gray-800 ring-1 ring-gray-200 dark:ring-gray-600 rounded-xl shadow-2xl p-8 ${getSizeClasses()} w-full mx-4 text-center relative max-h-[90vh] flex flex-col`}
           >
             {/* Botão de fechar (opcional) */}
             {showCloseButton && (
@@ -196,12 +196,14 @@ const Modal = ({
                 className="absolute top-4 right-4 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
                 aria-label="Fechar modal"
               >
-                <X size={20} className="text-gray-500" />
+                <X size={20} className="text-gray-500 dark:text-gray-400" />
               </button>
             )}
 
             {/* Conteúdo do modal */}
-            {renderContent()}
+            <div className="flex-1 overflow-y-auto">
+              {renderContent()}
+            </div>
           </motion.div>
         </section>
       )}

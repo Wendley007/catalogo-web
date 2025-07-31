@@ -18,6 +18,7 @@ import Vendedor from "./Pages/Perfis/Vendedor/Vendedor";
 import Avaliacao from "./Pages/Avaliacao/Avaliacao";
 import Resultados from "./Pages/Avaliacao/Resultados";
 import NotFound from "./Pages/NotFound/NotFound";
+import ImageOptimizationExample from "./examples/ImageOptimizationExample";
 
 // Páginas protegidas
 import Novo from "./Pages/Categorias/Novo/Novo";
@@ -71,6 +72,14 @@ const Rotas = () => {
           element={
             <AdminRoute>
               <Admin />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/otimizacao-imagens"
+          element={
+            <AdminRoute>
+              <ImageOptimizationExample />
             </AdminRoute>
           }
         />

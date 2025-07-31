@@ -95,7 +95,7 @@ const ProductImage = ({ images, name }) => {
               <div
                 key={index}
                 className={`w-2 h-2 rounded-full ${
-                  index === currentImageIndex ? "bg-white" : "bg-white/50"
+                  index === currentImageIndex ? "bg-white" : "bg-white/50 dark:bg-gray-300/50"
                 }`}
               />
             ))}
@@ -129,12 +129,12 @@ const ProductCard = ({ produto, onSelect, onDelete, isAdmin }) => {
 
   return (
     <div className="cursor-pointer" onClick={handleClick}>
-      <section className="relative bg-white/95 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50">
+              <section className="relative bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50 dark:border-gray-700/50">
         <ProductImage images={produto.images} name={produto.nome} />
 
         {/* Etiqueta simples */}
         <div className="absolute top-3 left-3">
-          <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-white/20"></div>
+          <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-white/20 dark:border-gray-700/20"></div>
         </div>
 
         {/* Botão de deletar para admin */}
@@ -186,12 +186,12 @@ const BancasList = ({ bancas, produtoName, loading, onClose }) => {
       <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-t-3xl p-6 pr-8 relative overflow-hidden">
         {/* Decoração de fundo */}
         <div className="absolute inset-0 bg-gradient-to-r from-green-400/20 to-green-600/20"></div>
-        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 dark:bg-gray-600/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 dark:bg-gray-600/10 rounded-full translate-y-12 -translate-x-12"></div>
 
         {/* Título */}
         <div className="flex items-center gap-3 text-white">
-          <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm flex-shrink-0">
+                      <div className="p-2 bg-white/20 dark:bg-gray-700/20 rounded-xl backdrop-blur-sm flex-shrink-0">
             <FaStore className="text-white text-xl" />
           </div>
           <div className="flex-1 min-w-0">
@@ -204,7 +204,7 @@ const BancasList = ({ bancas, produtoName, loading, onClose }) => {
           {/* Botão X para fechar */}
           <button
             onClick={onClose}
-            className="p-2.5 hover:bg-white/20 rounded-full transition-all duration-300 text-white hover:text-white/80 backdrop-blur-sm flex-shrink-0 ml-2"
+                          className="p-2.5 hover:bg-white/20 dark:hover:bg-gray-700/20 rounded-full transition-all duration-300 text-white hover:text-white/80 backdrop-blur-sm flex-shrink-0 ml-2"
             aria-label="Fechar"
           >
             <svg
@@ -238,7 +238,7 @@ const BancasList = ({ bancas, produtoName, loading, onClose }) => {
                 }}
               ></div>
             </div>
-            <p className="text-gray-600 text-sm mt-4 font-medium">
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-4 font-medium">
               Buscando bancas...
             </p>
           </div>
@@ -265,7 +265,7 @@ const BancasList = ({ bancas, produtoName, loading, onClose }) => {
                           {banca.nome?.charAt(0)?.toUpperCase() || "B"}
                         </div>
                         <div>
-                          <h4 className="font-semibold text-gray-900 group-hover:text-green-700 transition-colors">
+                          <h4 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-green-700 dark:group-hover:text-green-400 transition-colors">
                             {banca.nome || "Nome da banca não disponível"}
                           </h4>
                           <p className="text-gray-500 text-xs">
@@ -346,7 +346,7 @@ const SearchBar = React.memo(({ searchTerm, onSearchChange }) => {
       transition={{ duration: 0.5, delay: 0.2 }}
       className="w-full max-w-3xl mx-auto mb-8"
     >
-      <div className="bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-white/95 via-gray-50/95 to-white/95 dark:from-gray-800/95 dark:via-gray-700/95 dark:to-gray-800/95 backdrop-blur-xl rounded-3xl shadow-2xl p-6 border border-white/60 dark:border-gray-600/60 relative overflow-hidden">
         {/* Decorações de fundo */}
         <div className="absolute top-0 right-0 w-20 h-20 bg-green-500/10 rounded-full -translate-y-10 translate-x-10"></div>
         <div className="absolute bottom-0 left-0 w-16 h-16 bg-blue-500/10 rounded-full translate-y-8 -translate-x-8"></div>
@@ -357,11 +357,11 @@ const SearchBar = React.memo(({ searchTerm, onSearchChange }) => {
               <FaSearch className="text-white text-xl" />
             </div>
             <div className="flex-1">
-              <label className="block text-gray-700 font-semibold mb-2 text-sm">
+              <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2 text-sm">
                 Buscar Produtos
               </label>
               <input
-                className="w-full pl-4 pr-4 py-3 bg-white/70 border-2 border-gray-200 rounded-2xl text-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 transition-all duration-300 text-lg shadow-inner"
+                className="w-full pl-4 pr-4 py-3 bg-white/70 dark:bg-gray-700/70 border-2 border-gray-200 dark:border-gray-600 rounded-2xl text-gray-700 dark:text-gray-300 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-400 transition-all duration-300 text-lg shadow-inner"
                 placeholder="Digite o nome do produto..."
                 value={searchTerm}
                 onChange={handleInputChange}
@@ -421,7 +421,7 @@ const StatsSection = ({ produtos, categoria }) => {
       transition={{ duration: 0.5 }}
       className="text-center mb-8"
     >
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 backdrop-blur-xl rounded-3xl shadow-lg p-8 border border-white/60 max-w-5xl mx-auto relative overflow-hidden">
+      <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 backdrop-blur-xl rounded-3xl shadow-lg p-8 border border-white/60 dark:border-gray-700/60 max-w-5xl mx-auto relative overflow-hidden">
         {/* Decorações de fundo */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full -translate-y-16 translate-x-16"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 rounded-full translate-y-12 -translate-x-12"></div>
@@ -443,7 +443,7 @@ const StatsSection = ({ produtos, categoria }) => {
                 />
               </svg>
             </div>
-            <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent">
               {categoria.nome}
             </h1>
           </div>
@@ -484,6 +484,14 @@ StatsSection.propTypes = {
  * Página principal de produtos por categoria
  */
 const ProdutosPorCategoria = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const { idCategoria } = useParams();
   const { user } = useContext(AuthContext);
   const [allProdutos, setAllProdutos] = useState([]); // Todos os produtos
@@ -709,17 +717,8 @@ const ProdutosPorCategoria = () => {
         type="website"
       />
 
-      <div className="min-h-screen text-gray-800 relative ">
-        <div className="bg-gradient-to-br from-gray-100 via-green-50  to-purple-100 min-h-screen relative overflow-hidden">
-          {/* Elementos decorativos de fundo */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-20 left-10 w-72 h-72 bg-green-400/20 rounded-full blur-3xl"></div>
-            <div className="absolute top-40 right-20 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-20 left-1/4 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl"></div>
-            <div className="absolute bottom-40 right-1/3 w-64 h-64 bg-yellow-400/15 rounded-full blur-3xl"></div>
-          </div>
-
-          <MenuTopo />
+      <main className="min-h-screen bg-white dark:bg-gray-900">
+        <MenuTopo />
 
           <div className="container mx-auto py-8 px-1 overflow-hidden relative z-10">
             {/* Header e Estatísticas */}
@@ -784,7 +783,7 @@ const ProdutosPorCategoria = () => {
                       <h3 className="text-gray-800 font-bold text-xl">
                         Produtos Disponíveis
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-600 dark:text-gray-400 text-sm">
                         Clique nos cards para ver as bancas
                       </p>
                     </div>
@@ -841,7 +840,7 @@ const ProdutosPorCategoria = () => {
                       animate={{ opacity: 1, y: 0 }}
                       className="col-span-full text-center py-16"
                     >
-                      <div className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 border border-white/60 shadow-xl max-w-md mx-auto">
+                      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl p-8 border border-white/60 dark:border-gray-700/60 shadow-xl max-w-md mx-auto">
                         <div className="w-20 h-20 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
                           <svg
                             className="w-10 h-10 text-gray-500"
@@ -857,12 +856,12 @@ const ProdutosPorCategoria = () => {
                             />
                           </svg>
                         </div>
-                        <h4 className="text-gray-800 font-bold text-xl mb-2">
+                        <h4 className="text-gray-800 dark:text-gray-200 font-bold text-xl mb-2">
                           {searchTerm
                             ? "Nenhum produto encontrado"
                             : "Nenhum produto disponível"}
                         </h4>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
                           {searchTerm
                             ? `Não encontramos produtos para "${searchTerm}"`
                             : "Esta categoria ainda não possui produtos cadastrados"}
@@ -908,8 +907,7 @@ const ProdutosPorCategoria = () => {
             cancelText="Cancelar"
             type="danger"
           />
-        </div>
-      </div>
+        </main>
     </>
   );
 };

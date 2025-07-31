@@ -1,25 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
 import { X, CheckCircle, Shield, Users, Clock, Heart } from "lucide-react";
+import { useEffect } from "react";
 
 /**
  * Componente reutilizável para popup de termos elegante e profissional
- * @param {Object} props - Propriedades do componente
- * @param {boolean} props.isOpen - Se o popup está aberto
- * @param {Function} props.onClose - Função para fechar o popup
- * @param {Function} props.onAccept - Função executada ao aceitar
- * @param {string} props.title - Título do popup
- * @param {string} props.subtitle - Subtítulo do popup
- * @param {string} props.description - Descrição da avaliação
- * @param {Array} props.terms - Array de termos de participação
- * @param {string} props.acceptText - Texto do botão de aceitar
- * @param {string} props.cancelText - Texto do botão de cancelar
- * @param {string} props.thankYouText - Texto de agradecimento
- * @param {string} props.headerGradient - Classe CSS para gradiente do cabeçalho
- * @param {string} props.termsGradient - Classe CSS para gradiente dos termos
- * @param {string} props.acceptButtonClass - Classe CSS para o botão de aceitar
- * @param {string} props.cancelButtonClass - Classe CSS para o botão de cancelar
- * @param {string} props.size - Tamanho do popup ('sm', 'md', 'lg')
  */
 const TermPopup = ({
   isOpen,
@@ -33,16 +18,28 @@ const TermPopup = ({
     "Questionário anônimo, sem coleta de dados pessoais.",
     "Participação voluntária e possibilidade de desistência.",
     "Pesquisa ética, sem riscos aos participantes.",
+    "Seus dados serão tratados com total confidencialidade e segurança.",
+    "A pesquisa visa melhorar a experiência de todos os usuários do catálogo.",
+    "Você pode interromper sua participação a qualquer momento.",
+    "Os resultados serão utilizados apenas para fins de melhoria do sistema.",
+    "Não há identificação pessoal nos dados coletados.",
+    "A participação é completamente opcional e gratuita.",
   ],
   acceptText = "Aceitar e Continuar",
   cancelText = "Voltar",
   thankYouText = "Agradecemos sua participação!",
-  headerGradient = "bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700",
-  termsGradient = "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50",
-  acceptButtonClass = "",
-  cancelButtonClass = "",
   size = "lg",
 }) => {
+  // Gerenciamento de scroll
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
   // Função para obter tamanho do popup
   const getSizeClasses = () => {
     switch (size) {
@@ -60,20 +57,28 @@ const TermPopup = ({
   // Ícones para os termos
   const termIcons = [Shield, Users, Clock, Heart];
 
+  // Função para fechar o popup
+  const handleClose = () => {
+    onClose();
+  };
+
+  // Função para aceitar
+  const handleAccept = () => {
+    onAccept();
+  };
+
+  // Função para prevenir propagação do click
+  const handleModalClick = (e) => {
+    e.stopPropagation();
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <section className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-2 sm:p-4">
-          {/* Backdrop com animação */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/20"
-            onClick={onClose}
-          />
-
-          {/* Popup principal */}
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          onClick={handleClose}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -82,91 +87,70 @@ const TermPopup = ({
               type: "spring",
               damping: 25,
               stiffness: 300,
-              duration: 0.3,
             }}
-            className={`${getSizeClasses()} bg-white rounded-2xl shadow-2xl overflow-hidden relative max-h-[90vh] overflow-y-auto`}
+            className={`${getSizeClasses()} bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-h-[90vh] flex flex-col`}
+            onClick={handleModalClick}
           >
-            {/* Cabeçalho elegante */}
-            <div
-              className={`${headerGradient} overflow-hidden sticky top-0 z-10`}
-            >
-              {/* Elementos decorativos */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
-
-              <div className="relative px-4 sm:px-8 py-4 sm:py-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-xl sm:text-2xl font-bold mb-1 sm:mb-2 drop-shadow-sm truncate">
-                      {title}
-                    </h2>
-                    <p className="text-emerald-100 font-medium text-sm sm:text-base truncate">
-                      {subtitle}
-                    </p>
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-110 group flex-shrink-0 ml-2"
-                    aria-label="Fechar popup"
-                  >
-                    <X
-                      size={20}
-                      className="sm:w-6 sm:h-6 group-hover:rotate-90 transition-transform duration-200"
-                    />
-                  </button>
+            {/* Header */}
+            <div className="bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 py-2 px-6 rounded-t-2xl flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">
+                    {title}
+                  </h2>
+                  <p className="text-emerald-100 text-sm">{subtitle}</p>
                 </div>
+                <button
+                  onClick={handleClose}
+                  className="p-2 hover:bg-white/20 rounded-full transition-all duration-200 hover:scale-110 ml-2"
+                  aria-label="Fechar popup"
+                >
+                  <X size={20} className="text-white" />
+                </button>
               </div>
             </div>
 
-            {/* Conteúdo principal */}
-            <div className="p-4 sm:p-8">
-              {/* Descrição */}
-              <div className="mb-6 sm:mb-8">
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* Description */}
+              <div className="mb-6">
                 <div className="flex items-start space-x-3 mb-4">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <CheckCircle
-                      size={16}
-                      className="sm:w-5 sm:h-5 text-white"
-                    />
+                  <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <CheckCircle size={20} className="text-white" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                       Pesquisa de Usabilidade
                     </h3>
-                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
+                    <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                       {description}
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Termos de Participação */}
-              <div
-                className={`${termsGradient} border border-blue-100 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8`}
-              >
-                <h3 className="font-semibold text-gray-900 mb-4 flex items-center text-sm sm:text-base">
-                  <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 mr-2 flex-shrink-0" />
+              {/* Terms */}
+              <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border border-blue-100 dark:border-gray-600 rounded-xl p-6 mb-6">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                  <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mr-2 flex-shrink-0" />
                   Termos de Participação
                 </h3>
-                <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-4">
                   {terms.map((term, index) => {
-                    const Icon = termIcons[index] || Shield;
+                    const Icon = termIcons[index % termIcons.length];
                     return (
                       <motion.div
                         key={index}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-start space-x-3 sm:space-x-4 group"
+                        className="flex items-start space-x-3 group"
                       >
-                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
-                          <Icon
-                            size={12}
-                            className="sm:w-4 sm:h-4 text-white"
-                          />
+                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                          <Icon size={16} className="text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-gray-700 text-xs sm:text-sm leading-relaxed">
+                        <div className="flex-1">
+                          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
                             {term}
                           </p>
                         </div>
@@ -175,26 +159,28 @@ const TermPopup = ({
                   })}
                 </div>
               </div>
+            </div>
 
-              {/* Botões */}
+            {/* Footer */}
+            <div className="py-2 px-6 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
               <div className="text-center">
-                <p className="text-gray-500 mb-4 sm:mb-6 font-medium text-sm sm:text-base">
+                <p className="text-gray-500 dark:text-gray-400 mb-4 font-medium">
                   {thankYouText}
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={onAccept}
-                    className={`px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform text-sm sm:text-base ${acceptButtonClass}`}
+                    onClick={handleAccept}
+                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl"
                   >
                     {acceptText}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={onClose}
-                    className={`px-6 sm:px-8 py-2 sm:py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all duration-300 text-sm sm:text-base ${cancelButtonClass}`}
+                    onClick={handleClose}
+                    className="px-6 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-xl font-semibold transition-all duration-300"
                   >
                     {cancelText}
                   </motion.button>
@@ -202,7 +188,7 @@ const TermPopup = ({
               </div>
             </div>
           </motion.div>
-        </section>
+        </div>
       )}
     </AnimatePresence>
   );
@@ -220,10 +206,6 @@ TermPopup.propTypes = {
   acceptText: PropTypes.string,
   cancelText: PropTypes.string,
   thankYouText: PropTypes.string,
-  headerGradient: PropTypes.string,
-  termsGradient: PropTypes.string,
-  acceptButtonClass: PropTypes.string,
-  cancelButtonClass: PropTypes.string,
   size: PropTypes.oneOf(["sm", "md", "lg"]),
 };
 
@@ -238,15 +220,16 @@ TermPopup.defaultProps = {
     "Questionário anônimo, sem coleta de dados pessoais.",
     "Participação voluntária e possibilidade de desistência.",
     "Pesquisa ética, sem riscos aos participantes.",
+    "Seus dados serão tratados com total confidencialidade e segurança.",
+    "A pesquisa visa melhorar a experiência de todos os usuários do catálogo.",
+    "Você pode interromper sua participação a qualquer momento.",
+    "Os resultados serão utilizados apenas para fins de melhoria do sistema.",
+    "Não há identificação pessoal nos dados coletados.",
+    "A participação é completamente opcional e gratuita.",
   ],
   acceptText: "Aceitar e Continuar",
   cancelText: "Voltar",
   thankYouText: "Agradecemos sua participação!",
-  headerGradient:
-    "bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700",
-  termsGradient: "bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50",
-  acceptButtonClass: "",
-  cancelButtonClass: "",
   size: "lg",
 };
 

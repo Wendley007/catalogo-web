@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { db } from "../../../services/firebaseConnection";
-import banner from "../../../assets/banner.jpg";
+import banner from "../../../assets/banner.webp";
 import BancaCard from "../../../components/BancaCard/BancaCard";
 import StatsSection from "../../../components/StatsSection";
 
@@ -76,6 +76,14 @@ const getBancasHeroData = () => ({
 // ======================================================= Página Principal de Bancas
 
 const Bancas = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const { user } = useContext(AuthContext);
   const [bancas, setBancas] = useState([]);
   const [selectedBanca, setSelectedBanca] = useState(null);
@@ -92,6 +100,8 @@ const Bancas = () => {
         const bancasData = [];
         for (const doc of snapshotBancas.docs) {
           const banca = { id: doc.id, ...doc.data() };
+          
+          // Buscar vendedores da banca
           const vendedoresSnapshot = await getDocs(
             query(collection(db, `bancas/${banca.id}/vendedores`))
           );
@@ -99,16 +109,15 @@ const Bancas = () => {
             id: doc.id,
             ...doc.data(),
           }));
-          const produtosData = banca.produtos || [];
           banca.vendedores = vendedoresData;
-          banca.produtos = produtosData;
+          
+          // Os produtos já estão no documento da banca como array
+          banca.produtos = banca.produtos || [];
+          
           bancasData.push(banca);
         }
-        // Ordenar bancas por quantidade de produtos (mais produtos primeiro)
-        const bancasOrdenadas = bancasData.sort((a, b) => 
-          (b.produtos?.length || 0) - (a.produtos?.length || 0)
-        );
-        setBancas(bancasOrdenadas);
+        setBancas(bancasData);
+        setFilteredBancas(bancasData);
       } catch (error) {
         console.error("Erro ao buscar bancas:", error);
       } finally {
@@ -119,17 +128,16 @@ const Bancas = () => {
     fetchBancas();
   }, []);
 
+  // Filtro de produtos
   useEffect(() => {
-    if (!searchProduct) {
+    if (searchProduct.trim() === "") {
       setFilteredBancas(bancas);
     } else {
-      const filtered = bancas.filter((banca) => {
-        return banca.produtos.some(
-          (produto) =>
-            produto.nome &&
-            produto.nome.toLowerCase().includes(searchProduct.toLowerCase())
-        );
-      });
+      const filtered = bancas.filter((banca) =>
+        banca.produtos?.some((produto) =>
+          produto.nome?.toLowerCase().includes(searchProduct.toLowerCase())
+        )
+      );
       setFilteredBancas(filtered);
     }
   }, [searchProduct, bancas]);
@@ -137,8 +145,6 @@ const Bancas = () => {
   const handleSelectVendedores = (bancaId) => {
     setSelectedBanca(selectedBanca === bancaId ? null : bancaId);
   };
-
-
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -152,7 +158,7 @@ const Bancas = () => {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <SEO
         title="Bancas - Feira Livre de Buritizeiro"
         description="Conheça todas as bancas da Feira Livre de Buritizeiro. Encontre vendedores, produtos e informações de contato."
@@ -172,12 +178,12 @@ const Bancas = () => {
       />
 
       {/* Seção de pesquisa */}
-      <section className="py-10 bg-gradient-to-br bg-white relative overflow-hidden">
+      <section className="py-10 bg-gradient-to-br bg-white dark:bg-gray-800 relative overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-32 left-32 w-96 h-96 bg-gradient-to-r from-blue-50 to-green-200 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-32 right-32 w-80 h-80 bg-gradient-to-r from-green-200 to-teal-200 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-green-200 to-gray-200 rounded-full blur-3xl"></div>
+          <div className="absolute top-32 left-32 w-96 h-96 bg-gradient-to-r from-blue-50 to-green-200 dark:from-blue-900/20 dark:to-green-900/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-32 right-32 w-80 h-80 bg-gradient-to-r from-green-200 to-teal-200 dark:from-green-900/20 dark:to-teal-900/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-gradient-to-r from-green-200 to-gray-200 dark:from-green-900/20 dark:to-gray-700/20 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -185,11 +191,11 @@ const Bancas = () => {
             <div className="flex-1 max-w-2xl">
               <div className="relative">
                 <Search
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400"
                   size={20}
                 />
                 <input
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-700 placeholder-gray-400 shadow-lg"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 shadow-lg bg-white dark:bg-gray-700"
                   type="text"
                   placeholder="Pesquise por um produto específico..."
                   value={searchProduct}
@@ -202,7 +208,7 @@ const Bancas = () => {
             {user && user.role === "admin" && (
               <Link
                 to="/novoperfil"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3 rounded-xl font-medium text-sm hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 dark:from-green-700 dark:to-green-800 text-white px-8 py-3 rounded-xl font-medium text-sm hover:from-green-700 hover:to-green-800 dark:hover:from-green-800 dark:hover:to-green-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Plus size={20} />
                 <span>Novo Perfil</span>
@@ -221,10 +227,10 @@ const Bancas = () => {
               transition={{ duration: 0.6 }}
               className="text-center mb-16 relative z-10"
             >
-              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
+              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
                 Explore nossas Bancas
               </h2>
-              <p className="text-xl lg:text-2xl text-gray-700 max-w-3xl mx-auto">
+              <p className="text-xl lg:text-2xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
                 Cada banca oferece produtos únicos e de qualidade
               </p>
             </motion.div>
@@ -234,10 +240,10 @@ const Bancas = () => {
                 <div className="flex items-center justify-center min-h-[400px]">
                   <div className="text-center">
                     <Loader
-                      className="animate-spin mx-auto mb-4 text-green-600"
+                      className="animate-spin mx-auto mb-4 text-green-600 dark:text-green-400"
                       size={48}
                     />
-                    <p className="text-gray-600 text-lg">
+                    <p className="text-gray-600 dark:text-gray-400 text-lg">
                       Carregando bancas...
                     </p>
                   </div>
@@ -263,12 +269,12 @@ const Bancas = () => {
                 </article>
               ) : (
                 <div className="flex items-center justify-center min-h-[400px]">
-                  <div className="bg-white/80 backdrop-blur-lg  rounded-xl p-12 shadow-xl text-center border border-white/50">
-                    <Search className="mx-auto mb-4 text-gray-400" size={64} />
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl p-12 shadow-xl text-center border border-white/50 dark:border-gray-700/50">
+                    <Search className="mx-auto mb-4 text-gray-400 dark:text-gray-500" size={64} />
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                       Nenhuma banca encontrada
                     </h3>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       Não encontramos bancas com o produto pesquisado.
                     </p>
                   </div>
@@ -283,7 +289,7 @@ const Bancas = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
-                  className="inline-flex items-center space-x-3 bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 text-white px-10 py-3 rounded-xl font-semibold hover:from-gray-800 hover:via-blue-800 hover:to-purple-800 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 text-sm"
+                  className="inline-flex items-center space-x-3 bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 dark:from-gray-100 dark:via-blue-400 dark:to-purple-400 text-white dark:text-gray-900 px-10 py-3 rounded-xl font-semibold hover:from-gray-800 hover:via-blue-800 hover:to-purple-800 dark:hover:from-gray-200 dark:hover:via-blue-300 dark:hover:to-purple-300 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 text-sm"
                 >
                   <span>Explorar Todas as Categorias</span>
                   <ChevronRight size={24} />

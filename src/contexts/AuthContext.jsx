@@ -24,13 +24,15 @@ const AuthProvider = ({ children }) => {
 
         const userData = userDoc.exists() ? userDoc.data() : {};
 
-        setUser({
+        const userInfo = {
           uid: user.uid,
           name: user.displayName || "Nome não definido",
           email: user.email,
-          photoURL: user.photoURL || "",
+          photoURL: userData.photoURL || user.photoURL || "",
           role: userData.role || "cliente",
-        });
+        };
+        console.log('AuthStateChanged - Usuário carregado:', userInfo);
+        setUser(userInfo);
       } else {
         setUser(null);
       }
@@ -43,6 +45,7 @@ const AuthProvider = ({ children }) => {
   }, []);
 
   const handleInfoUser = ({ name, email, uid, role, photoURL }) => {
+    console.log('Atualizando usuário:', { name, email, uid, role, photoURL });
     setUser({
       uid,
       name,

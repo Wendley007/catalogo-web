@@ -4,6 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight, Trash2, Upload } from "lucide-react";
 import PropTypes from "prop-types";
+import OptimizedImage from "../OptimizedImage/OptimizedImage";
 
 const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
 
@@ -120,10 +121,10 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
   if (!images || images.length === 0) {
     return (
       <section className="relative">
-        <div className="w-full h-[300px] md:h-[400px] lg:h-[500px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl shadow-2xl flex items-center justify-center">
+        <div className="w-full h-[300px] md:h-[400px] lg:h-[500px] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-2xl shadow-2xl flex items-center justify-center">
           <div className="text-center">
             <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 font-medium">Carregando carrossel...</p>
+            <p className="text-gray-600 dark:text-gray-400 font-medium">Carregando carrossel...</p>
           </div>
         </div>
       </section>
@@ -157,14 +158,15 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
               <div className="relative scroll-vertical">
                 {/* Loading skeleton */}
                 {!imageLoading[index] && (
-                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse rounded-2xl" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-700 animate-pulse rounded-2xl" />
                 )}
 
-                <img
+                <OptimizedImage
                   src={image.imageUrl}
                   alt={image.alt || `Slide ${index + 1} do carrossel`}
                   className="w-full h-[300px] md:h-[400px] lg:h-[500px] object-cover transition-transform duration-700 hover:scale-105"
-                  loading="lazy"
+                  lazy={index > 0} // Primeira imagem carrega imediatamente
+                  priority={index === 0}
                   onLoad={() => handleImageLoad(index)}
                   onError={() => handleImageError(index)}
                 />
@@ -174,7 +176,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
 
                 {/* Informações do slide */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <h3 className="text-xl md:text-2xl font-bold mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                  <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white via-green-100 to-green-200 bg-clip-text text-transparent mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     {image.title || `Slide ${index + 1}`}
                   </h3>
                   <p className="text-sm md:text-base opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
@@ -236,7 +238,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
         whileHover={{ scale: 1.1, x: -2 }}
         whileTap={{ scale: 0.9 }}
         onClick={scrollPrev}
-        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/90 hover:bg-white text-gray-800 rounded-full shadow-xl backdrop-blur-sm transition-all duration-300 z-10 flex items-center justify-center"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full shadow-xl backdrop-blur-sm transition-all duration-300 z-10 flex items-center justify-center"
         aria-label="Slide anterior"
       >
         <ChevronLeft size={20} className="md:w-6 md:h-6" />
@@ -251,7 +253,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
         whileHover={{ scale: 1.1, x: 2 }}
         whileTap={{ scale: 0.9 }}
         onClick={scrollNext}
-        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/90 hover:bg-white text-gray-800 rounded-full shadow-xl backdrop-blur-sm transition-all duration-300 z-10 flex items-center justify-center"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white/90 dark:bg-gray-800/90 hover:bg-white dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full shadow-xl backdrop-blur-sm transition-all duration-300 z-10 flex items-center justify-center"
         aria-label="Próximo slide"
       >
         <ChevronRight size={20} className="md:w-6 md:h-6" />
@@ -268,7 +270,7 @@ const ModernCarousel = ({ images, onDeleteSlide, isAdmin, onAddImage }) => {
             className={`h-2 md:h-3 rounded-full transition-all duration-300 ${
               selectedIndex === index
                 ? "w-8 md:w-10 bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg"
-                : "w-2 md:w-3 bg-gray-300 hover:bg-gray-400"
+                : "w-2 md:w-3 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500"
             }`}
             aria-label={`Ir para slide ${index + 1}`}
           />

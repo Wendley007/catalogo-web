@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import logo1 from "../../assets/logo1.png";
+import logo1 from "../../assets/logo1.webp";
 
 /**
  * Componente para o logo

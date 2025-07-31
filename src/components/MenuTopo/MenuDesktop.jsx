@@ -12,6 +12,8 @@ import {
   Edit3,
 } from "lucide-react";
 import { useUserMenu } from "./hooks";
+import defaultProfileImage from "../../assets/perfil.webp";
+import OptimizedImage from "../OptimizedImage/OptimizedImage";
 
 /**
  * Componente para item do menu de navegação
@@ -141,7 +143,7 @@ const UserMenu = ({ isOpen, onToggle }) => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 -mr-24 mt-10 w-72 bg-white rounded-xl shadow-2xl border border-gray-300 z-[9998] py-3"
+            className="absolute right-0 -mr-24 mt-10 w-72 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-300 dark:border-gray-600 z-[9998] py-3"
             role="menu"
             aria-label="Menu do usuário"
           >
@@ -167,7 +169,7 @@ const UserMenu = ({ isOpen, onToggle }) => {
                         <input
                           value={newName}
                           onChange={(e) => setNewName(e.target.value)}
-                          className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                          className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
                           placeholder="Novo nome"
                           disabled={isLoading}
                           aria-label="Editar nome do usuário"
@@ -194,7 +196,7 @@ const UserMenu = ({ isOpen, onToggle }) => {
                     ) : (
                       <>
                         <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-gray-900">
+                          <span className="font-semibold text-gray-900 dark:text-gray-100">
                             {user.name}
                           </span>
                           <span
@@ -202,10 +204,10 @@ const UserMenu = ({ isOpen, onToggle }) => {
                             aria-label="Usuário online"
                           />
                         </div>
-                        <p className="text-sm text-gray-600">{user.email}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
                         <button
                           onClick={() => setEditingName(true)}
-                          className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-700 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                          className="flex items-center space-x-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
                           aria-label="Editar nome do usuário"
                         >
                           <Edit3 size={12} aria-hidden="true" />
@@ -292,17 +294,14 @@ const MenuDesktop = ({ menuItems, user, isUserMenuOpen, toggleUserMenu }) => {
         >
           {user ? (
             <>
-              {user.photoURL ? (
-                <img
-                  src={user.photoURL}
-                  alt="Foto do usuário"
-                  className="w-9 h-9 rounded-full object-cover border-2 border-white/20"
-                />
-              ) : (
-                <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                  {user.name?.[0]?.toUpperCase() || "U"}
-                </div>
-              )}
+              <OptimizedImage
+                src={user.photoURL || defaultProfileImage}
+                alt="Foto do usuário"
+                className="w-9 h-9 rounded-full object-cover border-2 border-white/20"
+                fallback={defaultProfileImage}
+                lazy={false}
+                priority={true}
+              />
             </>
           ) : (
             <span className="text-sm font-medium">Conta</span>

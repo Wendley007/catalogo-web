@@ -11,7 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import banner from "../../assets/banner.jpg";
+import banner from "../../assets/banner.webp";
 import { db, storage } from "../../services/firebaseConnection";
 import ScrollTopoButton from "../../components/ScrollTopoButton";
 import MenuTopo from "../../components/MenuTopo/MenuTopo";
@@ -125,6 +125,14 @@ const PaginaPrincipal = () => {
   const [selectedBanca, setSelectedBanca] = useState(null);
   const [showEvaluationPopup, setShowEvaluationPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
   const [modal, setModal] = useState({
     isOpen: false,
     type: "info",
@@ -366,6 +374,8 @@ const PaginaPrincipal = () => {
         const bancasData = [];
         for (const doc of snapshotBancas.docs) {
           const banca = { id: doc.id, ...doc.data() };
+          
+          // Buscar vendedores da banca
           const vendedoresSnapshot = await getDocs(
             query(collection(db, `bancas/${banca.id}/vendedores`))
           );
@@ -374,6 +384,10 @@ const PaginaPrincipal = () => {
             ...doc.data(),
           }));
           banca.vendedores = vendedoresData;
+          
+          // Os produtos já estão no documento da banca como array
+          banca.produtos = banca.produtos || [];
+          
           bancasData.push(banca);
         }
         // Ordenar bancas por quantidade de produtos (mais produtos primeiro)
@@ -442,17 +456,17 @@ const PaginaPrincipal = () => {
   // Renderização condicional de loading
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center">
+              <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600 font-medium">Carregando Feira Livre...</p>
+          <p className="text-gray-600 dark:text-gray-400 font-medium">Carregando Feira Livre...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 scroll-smooth">
+          <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 scroll-smooth">
       <MenuTopo />
       <SEO
         title="Feira Livre de Buritizeiro - Produtos Frescos e de Qualidade"
@@ -472,7 +486,7 @@ const PaginaPrincipal = () => {
       <HeroSection {...getMainPageHeroData()} />
 
       {/* Seção Principal com Carrossel e Categorias */}
-      <section className="py-16 bg-gradient-to-br from-gray-50 to-white">
+      <section className="py-16 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Carrossel */}
@@ -497,7 +511,7 @@ const PaginaPrincipal = () => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-10">
+              <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-10">
                 Categorias em Destaque
               </h2>
 
@@ -543,7 +557,7 @@ const PaginaPrincipal = () => {
       {/* Seção de Bancas Modernizada */}
       <section
         id="bancas"
-        className="py-16 bg-gradient-to-br from-gray-50 via-white to-gray-50 scroll-to-element"
+        className="py-16 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800 scroll-to-element"
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <motion.div
@@ -552,10 +566,10 @@ const PaginaPrincipal = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
+            <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
               Conheça Nossas Bancas
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Vendedores locais com produtos de qualidade garantida
             </p>
           </motion.div>
@@ -618,8 +632,8 @@ const PaginaPrincipal = () => {
       >
         {/* Elementos decorativos */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-20 h-20 bg-white rounded-full blur-xl"></div>
-          <div className="absolute bottom-20 right-20 w-32 h-32 bg-white rounded-full blur-xl"></div>
+                        <div className="absolute top-10 left-10 w-20 h-20 bg-white dark:bg-gray-300 rounded-full blur-xl"></div>
+              <div className="absolute bottom-20 right-20 w-32 h-32 bg-white dark:bg-gray-300 rounded-full blur-xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 text-center relative">
@@ -628,7 +642,7 @@ const PaginaPrincipal = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-white via-green-100 to-green-200 bg-clip-text text-transparent mb-4">
               Venha nos Visitar!
             </h2>
             <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -638,7 +652,7 @@ const PaginaPrincipal = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Link
                 to="/localizacao"
-                className="inline-flex items-center space-x-2 bg-white text-green-700 px-8 py-2 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-white dark:bg-gray-100 text-green-700 dark:text-green-800 px-8 py-2 rounded-xl font-semibold hover:bg-gray-100 dark:hover:bg-gray-200 transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
               >
                 <MapPin size={20} />
                 <span>Ver Localização</span>

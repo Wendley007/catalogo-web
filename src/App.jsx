@@ -1,11 +1,14 @@
 import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import Rotas from "./Rotas";
 
 const App = () => {
   return (
-    <BrowserRouter>
-      <Rotas />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Rotas />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 };
 

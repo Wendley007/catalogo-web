@@ -5,13 +5,15 @@ import { FiUpload, FiTrash, FiArrowLeft } from "react-icons/fi";
 import { useForm } from "react-hook-form";
 import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import { Link } from "react-router-dom";
-import fundo from "../../../assets/fundo.jpg";
+import fundo from "../../../assets/fundo.webp";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { v4 as uuidV4 } from "uuid";
 import toast from "react-hot-toast";
 import { db } from "../../../services/firebaseConnection";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import SEO from "../../../components/SEO/SEO";
+import OptimizedImageUpload from "../../../components/OptimizedImageUpload/OptimizedImageUpload";
+import { optimizeImage } from "../../../utils/imageOptimizer";
 
 const ImageUploadButton = ({ onChange }) => (
   <label className="relative inline-flex items-center justify-center w-48 h-20 md:w-48 border-2 border-gray-300 rounded-lg overflow-hidden transition duration-300 ease-in-out hover:bg-gray-800 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-gray-500">
@@ -31,6 +33,14 @@ const ImageUploadButton = ({ onChange }) => (
 );
 
 const NovoProdutoForm = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const { user } = useContext(AuthContext);
   const [categorias, setCategorias] = useState([]);
   const [novaCategoria, setNovaCategoria] = useState("");
@@ -75,26 +85,19 @@ const NovoProdutoForm = () => {
       />
     </div>
   );
-  const handleProdutoFile = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const image = e.target.files[0];
-
-      // Lista de formatos permitidos
-      const formatosPermitidos = [
-        "image/jpeg",
-        "image/png",
-        "image/jpg",
-        "image/webp",
-        "image/svg+xml",
-      ];
-
-      if (formatosPermitidos.includes(image.type)) {
-        setImagemProduto(image);
-      } else {
-        alert(
-          "Envie uma imagem nos formatos jpeg, png, jpg, webp ou svg para o produto!"
-        );
-      }
+  const handleOptimizedUpload = async (optimizedImages) => {
+    if (optimizedImages.length > 0) {
+      const optimizedImage = optimizedImages[0];
+      setImagemProduto(optimizedImage.optimized);
+      
+      toast.success(`Imagem do produto otimizada! ${optimizedImage.compressionRatio}% menor que o original.`);
+      
+      console.log('Produto otimizado:', {
+        originalSize: `${(optimizedImage.originalSize / 1024).toFixed(1)}KB`,
+        optimizedSize: `${(optimizedImage.size / 1024).toFixed(1)}KB`,
+        compressionRatio: `${optimizedImage.compressionRatio}%`,
+        format: optimizedImage.format
+      });
     }
   };
 
@@ -233,7 +236,15 @@ const NovoProdutoForm = () => {
                 />
               ) : (
                 <div className="flex justify-center">
-                  <ImageUploadButton onChange={handleProdutoFile} />
+                  <OptimizedImageUpload
+                    onUpload={handleOptimizedUpload}
+                    multiple={false}
+                    maxFiles={1}
+                    maxFileSize={5 * 1024 * 1024} // 5MB para produtos
+                    showPreview={false}
+                    showProgress={true}
+                    className="w-full max-w-xs"
+                  />
                 </div>
               )}
             </div>

@@ -34,7 +34,7 @@ export function Input({
       {label && (
         <label 
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-200 mb-2"
+          className="block text-sm font-medium text-gray-200 dark:text-gray-300 mb-2"
         >
           {label}
           {required && <span className="text-red-400 ml-1">*</span>}
@@ -47,11 +47,11 @@ export function Input({
           id={inputId}
           className={`
             w-full px-4 py-3 rounded-lg border-2 transition-all duration-200
-            bg-white/10 backdrop-blur-sm text-white placeholder-gray-300
+            bg-white/10 dark:bg-gray-700/50 backdrop-blur-sm text-white placeholder-gray-300 dark:placeholder-gray-400
             focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400
             ${error 
               ? "border-red-400 focus:border-red-400 focus:ring-red-500/50" 
-              : "border-gray-600 hover:border-gray-500"
+              : "border-gray-600 dark:border-gray-500 hover:border-gray-500 dark:hover:border-gray-400"
             }
             ${disabled ? "opacity-50 cursor-not-allowed" : ""}
           `}
@@ -73,9 +73,9 @@ export function Input({
             disabled={disabled}
           >
             {showPassword ? (
-              <EyeOff className="text-gray-400 hover:text-gray-300 transition-colors" size={18} />
+              <EyeOff className="text-gray-400 dark:text-gray-500 hover:text-gray-300 dark:hover:text-gray-400 transition-colors" size={18} />
             ) : (
-              <Eye className="text-gray-400 hover:text-gray-300 transition-colors" size={18} />
+              <Eye className="text-gray-400 dark:text-gray-500 hover:text-gray-300 dark:hover:text-gray-400 transition-colors" size={18} />
             )}
           </button>
         )}

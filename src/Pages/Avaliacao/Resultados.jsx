@@ -6,7 +6,7 @@ import { Chart as ChartJS, Title, Tooltip, Legend, ArcElement } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { motion } from "framer-motion";
 import MenuTopo from "../../components/MenuTopo/MenuTopo";
-import fundo from "../../assets/fundo.jpg";
+import fundo from "../../assets/fundo.webp";
 import Footer from "../../components/Footer";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -17,6 +17,14 @@ import SEO from "../../components/SEO/SEO";
 ChartJS.register(Title, Tooltip, Legend, ArcElement, ChartDataLabels);
 
 const Resultados = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const [avaliacoes, setAvaliacoes] = useState([]);
   const [loading, setLoading] = useState(true);
 

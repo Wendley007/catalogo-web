@@ -7,13 +7,16 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import { Link } from "react-router-dom";
-import fundo from "../../../assets/fundo.jpg";
+import fundo from "../../../assets/fundo.webp";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { v4 as uuidV4 } from "uuid";
 import toast from "react-hot-toast";
 import { db } from "../../../services/firebaseConnection";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import SEO from "../../../components/SEO/SEO";
+import OptimizedImageUpload from "../../../components/OptimizedImageUpload/OptimizedImageUpload";
+import { optimizeImage } from "../../../utils/imageOptimizer";
+import defaultProfileImage from "../../../assets/perfil.webp";
 
 const NovoVendedorSchema = yup.object().shape({
   nome: yup.string().required("O nome do vendedor é obrigatório."),
@@ -43,6 +46,14 @@ const ImageUploadButton = ({ onChange }) => (
 );
 
 const NovoVendedorForm = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const { user } = useContext(AuthContext);
   const [bancas, setBancas] = useState([]);
   const [novaBanca, setNovaBanca] = useState("");
@@ -84,7 +95,7 @@ const NovoVendedorForm = () => {
       </button>
       <div className="rounded-full overflow-hidden w-36 h-36">
         <img
-          src={item.previewUrl}
+          src={item.previewUrl || defaultProfileImage}
           className="w-full h-full object-cover"
           alt="Imagem do vendedor"
         />
@@ -92,15 +103,19 @@ const NovoVendedorForm = () => {
     </div>
   );
 
-  const handleVendedorFile = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const image = e.target.files[0];
-
-      if (image.type === "image/jpeg" || image.type === "image/png") {
-        setImagemVendedor(image);
-      } else {
-        toast.error("Envie uma imagem jpeg ou png para o vendedor!");
-      }
+  const handleOptimizedUpload = async (optimizedImages) => {
+    if (optimizedImages.length > 0) {
+      const optimizedImage = optimizedImages[0];
+      setImagemVendedor(optimizedImage.optimized);
+      
+      toast.success(`Imagem otimizada! ${optimizedImage.compressionRatio}% menor que o original.`);
+      
+      console.log('Imagem otimizada:', {
+        originalSize: `${(optimizedImage.originalSize / 1024).toFixed(1)}KB`,
+        optimizedSize: `${(optimizedImage.size / 1024).toFixed(1)}KB`,
+        compressionRatio: `${optimizedImage.compressionRatio}%`,
+        format: optimizedImage.format
+      });
     }
   };
 
@@ -250,7 +265,15 @@ const NovoVendedorForm = () => {
                 />
               ) : (
                 <div className="flex justify-center">
-                  <ImageUploadButton onChange={handleVendedorFile} />
+                  <OptimizedImageUpload
+                    onUpload={handleOptimizedUpload}
+                    multiple={false}
+                    maxFiles={1}
+                    maxFileSize={2 * 1024 * 1024} // 2MB para perfil
+                    showPreview={false}
+                    showProgress={true}
+                    className="w-full max-w-xs"
+                  />
                 </div>
               )}
             </div>

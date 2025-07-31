@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo.webp";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../../components/Input";
-import fundo from "../../assets/fundo.jpg";
+import fundo from "../../assets/fundo.webp";
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -27,6 +27,14 @@ const schema = z.object({
 });
 
 const Login = () => {
+  // Adicionar classe auth-page para remover espaçamento
+  useEffect(() => {
+    document.body.classList.add('auth-page');
+    return () => {
+      document.body.classList.remove('auth-page');
+    };
+  }, []);
+
   const { handleInfoUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const {
@@ -106,12 +114,21 @@ const Login = () => {
         );
       } else {
         const userData = userDoc.data();
+        
+        // Atualizar photoURL se o usuário do Google tiver uma nova foto
+        if (user.photoURL && user.photoURL !== userData.photoURL) {
+          await setDoc(userDocRef, {
+            ...userData,
+            photoURL: user.photoURL,
+          }, { merge: true });
+        }
+        
         handleInfoUser({
           name: user.displayName,
           email: user.email,
           uid: user.uid,
           role: userData.role || "cliente",
-          photoURL: userData.photoURL || "",
+          photoURL: user.photoURL || userData.photoURL || "",
         });
 
         setMessage("Bem-vindo(a) de volta!");

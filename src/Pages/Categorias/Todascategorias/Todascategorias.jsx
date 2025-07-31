@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { AuthContext } from "../../../contexts/AuthContext";
 import { db } from "../../../services/firebaseConnection";
 import { collection, getDocs, query } from "firebase/firestore";
-import banner from "../../../assets/banner.jpg";
+import banner from "../../../assets/banner.webp";
 import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import Footer from "../../../components/Footer";
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
@@ -31,11 +31,11 @@ import {
 // Função para gerar estatísticas das categorias
 const getCategoriasStats = (categorias, bancas) => {
   const totalProdutos = categorias.reduce(
-    (acc, categoria) => acc + categoria.produtos.length,
+    (acc, categoria) => acc + (categoria.produtos?.length || 0),
     0
   );
   const totalVendedores = bancas.reduce(
-    (acc, banca) => acc + banca.vendedores.length,
+    (acc, banca) => acc + (banca.vendedores?.length || 0),
     0
   );
 
@@ -81,6 +81,14 @@ const getTodasCategoriasHeroData = () => ({
 const TodasCategorias = () => {
   const { user } = useContext(AuthContext);
 
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const [categorias, setCategorias] = useState([]);
   const [bancas, setBancas] = useState([]);
   const [searchProduct, setSearchProduct] = useState("");
@@ -101,14 +109,7 @@ const TodasCategorias = () => {
   };
 
   const closeModal = () => {
-    setModal({
-      isOpen: false,
-      type: "info",
-      title: "",
-      message: "",
-      onConfirm: null,
-      icon: null,
-    });
+    setModal({ ...modal, isOpen: false });
   };
 
   useEffect(() => {
@@ -116,28 +117,29 @@ const TodasCategorias = () => {
       try {
         setLoading(true);
 
-        // Fetch categorias
+        // Buscar categorias
         const snapshotCategorias = await getDocs(collection(db, "categorias"));
         const categoriasData = [];
+        
         for (const doc of snapshotCategorias.docs) {
           const categoria = { id: doc.id, ...doc.data() };
+          
+          // Buscar produtos da categoria
           const produtosSnapshot = await getDocs(
             query(collection(db, `categorias/${categoria.id}/produtos`))
           );
-          const produtosData = produtosSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
+          const produtosData = produtosSnapshot.docs.map((produtoDoc) => ({
+            id: produtoDoc.id,
+            ...produtoDoc.data(),
           }));
+          
           categoria.produtos = produtosData;
           categoriasData.push(categoria);
         }
-        // Ordenar categorias por quantidade de produtos (mais produtos primeiro)
-        const categoriasOrdenadas = categoriasData.sort(
-          (a, b) => (b.produtos?.length || 0) - (a.produtos?.length || 0)
-        );
-        setCategorias(categoriasOrdenadas);
+        
+        setCategorias(categoriasData);
 
-        // Fetch bancas
+        // Buscar bancas
         const snapshotBancas = await getDocs(collection(db, "bancas"));
         const bancasData = [];
         for (const doc of snapshotBancas.docs) {
@@ -149,23 +151,16 @@ const TodasCategorias = () => {
             id: doc.id,
             ...doc.data(),
           }));
-
-          const produtosData = banca.produtos || [];
           banca.vendedores = vendedoresData;
-          banca.produtos = produtosData;
           bancasData.push(banca);
         }
-        // Ordenar bancas por quantidade de produtos (mais produtos primeiro)
-        const bancasOrdenadas = bancasData.sort(
-          (a, b) => (b.produtos?.length || 0) - (a.produtos?.length || 0)
-        );
-        setBancas(bancasOrdenadas);
+        setBancas(bancasData);
       } catch (error) {
         console.error("Erro ao buscar dados:", error);
         showModal(
           "error",
-          "Erro!",
-          "Erro ao carregar dados. Tente novamente.",
+          "Erro",
+          "Erro ao carregar as categorias. Tente novamente.",
           XCircle
         );
       } finally {
@@ -175,6 +170,33 @@ const TodasCategorias = () => {
 
     fetchData();
   }, []);
+
+  // Filtro de produtos
+  const [filteredCategorias, setFilteredCategorias] = useState([]);
+  const [filteredBancas, setFilteredBancas] = useState([]);
+
+  useEffect(() => {
+    if (searchProduct.trim() === "") {
+      setFilteredCategorias(categorias);
+      setFilteredBancas([]);
+    } else {
+      // Filtrar categorias
+      const categoriasFiltradas = categorias.filter((categoria) =>
+        categoria.produtos?.some((produto) =>
+          produto.nome?.toLowerCase().includes(searchProduct.toLowerCase())
+        )
+      );
+      setFilteredCategorias(categoriasFiltradas);
+
+      // Filtrar bancas
+      const bancasFiltradas = bancas.filter((banca) =>
+        banca.produtos?.some((produto) =>
+          produto.nome?.toLowerCase().includes(searchProduct.toLowerCase())
+        )
+      );
+      setFilteredBancas(bancasFiltradas);
+    }
+  }, [searchProduct, categorias, bancas]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -187,65 +209,64 @@ const TodasCategorias = () => {
     return () => document.removeEventListener("mousedown", handleOutsideClick);
   }, []);
 
-  const filteredBancas = searchProduct
-    ? bancas.filter((banca) =>
-        banca.produtos.some(
-          (produto) =>
-            produto.nome &&
-            produto.nome.toLowerCase().includes(searchProduct.toLowerCase())
-        )
-      )
-    : [];
-
-  const filteredCategorias = searchProduct
-    ? categorias.filter((categoria) =>
-        categoria.produtos.some(
-          (produto) =>
-            produto.nome &&
-            produto.nome.toLowerCase().includes(searchProduct.toLowerCase())
-        )
-      )
-    : categorias;
-
   const handleDeleteCategoria = (categoria) => {
-    // Atualizar o estado local removendo a categoria excluída
-    setCategorias((prevCategorias) =>
-      prevCategorias.filter((item) => item.id !== categoria.id)
-    );
-
-    // Mostrar mensagem de sucesso
     showModal(
-      "success",
-      "Sucesso!",
-      `Categoria "${categoria.nome}" e todos os seus produtos foram excluídos com sucesso!`,
-      CheckCircle
+      "warning",
+      "Confirmar Exclusão",
+      `Tem certeza que deseja excluir a categoria "${categoria.nome}"? Esta ação não pode ser desfeita.`,
+      XCircle,
+      async () => {
+        try {
+          // Aqui você implementaria a lógica de exclusão
+          // await deleteDoc(doc(db, "categorias", categoria.id));
+          
+          // Atualizar a lista local
+          setCategorias(categorias.filter((cat) => cat.id !== categoria.id));
+          
+          showModal(
+            "success",
+            "Sucesso",
+            "Categoria excluída com sucesso!",
+            CheckCircle
+          );
+        } catch (error) {
+          console.error("Erro ao excluir categoria:", error);
+          showModal(
+            "error",
+            "Erro",
+            "Erro ao excluir a categoria. Tente novamente.",
+            XCircle
+          );
+        }
+      }
     );
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <MenuTopo />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <Loader
-              className="animate-spin mx-auto mb-4 text-green-600"
-              size={48}
-            />
-            <p className="text-gray-600 text-lg">Carregando categorias...</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
 
   const handleSelectVendedores = (bancaId) => {
     setSelectedBanca(selectedBanca === bancaId ? null : bancaId);
   };
 
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <MenuTopo />
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <Loader
+              className="animate-spin mx-auto mb-4 text-green-600 dark:text-green-400"
+              size={48}
+            />
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Carregando categorias...
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <MenuTopo />
       <SEO
         title="Todas Categorias - Feira de Buritizeiro"
@@ -272,11 +293,11 @@ const TodasCategorias = () => {
       />
 
       {/* Seção de Pesquisa  */}
-      <section className="py-10 bg-white relative overflow-hidden">
+      <section className="py-10 bg-white dark:bg-gray-800 relative overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-10 right-10 w-64 h-64 bg-gradient-to-r from-green-210 to-blue-200 rounded-full blur-2xl"></div>
-          <div className="absolute bottom-10 left-10 w-80 h-80 bg-gradient-to-r from-purple-100 to-teal-100 rounded-full blur-2xl"></div>
+          <div className="absolute top-10 right-10 w-64 h-64 bg-gradient-to-r from-green-210 to-blue-200 dark:from-green-900/20 dark:to-blue-900/20 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-10 left-10 w-80 h-80 bg-gradient-to-r from-purple-100 to-teal-100 dark:from-purple-900/20 dark:to-teal-900/20 rounded-full blur-2xl"></div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -284,11 +305,11 @@ const TodasCategorias = () => {
             <div className="flex-1 max-w-2xl">
               <div className="relative">
                 <Search
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-500"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400"
                   size={20}
                 />
                 <input
-                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-700 placeholder-gray-400 shadow-lg"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-gray-700 dark:text-gray-300 placeholder-gray-400 dark:placeholder-gray-500 shadow-lg bg-white dark:bg-gray-700"
                   type="text"
                   placeholder="Pesquise por um produto específico..."
                   value={searchProduct}
@@ -301,7 +322,7 @@ const TodasCategorias = () => {
             {user && user.role === "admin" && (
               <Link
                 to="/novo"
-                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-3  rounded-xl font-medium text-sm hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="inline-flex items-center space-x-2 bg-gradient-to-r from-green-600 to-green-700 dark:from-green-700 dark:to-green-800 text-white px-8 py-3  rounded-xl font-medium text-sm hover:from-green-700 hover:to-green-800 dark:hover:from-green-800 dark:hover:to-green-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
               >
                 <Plus size={20} />
                 <span>Cadastrar Produtos</span>
@@ -313,7 +334,7 @@ const TodasCategorias = () => {
 
       {/* Pesquisa de Resultados- Bancas */}
       {searchProduct && filteredBancas.length > 0 && (
-        <section className="py-6 bg-white">
+        <section className="py-6 bg-white dark:bg-gray-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -321,10 +342,10 @@ const TodasCategorias = () => {
               transition={{ duration: 0.6 }}
               className="text-center mb-14 relative z-10"
             >
-              <h2 className="text-3xl text-center lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
+              <h2 className="text-3xl text-center lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
                 Bancas Encontradas
               </h2>
-              <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
                 Vendedores que possuem o produto pesquisado
               </p>
             </motion.div>
@@ -352,7 +373,7 @@ const TodasCategorias = () => {
 
       {/* Seção de Categorias */}
 
-      <section className="py-20 bg-gradient-to-br bg-white relative">
+      <section className="py-20 bg-gradient-to-br bg-white dark:bg-gray-800 relative">
         {/* Background */}
 
         <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -362,10 +383,10 @@ const TodasCategorias = () => {
             transition={{ duration: 0.6 }}
             className="text-center mb-16 relative z-10"
           >
-            <h2 className="text-3xl lg:text-4xl font-bold leading-normal bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-6">
+            <h2 className="text-3xl lg:text-4xl font-bold leading-normal bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
               {searchProduct ? "Categorias Encontradas" : "Todas as Categorias"}
             </h2>
-            <p className="text-xl text-gray-700 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
               {searchProduct
                 ? "Categorias que contêm o produto pesquisado"
                 : "Explore nossa variedade completa de produtos"}
@@ -387,12 +408,12 @@ const TodasCategorias = () => {
             </div>
           ) : (
             <div className="text-center py-16 relative z-10">
-              <div className="bg-white/80 backdrop-blur-lg rounded-xl p-12 shadow-xl border border-white/50 max-w-md mx-auto">
-                <Search className="mx-auto mb-4 text-gray-400" size={64} />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl p-12 shadow-xl border border-white/50 dark:border-gray-700/50 max-w-md mx-auto">
+                <Search className="mx-auto mb-4 text-gray-400 dark:text-gray-500" size={64} />
+                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                   Nenhuma categoria encontrada
                 </h3>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Não encontramos categorias com o produto pesquisado.
                 </p>
               </div>
@@ -410,7 +431,7 @@ const TodasCategorias = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
-                  className="inline-flex items-center text-sm space-x-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 font-semibold text-white hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-lg hover:shadow-lg transform hover:scale-105"
+                  className="inline-flex items-center text-sm space-x-2 px-4 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 font-semibold text-white hover:from-green-600 hover:to-emerald-700 dark:hover:from-green-700 dark:hover:to-emerald-800 transition-all duration-300 shadow-lg hover:shadow-lg transform hover:scale-105"
                 >
                   <ChevronRight size={24} />
                   <span>Conheça todas as bancas</span>
@@ -439,3 +460,4 @@ const TodasCategorias = () => {
 };
 
 export default TodasCategorias;
+

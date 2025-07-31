@@ -14,8 +14,8 @@ import {
   Award,
   Leaf,
 } from "lucide-react";
-import logo1 from "../assets/logo1.png";
-import prefeituraLogo from "../assets/logo_Buritizeiro.jpg";
+import logo1 from "../assets/logo1.webp";
+import prefeituraLogo from "../assets/logo_Buritizeiro.webp";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();

@@ -2,11 +2,12 @@ import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import banner from "../../../assets/banner.jpg";
+import banner from "../../../assets/banner.webp";
 import { FaWhatsapp } from "react-icons/fa";
 import { db } from "../../../services/firebaseConnection";
 import { AuthContext } from "../../../contexts/AuthContext";
-
+import OptimizedImageUpload from "../../../components/OptimizedImageUpload/OptimizedImageUpload";
+import defaultProfileImage from "../../../assets/perfil.webp";
 import MenuTopo from "../../../components/MenuTopo/MenuTopo";
 import Footer from "../../../components/Footer";
 import ScrollTopoButton from "../../../components/ScrollTopoButton";
@@ -88,6 +89,14 @@ const getVendedorHeroData = (banca) => ({
 // ======================================================= Página do vendedor
 
 const Vendedor = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const { bancaId } = useParams();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -343,6 +352,21 @@ const Vendedor = () => {
     setShowEditVendedorModal(true);
   };
 
+  // Função para otimizar upload de imagem do vendedor
+  const handleOptimizedVendedorUpload = async (optimizedImages) => {
+    if (optimizedImages.length > 0) {
+      const optimizedImage = optimizedImages[0];
+      setNewVendedorImage(optimizedImage.optimized);
+
+      console.log("Imagem do vendedor otimizada:", {
+        originalSize: `${(optimizedImage.originalSize / 1024).toFixed(1)}KB`,
+        optimizedSize: `${(optimizedImage.size / 1024).toFixed(1)}KB`,
+        compressionRatio: `${optimizedImage.compressionRatio}%`,
+        format: optimizedImage.format,
+      });
+    }
+  };
+
   // Função para cancelar edições
   const cancelEdit = () => {
     setShowEditVendedorModal(false);
@@ -558,7 +582,7 @@ const Vendedor = () => {
 
   if (isLoading) {
     return (
-      <section className="min-h-screen bg-gray-50">
+      <section className="min-h-screen bg-gray-50 dark:bg-gray-900">
         <MenuTopo />
         <div className="flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
@@ -566,7 +590,7 @@ const Vendedor = () => {
               className="animate-spin mx-auto mb-4 text-green-600"
               size={48}
             />
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
               Carregando informações da banca...
             </p>
           </div>
@@ -577,7 +601,7 @@ const Vendedor = () => {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <MenuTopo />
       <SEO
         title={`${banca?.nome} - Vendedores`}
@@ -603,15 +627,15 @@ const Vendedor = () => {
         >
           <div className="flex flex-col sm:flex-row gap-4">
             {isEditingBancaName ? (
-              <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-6 border border-white/50 max-w-md w-full">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-lg p-6 border border-white/50 dark:border-gray-700/50 max-w-md w-full">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 text-center">
                   Editar nome da Banca
                 </h3>
                 <input
                   type="text"
                   value={newBancaName}
                   onChange={(e) => setNewBancaName(e.target.value)}
-                  className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4"
+                  className="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent mb-4 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                   placeholder="Nome da banca"
                 />
                 <div className="flex gap-3 justify-center">
@@ -668,7 +692,7 @@ const Vendedor = () => {
       />
 
       {/* Main Content */}
-      <section className="py-20 bg-gradient-to-br bg-white from-slate-50 relative overflow-hidden">
+      <section className="py-20 bg-gradient-to-br bg-white dark:bg-gray-800 from-slate-50 dark:from-gray-700 relative overflow-hidden">
         {/* Background */}
 
         <article className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
@@ -680,9 +704,9 @@ const Vendedor = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-16"
           >
-            <h3 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent text-center mb-16">
-              Nossos Vendedores
-            </h3>
+            <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-10 text-center">
+              Perfil do Vendedor
+            </h2>
 
             <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {vendedores.map((vendedor, index) => (
@@ -691,10 +715,10 @@ const Vendedor = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50"
+                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50 dark:border-gray-700/50"
                 >
                   {/* Card do vendedor*/}
-                  <div className="bg-gradient-to-r bg-white via-teal-50 to-green-100 p-6 text-center">
+                  <div className="bg-gradient-to-r bg-white dark:bg-gray-700 via-teal-50 dark:via-teal-900/20 to-green-100 dark:to-green-900/20 p-6 text-center">
                     <div className="w-36 h-36 mx-auto relative">
                       <div className="absolute inset-0 bg-gradient-to-r from-green-300 to-blue-300 rounded-full blur-lg"></div>
                       {vendedor.images && vendedor.images.length > 0 ? (
@@ -704,18 +728,20 @@ const Vendedor = () => {
                           className="relative w-full h-full rounded-full object-cover shadow-2xl border-1 border-white"
                         />
                       ) : (
-                        <div className="relative w-full h-full rounded-full bg-gradient-to-r from-gray-300 to-gray-400 shadow-2xl border-1 border-white flex items-center justify-center">
-                          <User size={48} className="text-gray-600" />
-                        </div>
+                        <img
+                          src={defaultProfileImage}
+                          alt={`Imagem padrão de perfil`}
+                          className="relative w-full h-full rounded-full object-cover shadow-2xl border-1 border-white"
+                        />
                       )}
                     </div>
                   </div>
 
                   <div className="p-8 text-center">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                       {vendedor.nome}
                     </h3>
-                    <p className="text-gray-600 text-lg mb-4 flex items-center justify-center space-x-2">
+                    <p className="text-gray-600 dark:text-gray-400 text-lg mb-4 flex items-center justify-center space-x-2">
                       <MapPin size={16} />
                       <span>{vendedor.cidade}</span>
                     </p>
@@ -763,8 +789,8 @@ const Vendedor = () => {
               transition={{ duration: 0.6, delay: 0.3 }}
               className="mb-16"
             >
-              <div className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-lg p-8 border border-white/50">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl shadow-lg p-8 border border-white/50 dark:border-gray-700/50">
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
                   Gerenciar Produtos
                 </h3>
 
@@ -780,7 +806,7 @@ const Vendedor = () => {
                       id="produto"
                       onChange={handleProdutoChange}
                       value={produtoSelecionado}
-                      className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                      className="w-full border-2 border-gray-300 dark:border-gray-600 rounded-xl px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     >
                       <option value="">Selecione um produto...</option>
                       {produtosExistentes
@@ -819,8 +845,8 @@ const Vendedor = () => {
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl mt-32 text-center lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 bg-clip-text text-transparent mb-12">
-              Produtos Disponíveis
+            <h2 className="text-3xl mt-32 text-center lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-12">
+              Produtos do Vendedor
             </h2>
 
             {produtosAdicionados.length > 0 ? (
@@ -831,7 +857,7 @@ const Vendedor = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
-                    className="bg-white/80 backdrop-blur-lg rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50"
+                    className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50 dark:border-gray-700/50"
                   >
                     <div className="relative">
                       {produto.images && produto.images.length > 0 && (
@@ -845,7 +871,7 @@ const Vendedor = () => {
                     </div>
 
                     <div className="p-4">
-                      <h3 className="text-lg font-bold text-gray-900 text-center">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 text-center">
                         {produto.nome}
                       </h3>
 
@@ -864,15 +890,15 @@ const Vendedor = () => {
               </div>
             ) : (
               <div className="text-center py-16">
-                <div className="bg-white/80 backdrop-blur-lg rounded-xl p-12 shadow-lg border border-white/50 max-w-md mx-auto">
+                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-xl p-12 shadow-lg border border-white/50 dark:border-gray-700/50 max-w-md mx-auto">
                   <ShoppingBag
-                    className="mx-auto mb-4 text-gray-400"
+                    className="mx-auto mb-4 text-gray-400 dark:text-gray-500"
                     size={64}
                   />
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                     Nenhum produto disponível
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 dark:text-gray-400">
                     Esta banca ainda não possui produtos cadastrados.
                   </p>
                 </div>
@@ -936,60 +962,64 @@ const Vendedor = () => {
         size="xl"
       >
         <div className="text-center p-6 max-h-[80vh] overflow-y-auto">
-          <h3 className="text-xl font-bold text-gray-900 mb-6">
+          <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-6">
             Editar Vendedor
           </h3>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
                 Nome do Vendedor
               </label>
               <input
                 type="text"
                 value={newVendedorName}
                 onChange={(e) => setNewVendedorName(e.target.value)}
-                className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 placeholder="Nome do vendedor"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
                 Cidade
               </label>
               <input
                 type="text"
                 value={newVendedorCity}
                 onChange={(e) => setNewVendedorCity(e.target.value)}
-                className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 placeholder="Cidade"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2 text-left">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-left">
                 Foto de Perfil
               </label>
 
               {/* Mostrar imagem atual se existir */}
-              {selectedVendedor?.images &&
-                selectedVendedor.images.length > 0 && (
-                  <div className="mb-3">
-                    <p className="text-xs text-gray-600 mb-2">Foto atual:</p>
-                    <img
-                      src={selectedVendedor.images[0].url}
-                      alt="Foto atual"
-                      className="w-20 h-20 object-cover rounded-lg mx-auto"
-                    />
-                  </div>
-                )}
+              <div className="mb-3">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+                  Foto atual:
+                </p>
+                <img
+                  src={selectedVendedor?.images && selectedVendedor.images.length > 0 
+                    ? selectedVendedor.images[0].url 
+                    : defaultProfileImage}
+                  alt="Foto atual"
+                  className="w-20 h-20 object-cover rounded-lg mx-auto"
+                />
+              </div>
 
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setNewVendedorImage(e.target.files[0])}
-                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              <OptimizedImageUpload
+                onUpload={handleOptimizedVendedorUpload}
+                multiple={false}
+                maxFiles={1}
+                maxFileSize={2 * 1024 * 1024} // 2MB para perfil
+                showPreview={false}
+                showProgress={true}
+                className="w-full"
               />
               {newVendedorImage && (
                 <div className="mt-2">
@@ -1015,7 +1045,7 @@ const Vendedor = () => {
                         onChange={(e) =>
                           setRemoveVendedorImage(e.target.checked)
                         }
-                        className="rounded border-gray-300 text-red-600 focus:ring-red-500"
+                        className="rounded border-gray-300 dark:border-gray-600 text-red-600 focus:ring-red-500 bg-white dark:bg-gray-700"
                       />
                       <span>Remover foto atual</span>
                     </label>

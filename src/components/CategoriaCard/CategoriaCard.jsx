@@ -102,7 +102,7 @@ const CategoriaCard = ({
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: index * 0.1 }}
           whileHover={{ y: -8, scale: 1.02 }}
-          className="group bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-gray-100/50 hover:border-green-200"
+          className="group bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-gray-100/50 dark:border-gray-700/50 hover:border-green-200 dark:hover:border-green-600"
         >
           <div className="relative overflow-hidden">
             <img
@@ -114,7 +114,7 @@ const CategoriaCard = ({
 
                       {/* Etiqueta simples */}
           <div className="absolute top-4 left-4">
-            <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-white/20"></div>
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-white/20 dark:border-gray-700/20"></div>
           </div>
 
           {/* Admin gerenciamento - variante compact */}
@@ -144,7 +144,7 @@ const CategoriaCard = ({
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
               <Link
                 to={`/categorias/${categoria.id}`}
-                className="bg-white/95 backdrop-blur-sm text-gray-900 px-6 py-3 rounded-xl font-semibold hover:bg-white transition-all duration-300 text-sm shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
+                className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm text-gray-900 dark:text-gray-100 px-6 py-3 rounded-xl font-semibold hover:bg-white dark:hover:bg-gray-700 transition-all duration-300 text-sm shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center space-x-2"
               >
                 <span>Ver Produtos</span>
                 <ChevronRight size={16} />
@@ -155,14 +155,14 @@ const CategoriaCard = ({
           <div className="p-4">
             <div className="mb-3">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 </div>
-                <h3 className="font-bold text-gray-900 text-xl">
+                <h3 className="font-bold text-gray-900 dark:text-gray-100 text-xl">
                   {categoria.nome}
                 </h3>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
                 {categoria.description ||
                   `${categoria.produtos?.length || 0} produtos disponíveis`}
               </p>
@@ -202,7 +202,7 @@ const CategoriaCard = ({
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: index * 0.1 }}
-        className="group bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50"
+        className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-white/50 dark:border-gray-700/50"
       >
         <div className="relative">
           <img
@@ -214,7 +214,7 @@ const CategoriaCard = ({
 
           {/* Etiqueta simples */}
           <div className="absolute top-4 left-4">
-            <div className="bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-white/20"></div>
+            <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full px-3 py-1 shadow-lg border border-white/20 dark:border-gray-700/20"></div>
           </div>
 
           {/* Admin gerenciamento */}
@@ -243,7 +243,7 @@ const CategoriaCard = ({
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
             <Link
               to={`/categorias/${categoria.id}`}
-              className="bg-white text-gray-900 px-6 py-2 rounded-xl font-semibold flex items-center space-x-2 hover:bg-gray-100 transition-colors shadow-lg transform hover:scale-105"
+              className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-6 py-2 rounded-xl font-semibold flex items-center space-x-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors shadow-lg transform hover:scale-105"
             >
               <svg
                 className="w-5 h-5"
@@ -270,11 +270,11 @@ const CategoriaCard = ({
 
           {/* Nomes das Categorias*/}
           <div className="absolute bottom-0 left-0 right-0 p-6">
-            <div className="rounded-xl p-2 shadow-lg transition-colors bg-white/95 group-hover:bg-gray-200">
-              <h3 className="text-xl font-bold text-gray-900 text-center group-hover:text-black transition-colors">
+            <div className="rounded-xl p-2 shadow-lg transition-colors bg-white/95 dark:bg-gray-800/95 group-hover:bg-gray-200 dark:group-hover:bg-gray-700">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 text-center group-hover:text-black dark:group-hover:text-white transition-colors">
                 {categoria.nome}
               </h3>
-              <p className="text-gray-600 text-center text-sm mt-1">
+              <p className="text-gray-600 dark:text-gray-400 text-center text-sm mt-1">
                 {categoria.produtos?.length || 0} produto
                 {(categoria.produtos?.length || 0) !== 1 ? "s" : ""}
               </p>

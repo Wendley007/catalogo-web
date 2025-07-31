@@ -6,6 +6,7 @@ import Logo from "./Logo";
 import FeiraStatus from "./ContagemRegressiva";
 import MenuDesktop from "./MenuDesktop";
 import MenuMobile from "./MenuMobile";
+import ThemeToggleEnhanced from "../ThemeToggleEnhanced";
 
 /**
  * Componente principal do MenuTopo
@@ -41,7 +42,7 @@ const MenuTopo = () => {
 
   return (
     <>
-      <header className="bg-gradient-to-r from-emerald-700 via-green-600 to-green-700 shadow-lg sticky top-0 z-40">
+      <header className="bg-gradient-to-r from-emerald-700 via-green-600 to-green-700 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 shadow-lg fixed top-0 left-0 right-0 z-40">
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -72,6 +73,11 @@ const MenuTopo = () => {
               isUserMenuOpen={isUserMenuOpen}
               toggleUserMenu={toggleUserMenu}
             />
+
+            {/* Toggle de Tema - Alinhado com os itens de navegação */}
+            <div className="hidden lg:block">
+              <ThemeToggleEnhanced variant="button" />
+            </div>
 
             {/* Botão do menu mobile */}
             <button

@@ -4,10 +4,18 @@ import { auth } from "../../services/firebaseConnection";
 import SEO from "../../components/SEO/SEO";
 import HeroSection from "../../components/HeroSection/HeroSection";
 import { Users, ShoppingBag, Heart, Award } from "lucide-react";
-import fundo from "../../assets/fundo.jpg";
-import logo1 from "../../assets/logo1.png";
+import fundo from "../../assets/fundo.webp";
+import logo1 from "../../assets/logo1.webp";
 
 const Home = () => {
+  // Adicionar classe auth-page para remover espaçamento
+  useEffect(() => {
+    document.body.classList.add('auth-page');
+    return () => {
+      document.body.classList.remove('auth-page');
+    };
+  }, []);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,7 +76,7 @@ const Home = () => {
           "mercado municipal",
           "produtos locais",
         ]}
-        image="/logo.png"
+        image="/logo.webp"
         url={window.location.href}
         type="website"
       />

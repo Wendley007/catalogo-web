@@ -1,10 +1,11 @@
-import banner from "../../assets/banner.jpg";
+import banner from "../../assets/banner.webp";
 import MenuTopo from "../../components/MenuTopo/MenuTopo";
 import Footer from "../../components/Footer";
 import HeroSection from "../../components/HeroSection";
 import { Info } from "lucide-react";
 import { motion } from "framer-motion";
 import SEO from "../../components/SEO/SEO";
+import { useEffect } from "react";
 
 import {
   ArrowUp,
@@ -18,6 +19,14 @@ import {
 } from "lucide-react";
 
 const Historia = () => {
+  // Adicionar classe has-header para espaçamento do MenuTopo
+  useEffect(() => {
+    document.body.classList.add('has-header');
+    return () => {
+      document.body.classList.remove('has-header');
+    };
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -99,7 +108,7 @@ const Historia = () => {
         section="História"
         tags={["feira", "buritizeiro", "história", "tradição", "comunidade"]}
       />
-      <main className="min-h-screen bg-gray-50 scroll-smooth">
+      <main className="min-h-screen bg-gray-50 dark:bg-gray-900 scroll-smooth">
         <MenuTopo />
 
         {/* Hero Section */}
@@ -110,22 +119,22 @@ const Historia = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               <aside className="lg:col-span-1 space-y-8">
                 {/* Card de Informações da Feira */}
-                <section className="bg-white rounded-2xl shadow-lg p-8 sticky top-24 scroll-with-header">
-                  <h2 className="text-3xl lg:text-4xl font-bold text-gradient-primary mb-6">
+                <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 sticky top-24 scroll-with-header">
+                  <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
                     Feira de Buritizeiro
                   </h2>
 
                   <div className="space-y-6">
                     <div className="flex items-start space-x-3">
                       <MapPin
-                        className="text-green-600 mt-1 min-w-[20px]"
+                        className="text-green-600 dark:text-green-400 mt-1 min-w-[20px]"
                         size={20}
                       />
                       <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                           Localização
                         </h3>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
                           Centro da cidade, delimitada pelas ruas Melchior
                           Roquete, Prefeito Antônio Cândido e José Vicente
                         </p>
@@ -133,30 +142,30 @@ const Historia = () => {
                     </div>
 
                     <div className="flex items-start space-x-3">
-                      <Clock className="text-green-600 mt-1" size={20} />
+                      <Clock className="text-green-600 dark:text-green-400 mt-1" size={20} />
                       <div>
-                        <h3 className="font-semibold text-gray-900">Horário</h3>
-                        <p className="text-gray-600 text-sm">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">Horário</h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
                           Domingos das 6h às 12h
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-start space-x-3">
-                      <Calendar className="text-green-600 mt-1" size={20} />
+                      <Calendar className="text-green-600 dark:text-green-400 mt-1" size={20} />
                       <div>
-                        <h3 className="font-semibold text-gray-900">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                           Tradição
                         </h3>
-                        <p className="text-gray-600 text-sm">
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
                           Mais de 40 anos no mesmo local
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-8 p-4 bg-green-50 rounded-lg">
-                    <p className="text-sm text-green-800 leading-relaxed">
+                  <div className="mt-8 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <p className="text-sm text-green-800 dark:text-green-200 leading-relaxed">
                       O terreno arenoso é embelezado por mangueiras de grande
                       porte que conferem um charme único ao ambiente.
                     </p>
@@ -164,8 +173,8 @@ const Historia = () => {
                 </section>
 
                 {/* Card de Características */}
-                <section className="bg-white rounded-2xl shadow-lg p-8 sticky top-24 scroll-with-header">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 sticky top-24 scroll-with-header">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                     Por que escolher nossa feira?
                   </h3>
                   <article className="grid grid-cols-2 gap-4">
@@ -176,15 +185,15 @@ const Historia = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
                         whileHover={{ y: -5 }}
-                        className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 text-center hover:shadow-md transition-all duration-300"
+                        className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-600 rounded-xl p-5 text-center hover:shadow-md transition-all duration-300"
                       >
                         <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mx-auto mb-4">
                           <feature.icon className="text-white" size={18} />
                         </div>
-                        <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
                           {feature.title}
                         </h4>
-                        <p className="text-xs text-gray-600 leading-relaxed">
+                        <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
                           {feature.description}
                         </p>
                       </motion.div>
@@ -198,13 +207,13 @@ const Historia = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
-                  className="bg-white rounded-2xl shadow-lg p-8 mb-8"
+                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 mb-8"
                 >
-                  <h2 className="text-3xl lg:text-4xl font-bold text-gradient-primary mb-6">
-                    Mercado Municipal: Uma Nova Era
+                  <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
+                    Linha do Tempo
                   </h2>
 
-                  <div className="prose prose-lg max-w-none text-gray-700 space-y-6">
+                  <div className="prose prose-lg max-w-none text-gray-700 dark:text-gray-300 space-y-6">
                     <p>
                       O Mercado Municipal representa a nova fase da feira,
                       contando com
@@ -240,9 +249,9 @@ const Historia = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
-                  className="bg-white rounded-2xl shadow-lg p-8"
+                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8"
                 >
-                  <h2 className="text-3xl lg:text-4xl font-bold text-gradient-primary mb-6">
+                  <h2 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-green-600 to-blue-800 dark:from-gray-100 dark:via-green-400 dark:to-blue-400 bg-clip-text text-transparent mb-6">
                     Linha do Tempo
                   </h2>
 
@@ -263,16 +272,16 @@ const Historia = () => {
                           </div>
                         </div>
                         <div className="flex-1">
-                          <div className="bg-gray-50 rounded-lg p-6 hover-lift">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 hover-lift">
                             <div className="flex items-center space-x-2 mb-2">
-                              <span className="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">
+                              <span className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 text-xs font-semibold px-2 py-1 rounded">
                                 {item.year}
                               </span>
                             </div>
-                            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                               {item.title}
                             </h3>
-                            <p className="text-gray-600">{item.description}</p>
+                            <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
                           </div>
                         </div>
                       </motion.div>
@@ -284,7 +293,7 @@ const Historia = () => {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
-                  className="mt-8 bg-gradient-to-r from-green-600 to-green-700 rounded-2xl p-8 text-white text-center"
+                  className="mt-8 bg-gradient-to-r from-green-600 to-green-700 dark:from-green-700 dark:to-green-800 rounded-2xl p-8 text-white text-center"
                 >
                   <h3 className="text-2xl font-bold mb-4">
                     Venha Conhecer o Mercado Municipal
@@ -299,7 +308,7 @@ const Historia = () => {
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={scrollToTop}
-                    className="bg-white text-green-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center space-x-2"
+                    className="bg-white dark:bg-gray-100 text-green-700 dark:text-green-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-200 transition-colors inline-flex items-center space-x-2"
                   >
                     <ArrowUp size={20} />
                     <span>Voltar ao Topo</span>
